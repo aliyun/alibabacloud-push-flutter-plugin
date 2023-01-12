@@ -1,0 +1,141 @@
+package com.aliyun.ams.push;
+
+import java.util.Map;
+
+import com.alibaba.sdk.android.push.MessageReceiver;
+import com.alibaba.sdk.android.push.notification.CPushMessage;
+import com.alibaba.sdk.android.push.notification.NotificationConfigure;
+import com.alibaba.sdk.android.push.notification.PushData;
+
+import android.app.Notification;
+import android.content.Context;
+import android.util.Log;
+import androidx.core.app.NotificationCompat;
+
+/**
+ * @author wangyun
+ * @date 2023/1/12
+ */
+
+public class AliyunPushMessageReceiver extends MessageReceiver {
+
+	// 消息接收部分的LOG_TAG
+	public static final String REC_TAG = "MPS:receiver";
+	//private static final ILog log = PushPluginLogger.getLogger(MyMessageReceiver.class);
+
+	@Override
+	public NotificationConfigure hookNotificationBuild() {
+		return new NotificationConfigure() {
+			@Override
+			public void configBuilder(Notification.Builder builder, PushData pushData) {
+				Log.e(REC_TAG, "configBuilder");
+			}
+
+			@Override
+			public void configBuilder(NotificationCompat.Builder builder, PushData pushData) {
+				Log.e(REC_TAG, "configBuilder");
+			}
+
+			@Override
+			public void configNotification(Notification notification, PushData pushData) {
+				Log.e(REC_TAG, "configNotification");
+			}
+		};
+	}
+
+	@Override
+	public boolean showNotificationNow(Context context, Map<String, String> map) {
+		Log.e(REC_TAG, "foreground " + com.alibaba.sdk.android.push.notification.e.a(context));
+		Log.e(REC_TAG,
+			"show when foreground " + com.alibaba.sdk.android.push.notification.d.a(map));
+		for (Map.Entry<String, String> entry :
+			map.entrySet()) {
+			Log.e(REC_TAG, "key " + entry.getKey() + " value " + entry.getValue());
+		}
+		return true;
+	}
+
+	/**
+	 * 推送通知的回调方法
+	 *
+	 * @param context
+	 * @param title
+	 * @param summary
+	 * @param extraMap
+	 */
+	@Override
+	public void onNotification(Context context, String title, String summary,
+							   Map<String, String> extraMap) {
+		if (null != extraMap) {
+			for (Map.Entry<String, String> entry : extraMap.entrySet()) {
+
+			}
+		} else {
+		}
+	}
+
+	/**
+	 * 应用处于前台时通知到达回调。注意:该方法仅对自定义样式通知有效,相关详情请参考https://help.aliyun.com/document_detail/30066
+	 * .html?spm=5176.product30047.6.620.wjcC87#h3-3-4-basiccustompushnotification-api
+	 *
+	 * @param context
+	 * @param title
+	 * @param summary
+	 * @param extraMap
+	 * @param openType
+	 * @param openActivity
+	 * @param openUrl
+	 */
+	@Override
+	protected void onNotificationReceivedInApp(Context context, String title, String summary,
+											   Map<String, String> extraMap, int openType,
+											   String openActivity, String openUrl) {
+	}
+
+	/**
+	 * 推送消息的回调方法
+	 *
+	 * @param context
+	 * @param cPushMessage
+	 */
+	@Override
+	public void onMessage(Context context, CPushMessage cPushMessage) {
+	}
+
+	/**
+	 * 从通知栏打开通知的扩展处理
+	 *
+	 * @param context
+	 * @param title
+	 * @param summary
+	 * @param extraMap
+	 */
+	@Override
+	public void onNotificationOpened(Context context, String title, String summary,
+									 String extraMap) {
+	}
+
+	/**
+	 * 通知删除回调
+	 *
+	 * @param context
+	 * @param messageId
+	 */
+	@Override
+	public void onNotificationRemoved(Context context, String messageId) {
+	}
+
+	/**
+	 * 无动作通知点击回调。当在后台或阿里云控制台指定的通知动作为无逻辑跳转时,
+	 * 通知点击回调为onNotificationClickedWithNoAction而不是onNotificationOpened
+	 *
+	 * @param context
+	 * @param title
+	 * @param summary
+	 * @param extraMap
+	 */
+	@Override
+	protected void onNotificationClickedWithNoAction(Context context, String title, String summary
+		, String extraMap) {
+	}
+}
