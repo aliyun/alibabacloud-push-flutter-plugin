@@ -2,12 +2,14 @@ package com.aliyun.ams.push;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 import com.alibaba.sdk.android.push.CloudPushService;
 import com.alibaba.sdk.android.push.CommonCallback;
 import com.alibaba.sdk.android.push.noonesdk.PushServiceFactory;
 
 import android.app.Activity;
+import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationChannelGroup;
 import android.app.NotificationManager;
@@ -18,6 +20,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
@@ -45,6 +49,21 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 	private MethodChannel channel;
 	private Context mContext;
 
+	public static AliyunPushPlugin sInstance;
+
+	public AliyunPushPlugin() {
+		sInstance = this;
+	}
+	
+	public void callFlutterMethod(String method, Map<String, Object> arguments) {
+		if (TextUtils.isEmpty(method)) {
+			return;
+		}
+
+		Handler handler = new Handler(Looper.getMainLooper());
+		handler.post(() -> channel.invokeMethod(method, arguments));
+	}
+
 	@Override
 	public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
 		channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "aliyun_push");
@@ -55,8 +74,10 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 	@Override
 	public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
 		String methodName = call.method;
-		if ("setup".equals(methodName)) {
-			setup(result);
+		if ("initPush".equals(methodName)) {
+			initPush(result);
+		} else if ("initThirdPush".equals(methodName)) {
+			initThirdPush(result);
 		} else if ("getDeviceId".equals(methodName)) {
 			getDeviceId(result);
 		} else if ("closePushLog".equals(methodName)) {
@@ -107,7 +128,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 		channel.setMethodCallHandler(null);
 	}
 
-	private void setup(Result result) {
+	private void initPush(Result result) {
 		PushServiceFactory.init(mContext);
 		final CloudPushService pushService = PushServiceFactory.getCloudPushService();
 		pushService.setLogLevel(CloudPushService.LOG_DEBUG);
@@ -148,6 +169,40 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 
 			}
 		});
+	}
+
+	private void initThirdPush(Result result) {
+
+		JSONObject obj = new JSONObject();
+		Context context = mContext.getApplicationContext();
+		if (context instanceof Application) {
+			Application application = (Application)context;
+			AliyunThirdPushUtils.registerHuaweiPush(application);
+			AliyunThirdPushUtils.registerXiaoMiPush(application);
+			AliyunThirdPushUtils.registerVivoPush(application);
+			AliyunThirdPushUtils.registerOppoPush(application);
+			AliyunThirdPushUtils.registerMeizuPush(application);
+			AliyunThirdPushUtils.registerGCM(application);
+			AliyunThirdPushUtils.registerHonorPush(application);
+
+			try {
+				obj.put(CODE_KEY, CODE_SUCCESS);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+
+			result.success(obj.toString());
+		} else {
+			try {
+				obj.put(CODE_KEY, "PUSH_30002");
+				obj.put(ERROR_MSG_KEY, "context is not Application");
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+
+			result.success(obj.toString());
+		}
+
 	}
 
 	private void closePushLog() {

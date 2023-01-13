@@ -31,7 +31,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final _pushPlugin = AliyunPush();
+  final _aliyunPush = AliyunPush();
 
   var _deviceId = "";
 
@@ -45,20 +45,77 @@ class _HomePageState extends State<HomePage> {
     _selectedLogLevel = "DEBUG";
   }
 
+  Future<void> _onAndroidNotification(Map<String, dynamic> message) async {
+    Fluttertoast.showToast(msg: 'onAndroidNotification: $message', gravity: ToastGravity.CENTER);
+  }
+
+  Future<void> _onAndroidNotificationReceivedInApp(
+      Map<String, dynamic> message) async {
+    Fluttertoast.showToast(msg: 'onAndroidNotificationReceivedInApp: $message', gravity: ToastGravity.CENTER);
+  }
+  Future<void> _onAndroidMessage(Map<String, dynamic> message) async {
+    Fluttertoast.showToast(msg: 'onAndroidMessage: $message', gravity: ToastGravity.CENTER);
+  }
+  Future<void> _onAndroidNotificationOpened(
+      Map<String, dynamic> message) async {
+    Fluttertoast.showToast(msg: 'onAndroidNotificationOpened: $message', gravity: ToastGravity.CENTER);
+  }
+  Future<void> _onAndroidNotificationRemoved(
+      Map<String, dynamic> message) async {
+    Fluttertoast.showToast(msg: 'onAndroidNotificationRemoved: $message', gravity: ToastGravity.CENTER);
+  }
+  Future<void> _onAndroidNotificationClickedWithNoAction(
+      Map<String, dynamic> message) async {
+    Fluttertoast.showToast(msg: 'onAndroidNotificationClickedWithNoAction: $message', gravity: ToastGravity.CENTER);
+  }
+
+  _addMessageReceiver() {
+    _aliyunPush.addMessageReceiver(
+        onAndroidNotification: _onAndroidNotification,
+        onAndroidNotificationReceivedInApp: _onAndroidNotificationReceivedInApp,
+        onAndroidMessage: _onAndroidMessage,
+        onAndroidNotificationOpened: _onAndroidNotificationOpened,
+        onAndroidNotificationRemoved: _onAndroidNotificationRemoved,
+        onAndroidNotificationClickedWithNoAction:
+            _onAndroidNotificationClickedWithNoAction);
+  }
+
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initAliyunPush() async {
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    // We also handle the message potentially returning null.
-    _pushPlugin.setup().then((setupResult) {
-      var code = setupResult['code'];
+    _addMessageReceiver();
+
+    _aliyunPush.initAndroidPush().then((initResult) {
+      var code = initResult['code'];
       if (code == kAliyunPushSuccessCode) {
         Fluttertoast.showToast(
-            msg: "Aliyun Push setup successfully",
+            msg: "Init Aliyun Push successfully", gravity: ToastGravity.CENTER);
+      } else {
+        String errorMsg = initResult['errorMsg'];
+        Fluttertoast.showToast(
+            msg: 'Aliyun Push init failed, errorMsg is: $errorMsg',
+            gravity: ToastGravity.CENTER);
+      }
+    });
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) return;
+  }
+
+  Future<void> initAliyunThirdPush() async {
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    // We also handle the message potentially returning null.
+    _aliyunPush.initAndroidThirdPush().then((initResult) {
+      var code = initResult['code'];
+      if (code == kAliyunPushSuccessCode) {
+        Fluttertoast.showToast(
+            msg: "Init Aliyun Third Push successfully",
             gravity: ToastGravity.CENTER);
       } else {
-        String errorMsg = setupResult['errorMsg'];
+        String errorMsg = initResult['errorMsg'];
         Fluttertoast.showToast(
-            msg: 'Aliyun Push setup failed, errorMsg is: $errorMsg',
+            msg: 'Aliyun Third Push init failed, errorMsg is: $errorMsg',
             gravity: ToastGravity.CENTER);
       }
     });
@@ -89,13 +146,19 @@ class _HomePageState extends State<HomePage> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  _pushPlugin.closePushLog();
+                  initAliyunThirdPush();
+                },
+                child: const Text('初始化厂商通道'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  _aliyunPush.closePushLog();
                 },
                 child: const Text('关闭AliyunPush Log'),
               ),
               ElevatedButton(
                   onPressed: () {
-                    _pushPlugin.getDeviceId().then((deviceId) {
+                    _aliyunPush.getDeviceId().then((deviceId) {
                       setState(() {
                         _deviceId = deviceId;
                       });
@@ -151,25 +214,29 @@ class _HomePageState extends State<HomePage> {
                     } else {
                       logLevel = kAliyunPushLogLevelDebug;
                     }
-                    _pushPlugin.setLogLevel(logLevel);
+                    _aliyunPush.setLogLevel(logLevel);
                   },
                   child: Text('设置LogLevel为 $_selectedLogLevel')),
-              ElevatedButton(onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) {
-                    return const CommonApiPage();
-                  }),
-                );
-              }, child: const Text('账号/别名/标签 功能')),
-              ElevatedButton(onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) {
-                    return const AndroidPage();
-                  }),
-                );
-              }, child: const Text('Android平台特定方法'))
+              ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) {
+                        return const CommonApiPage();
+                      }),
+                    );
+                  },
+                  child: const Text('账号/别名/标签 功能')),
+              ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) {
+                        return const AndroidPage();
+                      }),
+                    );
+                  },
+                  child: const Text('Android平台特定方法'))
             ],
           ),
         ),

@@ -18,6 +18,61 @@
             android:value="226c59086b35aaa711eac776e87c617c"
         />
 
+        <!-- 华为通道的参数appid -->
+        <meta-data
+            android:name="com.huawei.hms.client.appid"
+            android:value="appid=104689013" />
+
+        <!-- vivo通道的参数api_key为appkey -->
+        <meta-data
+            android:name="com.vivo.push.api_key"
+            android:value="76bf8c20-a40e-4638-a6b7-28726b280d78" />
+        <meta-data
+            android:name="com.vivo.push.app_id"
+            android:value="16835" />
+
+        <!-- honor通道的参数-->
+        <meta-data
+            android:name="com.hihonor.push.app_id"
+            android:value="220884703" />
+
+        <!-- oppo -->
+        <meta-data
+            android:name="com.oppo.push.key"
+            android:value="9a2d869058e94b3b9ef8ad254d45d722" />
+        <meta-data
+            android:name="com.oppo.push.secret"
+            android:value="e519313fd30545afb8338810b6b941f7" />
+        <!-- 小米-->
+        <meta-data
+            android:name="com.xiaomi.push.id"
+            android:value="2882303761520036460" />
+        <meta-data
+            android:name="com.xiaomi.push.key"
+            android:value="5982003637460" />
+
+        <!-- 魅族-->
+        <meta-data
+            android:name="com.meizu.push.id"
+            android:value="121026" />
+        <meta-data
+            android:name="com.meizu.push.key"
+            android:value="ba7cd1a355d8416dab0142e390170e5a" />
+
+        <!-- fcm -->
+        <meta-data
+            android:name="com.gcm.push.sendid"
+            android:value="908879601644" />
+        <meta-data
+            android:name="com.gcm.push.applicationid"
+            android:value="1:908879601644:android:afa8bdb8e445d644" />
+        <meta-data
+            android:name="com.gcm.push.projectid"
+            android:value="pocdemo-a9db9" />
+        <meta-data
+            android:name="com.gcm.push.api.key"
+            android:value="AIzaSyC2R8V0fy0fkpUPHeURAnp3kgcyRkBbkDo" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

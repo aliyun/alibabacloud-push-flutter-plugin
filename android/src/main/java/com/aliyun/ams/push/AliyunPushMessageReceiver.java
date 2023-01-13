@@ -1,5 +1,6 @@
 package com.aliyun.ams.push;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import com.alibaba.sdk.android.push.MessageReceiver;
@@ -48,11 +49,11 @@ public class AliyunPushMessageReceiver extends MessageReceiver {
 		Log.e(REC_TAG, "foreground " + com.alibaba.sdk.android.push.notification.e.a(context));
 		Log.e(REC_TAG,
 			"show when foreground " + com.alibaba.sdk.android.push.notification.d.a(map));
-		for (Map.Entry<String, String> entry :
-			map.entrySet()) {
+		for (Map.Entry<String, String> entry : map.entrySet()) {
 			Log.e(REC_TAG, "key " + entry.getKey() + " value " + entry.getValue());
 		}
-		return true;
+
+		return super.showNotificationNow(context, map);
 	}
 
 	/**
@@ -66,12 +67,13 @@ public class AliyunPushMessageReceiver extends MessageReceiver {
 	@Override
 	public void onNotification(Context context, String title, String summary,
 							   Map<String, String> extraMap) {
+		Map<String, Object> arguments = new HashMap<>();
 		if (null != extraMap) {
-			for (Map.Entry<String, String> entry : extraMap.entrySet()) {
-
-			}
+			arguments.putAll(extraMap);
 		} else {
 		}
+
+		AliyunPushPlugin.sInstance.callFlutterMethod("onNotification", arguments);
 	}
 
 	/**
@@ -90,6 +92,16 @@ public class AliyunPushMessageReceiver extends MessageReceiver {
 	protected void onNotificationReceivedInApp(Context context, String title, String summary,
 											   Map<String, String> extraMap, int openType,
 											   String openActivity, String openUrl) {
+		Map<String, Object> arguments = new HashMap<>();
+		if (extraMap != null && !extraMap.isEmpty()) {
+			arguments.putAll(extraMap);
+		}
+		arguments.put("title", title);
+		arguments.put("summary", summary);
+		arguments.put("openType", openType);
+		arguments.put("openActivity", openActivity);
+		arguments.put("openUrl", openUrl);
+		AliyunPushPlugin.sInstance.callFlutterMethod("onNotificationReceivedInApp", arguments);
 	}
 
 	/**
@@ -100,6 +112,13 @@ public class AliyunPushMessageReceiver extends MessageReceiver {
 	 */
 	@Override
 	public void onMessage(Context context, CPushMessage cPushMessage) {
+		Map<String, Object> arguments = new HashMap<>();
+		arguments.put("title", cPushMessage.getTitle());
+		arguments.put("content", cPushMessage.getContent());
+		arguments.put("msgId", cPushMessage.getMessageId());
+		arguments.put("appId", cPushMessage.getAppId());
+		arguments.put("traceInfo", cPushMessage.getTraceInfo());
+		AliyunPushPlugin.sInstance.callFlutterMethod("onMessage", arguments);
 	}
 
 	/**
@@ -113,6 +132,11 @@ public class AliyunPushMessageReceiver extends MessageReceiver {
 	@Override
 	public void onNotificationOpened(Context context, String title, String summary,
 									 String extraMap) {
+		Map<String, Object> arguments = new HashMap<>();
+		arguments.put("title", title);
+		arguments.put("summary", summary);
+		arguments.put("extraMap", extraMap);
+		AliyunPushPlugin.sInstance.callFlutterMethod("onNotificationOpened", arguments);
 	}
 
 	/**
@@ -123,6 +147,9 @@ public class AliyunPushMessageReceiver extends MessageReceiver {
 	 */
 	@Override
 	public void onNotificationRemoved(Context context, String messageId) {
+		Map<String, Object> arguments = new HashMap<>();
+		arguments.put("msgId", messageId);
+		AliyunPushPlugin.sInstance.callFlutterMethod("onNotificationRemoved", arguments);
 	}
 
 	/**
@@ -137,5 +164,10 @@ public class AliyunPushMessageReceiver extends MessageReceiver {
 	@Override
 	protected void onNotificationClickedWithNoAction(Context context, String title, String summary
 		, String extraMap) {
+		Map<String, Object> arguments = new HashMap<>();
+		arguments.put("title", title);
+		arguments.put("summary", summary);
+		arguments.put("extraMap", extraMap);
+		AliyunPushPlugin.sInstance.callFlutterMethod("onNotificationClickedWithNoAction", arguments);
 	}
 }

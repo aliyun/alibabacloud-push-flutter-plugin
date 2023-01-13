@@ -84,17 +84,18 @@ class _AndroidPageState extends State<AndroidPage> {
               Fluttertoast.showToast(msg: '通道名称不能为空', gravity: ToastGravity.CENTER);
               return;
             }
+            var channel = _channelController.text;
             _pushPlugin.createAndroidChannel(_channelController.text, '测试通道A', 3, '测试创建通知通道').then((createResult){
               var code = createResult['code'];
               if (code == kAliyunPushSuccessCode) {
                 Fluttertoast.showToast(
-                    msg: '创建AliyunTest通道成功',
+                    msg: '创建$channel通道成功',
                     gravity: ToastGravity.CENTER);
               } else {
                 var errorCode = createResult['code'];
                 var errorMsg = createResult['errorMsg'];
                 Fluttertoast.showToast(
-                    msg: '创建AliyunTest通道失败, $errorCode - $errorMsg',
+                    msg: '创建$channel通道失败, $errorCode - $errorMsg',
                     gravity: ToastGravity.CENTER);
               }
             });
@@ -114,7 +115,7 @@ class _AndroidPageState extends State<AndroidPage> {
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
       child: ElevatedButton(
           onPressed: () async {
-            bool isEnabled = await _pushPlugin.isAndroidNotificationEnabled(id: 'AliyunTest');
+            bool isEnabled = await _pushPlugin.isAndroidNotificationEnabled(id: _channelController.text);
             Fluttertoast.showToast(msg: '通知状态: $isEnabled', gravity: ToastGravity.CENTER);
           },
           child: const Text('检查通知通道状态')),
@@ -131,7 +132,7 @@ class _AndroidPageState extends State<AndroidPage> {
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
       child: ElevatedButton(
           onPressed: () {
-            _pushPlugin.jumpToAndroidNotificationSettings(id: 'AliyunTest');
+            _pushPlugin.jumpToAndroidNotificationSettings(id: _channelController.text);
           },
           child: const Text('跳转通知通道设置界面')),
     ));

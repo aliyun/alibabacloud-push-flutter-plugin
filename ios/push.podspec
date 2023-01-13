@@ -16,6 +16,7 @@ A new Flutter plugin project.
   s.source_files = 'Classes/**/*'
   s.public_header_files = 'Classes/**/*.h'
   s.dependency 'Flutter'
+  s.dependency 'AlicloudPush'
   s.platform = :ios, '9.0'
 
   # Flutter.framework does not contain a i386 slice.

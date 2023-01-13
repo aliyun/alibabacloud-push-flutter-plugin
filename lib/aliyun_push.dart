@@ -1,8 +1,8 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:platform/platform.dart';
 
 const kAliyunPushSuccessCode = "0";
 
@@ -15,10 +15,12 @@ const kAliyunPushLogLevelDebug = 2;
 const kAliyunTargetDevice = 1;
 
 ///本设备绑定账号
-const kAliyunTargetDeviceAccount = 2;
+const kAliyunTargetAccount = 2;
 
 ///别名
 const kAliyunTargetAlias = 3;
+
+typedef Future<dynamic> MessageReceiver(Map<String, dynamic> message);
 
 class AliyunPush {
   @visibleForTesting
@@ -30,13 +32,75 @@ class AliyunPush {
 
   static final AliyunPush _instance = AliyunPush._internal();
 
-  final Platform _platform = const LocalPlatform();
+  ///发出通知的回调
+  MessageReceiver? _onAndroidNotification;
+
+  ///应用处于前台时通知到达回调
+  MessageReceiver? _onAndroidNotificationReceivedInApp;
+
+  ///推送消息的回调方法
+  MessageReceiver? _onAndroidMessage;
+
+  ///从通知栏打开通知的扩展处理
+  MessageReceiver? _onAndroidNotificationOpened;
+
+  ///通知删除回调
+  MessageReceiver? _onAndroidNotificationRemoved;
+
+  ///无动作通知点击回调
+  MessageReceiver? _onAndroidNotificationClickedWithNoAction;
+
+  void addMessageReceiver(
+      {MessageReceiver? onAndroidNotification,
+      MessageReceiver? onAndroidNotificationReceivedInApp,
+      MessageReceiver? onAndroidMessage,
+      MessageReceiver? onAndroidNotificationOpened,
+      MessageReceiver? onAndroidNotificationRemoved,
+      MessageReceiver? onAndroidNotificationClickedWithNoAction}) {
+    _onAndroidNotification = onAndroidNotification;
+    _onAndroidNotificationReceivedInApp = onAndroidNotificationReceivedInApp;
+    _onAndroidMessage = onAndroidMessage;
+    _onAndroidNotificationOpened = onAndroidNotificationOpened;
+    _onAndroidNotificationRemoved = onAndroidNotificationRemoved;
+    _onAndroidNotificationClickedWithNoAction =
+        onAndroidNotificationClickedWithNoAction;
+
+    methodChannel.setMethodCallHandler(_methodCallHandler);
+  }
+
+  Future<dynamic> _methodCallHandler(MethodCall call) async {
+    switch (call.method) {
+      case 'onNotification':
+        return _onAndroidNotification!(call.arguments.cast<String, dynamic>());
+      case 'onNotificationReceivedInApp':
+        return _onAndroidNotificationReceivedInApp!(
+            call.arguments.cast<String, dynamic>());
+      case 'onMessage':
+        return _onAndroidMessage!(call.arguments.cast<String, dynamic>());
+      case 'onNotificationOpened':
+        return _onAndroidNotificationOpened!(
+            call.arguments.cast<String, dynamic>());
+      case 'onNotificationRemoved':
+        return _onAndroidNotificationRemoved!(
+            call.arguments.cast<String, dynamic>());
+      case 'onNotificationClickedWithNoAction':
+        return _onAndroidNotificationClickedWithNoAction!(
+            call.arguments.cast<String, dynamic>());
+    }
+  }
 
   ///注册推送
-  Future<Map<String, dynamic>> setup() async {
-    var resultJson = await methodChannel.invokeMethod('setup');
-    Map<String, dynamic> setupResult = jsonDecode(resultJson);
-    return setupResult;
+  Future<Map<String, dynamic>> initAndroidPush() async {
+    var resultJson = await methodChannel.invokeMethod('initPush');
+    Map<String, dynamic> initResult = jsonDecode(resultJson);
+    return initResult;
+  }
+
+  ///注册厂商通道
+  Future<Map<String, dynamic>> initAndroidThirdPush() async {
+    var resultJson = await methodChannel.invokeMethod('initThirdPush');
+    Map<String, dynamic> initResult = jsonDecode(resultJson);
+    return initResult;
   }
 
   void closePushLog() {
@@ -129,6 +193,7 @@ class AliyunPush {
     return listResult;
   }
 
+  ///绑定手机号码
   Future<Map<String, dynamic>> bindPhoneNumber(String phone) async {
     var resultJson =
         await methodChannel.invokeMethod('bindPhoneNumber', {'phone': phone});
@@ -136,6 +201,7 @@ class AliyunPush {
     return bindResult;
   }
 
+  ///绑定手机号码
   Future<Map<String, dynamic>> unbindPhoneNumber() async {
     var resultJson = await methodChannel.invokeMethod('unbindPhoneNumber');
     Map<String, dynamic> unbindResult = jsonDecode(resultJson);
@@ -146,13 +212,17 @@ class AliyunPush {
   ///
   ///@param inGroup 是否分组折叠展示
   void setNotificationInGroup(bool inGroup) {
-    if (!_platform.isAndroid) {
+    if (!Platform.isAndroid) {
       return;
     }
     methodChannel.invokeMethod('setNotificationInGroup', {'inGroup': inGroup});
   }
 
+  ///清除所有通知
   void clearNotifications() {
+    if (!Platform.isAndroid) {
+      return;
+    }
     methodChannel.invokeMethod('clearNotifications');
   }
 
@@ -170,6 +240,9 @@ class AliyunPush {
       int? soundFlag,
       bool? vibration,
       List<int>? vibrationPatterns}) async {
+    if (!Platform.isAndroid) {
+      return {'code': 'PUSH_31000', 'errorMsg': 'Only support Android'};
+    }
     var resultJson = await methodChannel.invokeMethod('createChannel', {
       'id': id,
       'name': name,
@@ -191,21 +264,90 @@ class AliyunPush {
     return createResult;
   }
 
+  ///创建通知通道的分组
   Future<Map<String, dynamic>> createAndroidChannelGroup(
       String id, String name, String desc) async {
+    if (!Platform.isAndroid) {
+      return {'code': 'PUSH_31000', 'errorMsg': 'Only support Android'};
+    }
     var resultJson = await methodChannel.invokeMethod(
         'createChannelGroup', {'id': id, 'name': name, 'desc': desc});
     Map<String, dynamic> createResult = jsonDecode(resultJson);
     return createResult;
   }
 
-  Future<bool> isAndroidNotificationEnabled(String id) async {
+  ///检查通知状态
+  ///
+  ///@param id 通道的id
+  Future<bool> isAndroidNotificationEnabled({String? id}) async {
+    if (!Platform.isAndroid) {
+      return false;
+    }
     bool enabled =
         await methodChannel.invokeMethod('isNotificationEnabled', {'id': id});
     return enabled;
   }
 
+  ///跳转到通知设置页面
   void jumpToAndroidNotificationSettings({String? id}) {
+    if (!Platform.isAndroid) {
+      return;
+    }
     methodChannel.invokeMethod('jumpToNotificationSettings');
+  }
+
+  ///注册Android各厂商通道
+  ///
+
+  Future<Map<String, dynamic>> initIOSPush() async {
+    if (!Platform.isIOS) {
+      return {'code': 'PUSH_31000', 'errorMsg': 'Only support iOS'};
+    }
+    var resultJson = await methodChannel.invokeMethod('initPushSdk');
+    Map<String, dynamic> initResult = jsonDecode(resultJson);
+    return initResult;
+  }
+
+  ///开启iOS的debug日志
+  void turnOnIOSDebug() {
+    if (!Platform.isIOS) {
+      return;
+    }
+    methodChannel.invokeMethod('turnOnDebug');
+  }
+
+  void showIOSNoticeWhenForground(bool enable) {
+    if (!Platform.isIOS) {
+      return;
+    }
+    methodChannel.invokeMethod('showNoticeWhenForground', {'enable': enable});
+  }
+
+  void registerAPNS() {
+    if (!Platform.isIOS) {
+      return;
+    }
+    methodChannel.invokeMethod('registerAPNS');
+  }
+
+  void registerDevice() {
+    if (!Platform.isIOS) {
+      return;
+    }
+    methodChannel.invokeMethod('registerDevice');
+  }
+
+  void setIOSBadgeNum(int num) {
+    if (!Platform.isIOS) {
+      return;
+    }
+    methodChannel.invokeMethod('setBadgeNum', {'badgeNum': num});
+  }
+
+  void syncIOSBadgeNum() {
+    if (!Platform.isIOS) {
+      return;
+    }
+    methodChannel.invokeMethod('syncBadgeNum');
   }
 }

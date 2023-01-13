@@ -128,13 +128,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.8.2"
-  platform:
-    dependency: transitive
-    description:
-      name: platform
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "3.1.0"
   plugin_platform_interface:
     dependency: transitive
     description:
