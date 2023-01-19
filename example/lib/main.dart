@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:push/aliyun_push.dart';
+import 'package:aliyun_push/aliyun_push.dart';
 import 'package:push_example/ios.dart';
 
 import 'android.dart';

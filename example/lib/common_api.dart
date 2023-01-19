@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:push/aliyun_push.dart';
+import 'package:aliyun_push/aliyun_push.dart';
 
 class CommonApiPage extends StatefulWidget {
   const CommonApiPage({super.key});

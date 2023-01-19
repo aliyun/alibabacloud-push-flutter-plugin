@@ -1,7 +1,7 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:push/aliyun_push.dart';
+import 'package:aliyun_push/aliyun_push.dart';
 
 class AndroidPage extends StatefulWidget {
   const AndroidPage({super.key});
