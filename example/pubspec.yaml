@@ -18,7 +18,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  push:
+  aliyun_push:
     # When depending on this package from a real application you should use:
     #   push: ^x.y.z
     # See https://dart.dev/tools/pub/dependencies#version-constraints
@@ -85,3 +85,5 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+

@@ -1,7 +1,7 @@
-name: push
-description: A new Flutter plugin project.
+name: aliyun_push
+description: Aliyun Push Flutter plugin.
 version: 0.0.1
-homepage:
+homepage: https://help.aliyun.com/document_detail/434552.html
 
 environment:
   sdk: '>=2.18.5 <3.0.0'
@@ -17,10 +17,6 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^2.0.0
 
-# For information on the generic Dart part of this file, see the
-# following page: https://dart.dev/tools/pub/pubspec
-
-# The following section is specific to Flutter packages.
 flutter:
   # This section identifies this Flutter project as a plugin project.
   # The 'pluginClass' specifies the class (in Java, Kotlin, Swift, Objective-C, etc.)
