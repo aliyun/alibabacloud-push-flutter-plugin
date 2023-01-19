@@ -6,6 +6,11 @@ import 'package:flutter/services.dart';
 
 const kAliyunPushSuccessCode = "0";
 
+///参数错误
+const kAliyunPushParamsIllegal = "-1";
+
+const kAliyunPushFailedCode = "-2";
+
 ///LogLevel
 const kAliyunPushLogLevelError = 0;
 const kAliyunPushLogLevelInfo = 1;
@@ -20,7 +25,7 @@ const kAliyunTargetAccount = 2;
 ///别名
 const kAliyunTargetAlias = 3;
 
-typedef Future<dynamic> MessageReceiver(Map<String, dynamic> message);
+typedef PushCallback = Future<dynamic> Function(Map<String, dynamic> message);
 
 class AliyunPush {
   @visibleForTesting
@@ -33,37 +38,52 @@ class AliyunPush {
   static final AliyunPush _instance = AliyunPush._internal();
 
   ///发出通知的回调
-  MessageReceiver? _onAndroidNotification;
+  PushCallback? _onNotification;
 
   ///应用处于前台时通知到达回调
-  MessageReceiver? _onAndroidNotificationReceivedInApp;
+  PushCallback? _onAndroidNotificationReceivedInApp;
 
   ///推送消息的回调方法
-  MessageReceiver? _onAndroidMessage;
+  PushCallback? _onMessage;
 
   ///从通知栏打开通知的扩展处理
-  MessageReceiver? _onAndroidNotificationOpened;
+  PushCallback? _onNotificationOpened;
 
   ///通知删除回调
-  MessageReceiver? _onAndroidNotificationRemoved;
+  PushCallback? _onNotificationRemoved;
 
   ///无动作通知点击回调
-  MessageReceiver? _onAndroidNotificationClickedWithNoAction;
+  PushCallback? _onAndroidNotificationClickedWithNoAction;
+
+  ///iOS通知打开回调
+  PushCallback? _onIOSChannelOpened;
+
+  ///APNs注册成功回调
+  PushCallback? _onIOSRegisterDeviceTokenSuccess;
+
+  ///APNs注册失败回调
+  PushCallback? _onIOSRegisterDeviceTokenFailed;
 
   void addMessageReceiver(
-      {MessageReceiver? onAndroidNotification,
-      MessageReceiver? onAndroidNotificationReceivedInApp,
-      MessageReceiver? onAndroidMessage,
-      MessageReceiver? onAndroidNotificationOpened,
-      MessageReceiver? onAndroidNotificationRemoved,
-      MessageReceiver? onAndroidNotificationClickedWithNoAction}) {
-    _onAndroidNotification = onAndroidNotification;
+      {PushCallback? onNotification,
+      PushCallback? onMessage,
+      PushCallback? onNotificationOpened,
+      PushCallback? onNotificationRemoved,
+      PushCallback? onAndroidNotificationReceivedInApp,
+      PushCallback? onAndroidNotificationClickedWithNoAction,
+      PushCallback? onIOSChannelOpened,
+      PushCallback? onIOSRegisterDeviceTokenSuccess,
+      PushCallback? onIOSRegisterDeviceTokenFailed}) {
+    _onNotification = onNotification;
     _onAndroidNotificationReceivedInApp = onAndroidNotificationReceivedInApp;
-    _onAndroidMessage = onAndroidMessage;
-    _onAndroidNotificationOpened = onAndroidNotificationOpened;
-    _onAndroidNotificationRemoved = onAndroidNotificationRemoved;
+    _onMessage = onMessage;
+    _onNotificationOpened = onNotificationOpened;
+    _onNotificationRemoved = onNotificationRemoved;
     _onAndroidNotificationClickedWithNoAction =
         onAndroidNotificationClickedWithNoAction;
+    _onIOSChannelOpened = onIOSChannelOpened;
+    _onIOSRegisterDeviceTokenSuccess = onIOSRegisterDeviceTokenSuccess;
+    _onIOSRegisterDeviceTokenFailed = onIOSRegisterDeviceTokenFailed;
 
     methodChannel.setMethodCallHandler(_methodCallHandler);
   }
@@ -71,29 +91,43 @@ class AliyunPush {
   Future<dynamic> _methodCallHandler(MethodCall call) async {
     switch (call.method) {
       case 'onNotification':
-        return _onAndroidNotification!(call.arguments.cast<String, dynamic>());
+        return _onNotification!(call.arguments.cast<String, dynamic>());
       case 'onNotificationReceivedInApp':
         return _onAndroidNotificationReceivedInApp!(
             call.arguments.cast<String, dynamic>());
       case 'onMessage':
-        return _onAndroidMessage!(call.arguments.cast<String, dynamic>());
+        return _onMessage!(call.arguments.cast<String, dynamic>());
       case 'onNotificationOpened':
-        return _onAndroidNotificationOpened!(
-            call.arguments.cast<String, dynamic>());
+        return _onNotificationOpened!(call.arguments.cast<String, dynamic>());
       case 'onNotificationRemoved':
-        return _onAndroidNotificationRemoved!(
-            call.arguments.cast<String, dynamic>());
+        return _onNotificationRemoved!(call.arguments.cast<String, dynamic>());
       case 'onNotificationClickedWithNoAction':
         return _onAndroidNotificationClickedWithNoAction!(
+            call.arguments.cast<String, dynamic>());
+      case 'onChannelOpened':
+        return _onIOSChannelOpened!(call.arguments.cast<String, dynamic>());
+      case 'onRegisterDeviceTokenSuccess':
+        return _onIOSRegisterDeviceTokenSuccess!(
+            call.arguments.cast<String, dynamic>());
+      case 'onRegisterDeviceTokenFailed':
+        return _onIOSRegisterDeviceTokenFailed!(
             call.arguments.cast<String, dynamic>());
     }
   }
 
   ///注册推送
-  Future<Map<String, dynamic>> initAndroidPush() async {
-    var resultJson = await methodChannel.invokeMethod('initPush');
-    Map<String, dynamic> initResult = jsonDecode(resultJson);
-    return initResult;
+  Future<Map<String, dynamic>> initPush(
+      {String? appKey, String? appSecret}) async {
+    if (Platform.isIOS) {
+      var resultJson = await methodChannel.invokeMethod(
+          'initPushSdk', {'appKey': appKey, 'appSecret': appSecret});
+      Map<String, dynamic> initResult = jsonDecode(resultJson);
+      return initResult;
+    } else {
+      var resultJson = await methodChannel.invokeMethod('initPush');
+      Map<String, dynamic> initResult = jsonDecode(resultJson);
+      return initResult;
+    }
   }
 
   ///注册厂商通道
@@ -114,7 +148,7 @@ class AliyunPush {
   }
 
   ///设置log的级别
-  void setLogLevel(int level) {
+  void setAndroidLogLevel(int level) {
     methodChannel.invokeMethod('setLogLevel', {'level': level});
   }
 
@@ -296,18 +330,6 @@ class AliyunPush {
     methodChannel.invokeMethod('jumpToNotificationSettings');
   }
 
-  ///注册Android各厂商通道
-  ///
-
-  Future<Map<String, dynamic>> initIOSPush() async {
-    if (!Platform.isIOS) {
-      return {'code': 'PUSH_31000', 'errorMsg': 'Only support iOS'};
-    }
-    var resultJson = await methodChannel.invokeMethod('initPushSdk');
-    Map<String, dynamic> initResult = jsonDecode(resultJson);
-    return initResult;
-  }
-
   ///开启iOS的debug日志
   void turnOnIOSDebug() {
     if (!Platform.isIOS) {
@@ -316,25 +338,11 @@ class AliyunPush {
     methodChannel.invokeMethod('turnOnDebug');
   }
 
-  void showIOSNoticeWhenForground(bool enable) {
+  void showIOSNoticeWhenForeground(bool enable) {
     if (!Platform.isIOS) {
       return;
     }
-    methodChannel.invokeMethod('showNoticeWhenForground', {'enable': enable});
-  }
-
-  void registerAPNS() {
-    if (!Platform.isIOS) {
-      return;
-    }
-    methodChannel.invokeMethod('registerAPNS');
-  }
-
-  void registerDevice() {
-    if (!Platform.isIOS) {
-      return;
-    }
-    methodChannel.invokeMethod('registerDevice');
+    methodChannel.invokeMethod('showNoticeWhenForeground', {'enable': enable});
   }
 
   void setIOSBadgeNum(int num) {
@@ -344,10 +352,24 @@ class AliyunPush {
     methodChannel.invokeMethod('setBadgeNum', {'badgeNum': num});
   }
 
-  void syncIOSBadgeNum() {
+  void syncIOSBadgeNum(int num) {
     if (!Platform.isIOS) {
       return;
     }
-    methodChannel.invokeMethod('syncBadgeNum');
+    methodChannel.invokeMethod('syncBadgeNum', {'badgeNum': num});
+  }
+
+  Future<String> getApnsDeviceToken() async {
+    if (!Platform.isIOS) {
+      return '';
+    }
+    var apnsDeviceToken =
+        await methodChannel.invokeMethod('getApnsDeviceToken');
+    return apnsDeviceToken;
+  }
+
+  Future<bool> isIOSChannelOpened() async {
+    var opened = await methodChannel.invokeMethod('isChannelOpened');
+    return opened;
   }
 }

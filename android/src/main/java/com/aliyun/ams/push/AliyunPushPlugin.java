@@ -42,6 +42,7 @@ import org.json.JSONObject;
 public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 
 	private static final String CODE_SUCCESS = "0";
+	private static final String CODE_PARAM_ILLEGAL = "-1";
 
 	private static final String CODE_KEY = "code";
 	private static final String ERROR_MSG_KEY = "code";
@@ -118,7 +119,13 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 			if (VERSION.SDK_INT >= VERSION_CODES.O) {
 				jumpToAndroidNotificationSettings(call);
 			}
-		} else {
+		} else if ("setPluginLogEnabled".equals(methodName)) {
+			Boolean enabled = call.argument("enabled");
+			if (enabled != null) {
+				AliyunPushLog.setLogEnabled(enabled);
+			}
+		}
+		else {
 			result.notImplemented();
 		}
 	}
@@ -229,7 +236,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 		JSONObject obj = new JSONObject();
 		if (TextUtils.isEmpty(account)) {
 			try {
-				obj.put(CODE_KEY, "PUSH_20101");
+				obj.put(CODE_KEY, CODE_PARAM_ILLEGAL);
 				obj.put(ERROR_MSG_KEY, "account can not be empty");
 				result.success(obj.toString());
 			} catch (JSONException e) {
@@ -296,7 +303,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 		String alias = call.argument("alias");
 		if (TextUtils.isEmpty(alias)) {
 			try {
-				obj.put(CODE_KEY, "PUSH_20101");
+				obj.put(CODE_KEY, CODE_PARAM_ILLEGAL);
 				obj.put(ERROR_MSG_KEY, "alias can not be empty");
 				result.success(obj.toString());
 			} catch (JSONException e) {
@@ -334,7 +341,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 		String alias = call.argument("alias");
 		if (TextUtils.isEmpty(alias)) {
 			try {
-				obj.put(CODE_KEY, "PUSH_20101");
+				obj.put(CODE_KEY, CODE_PARAM_ILLEGAL);
 				obj.put(ERROR_MSG_KEY, "alias can not be empty");
 				result.success(obj.toString());
 			} catch (JSONException e) {
@@ -376,7 +383,6 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 				try {
 					obj.put(CODE_KEY, CODE_SUCCESS);
 					obj.put("alias_list", response);
-					Log.d("wy", "alias list is: " + response);
 					result.success(obj.toString());
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -401,7 +407,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 		JSONObject obj = new JSONObject();
 		if (tags == null || tags.isEmpty()) {
 			try {
-				obj.put(CODE_KEY, "PUSH_20101");
+				obj.put(CODE_KEY, CODE_PARAM_ILLEGAL);
 				obj.put(ERROR_MSG_KEY, "tags can not be empty");
 				result.success(obj.toString());
 			} catch (JSONException e) {
@@ -447,7 +453,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 		JSONObject obj = new JSONObject();
 		if (tags == null || tags.isEmpty()) {
 			try {
-				obj.put(CODE_KEY, "PUSH_20101");
+				obj.put(CODE_KEY, CODE_PARAM_ILLEGAL);
 				obj.put(ERROR_MSG_KEY, "tags can not be empty");
 				result.success(obj.toString());
 			} catch (JSONException e) {
@@ -526,7 +532,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 		String alias = call.argument("phone");
 		if (TextUtils.isEmpty(alias)) {
 			try {
-				obj.put(CODE_KEY, "PUSH_20101");
+				obj.put(CODE_KEY, CODE_PARAM_ILLEGAL);
 				obj.put(ERROR_MSG_KEY, "phone number can not be empty");
 				result.success(obj.toString());
 			} catch (JSONException e) {

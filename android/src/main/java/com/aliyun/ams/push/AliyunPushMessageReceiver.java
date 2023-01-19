@@ -22,35 +22,34 @@ public class AliyunPushMessageReceiver extends MessageReceiver {
 
 	// 消息接收部分的LOG_TAG
 	public static final String REC_TAG = "MPS:receiver";
-	//private static final ILog log = PushPluginLogger.getLogger(MyMessageReceiver.class);
 
 	@Override
 	public NotificationConfigure hookNotificationBuild() {
 		return new NotificationConfigure() {
 			@Override
 			public void configBuilder(Notification.Builder builder, PushData pushData) {
-				Log.e(REC_TAG, "configBuilder");
+				AliyunPushLog.e(REC_TAG, "configBuilder");
 			}
 
 			@Override
 			public void configBuilder(NotificationCompat.Builder builder, PushData pushData) {
-				Log.e(REC_TAG, "configBuilder");
+				AliyunPushLog.e(REC_TAG, "configBuilder");
 			}
 
 			@Override
 			public void configNotification(Notification notification, PushData pushData) {
-				Log.e(REC_TAG, "configNotification");
+				AliyunPushLog.e(REC_TAG, "configNotification");
 			}
 		};
 	}
 
 	@Override
 	public boolean showNotificationNow(Context context, Map<String, String> map) {
-		Log.e(REC_TAG, "foreground " + com.alibaba.sdk.android.push.notification.e.a(context));
-		Log.e(REC_TAG,
+		AliyunPushLog.e(REC_TAG, "foreground " + com.alibaba.sdk.android.push.notification.e.a(context));
+		AliyunPushLog.e(REC_TAG,
 			"show when foreground " + com.alibaba.sdk.android.push.notification.d.a(map));
 		for (Map.Entry<String, String> entry : map.entrySet()) {
-			Log.e(REC_TAG, "key " + entry.getKey() + " value " + entry.getValue());
+			AliyunPushLog.e(REC_TAG, "key " + entry.getKey() + " value " + entry.getValue());
 		}
 
 		return super.showNotificationNow(context, map);

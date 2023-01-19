@@ -1,9 +1,10 @@
 import 'dart:async';
+import 'dart:io';
 
-import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:push/aliyun_push.dart';
+import 'package:push_example/ios.dart';
 
 import 'android.dart';
 import 'common_api.dart';
@@ -35,56 +36,96 @@ class _HomePageState extends State<HomePage> {
 
   var _deviceId = "";
 
-  final List<String> _logLevelList = ['ERROR', 'INFO', 'DEBUG'];
-
-  String? _selectedLogLevel;
-
   @override
   void initState() {
     super.initState();
-    _selectedLogLevel = "DEBUG";
+    if (Platform.isAndroid) {
+      _aliyunPush.createAndroidChannel('8.0up', '测试通道A', 3, '测试创建通知通道');
+    }
   }
 
-  Future<void> _onAndroidNotification(Map<String, dynamic> message) async {
-    Fluttertoast.showToast(msg: 'onAndroidNotification: $message', gravity: ToastGravity.CENTER);
+  Future<void> _onNotification(Map<String, dynamic> message) async {
+    Fluttertoast.showToast(
+        msg: 'onNotification: $message', gravity: ToastGravity.CENTER);
   }
 
   Future<void> _onAndroidNotificationReceivedInApp(
       Map<String, dynamic> message) async {
-    Fluttertoast.showToast(msg: 'onAndroidNotificationReceivedInApp: $message', gravity: ToastGravity.CENTER);
-  }
-  Future<void> _onAndroidMessage(Map<String, dynamic> message) async {
-    Fluttertoast.showToast(msg: 'onAndroidMessage: $message', gravity: ToastGravity.CENTER);
-  }
-  Future<void> _onAndroidNotificationOpened(
-      Map<String, dynamic> message) async {
-    Fluttertoast.showToast(msg: 'onAndroidNotificationOpened: $message', gravity: ToastGravity.CENTER);
-  }
-  Future<void> _onAndroidNotificationRemoved(
-      Map<String, dynamic> message) async {
-    Fluttertoast.showToast(msg: 'onAndroidNotificationRemoved: $message', gravity: ToastGravity.CENTER);
-  }
-  Future<void> _onAndroidNotificationClickedWithNoAction(
-      Map<String, dynamic> message) async {
-    Fluttertoast.showToast(msg: 'onAndroidNotificationClickedWithNoAction: $message', gravity: ToastGravity.CENTER);
+    Fluttertoast.showToast(
+        msg: 'onAndroidNotificationReceivedInApp: $message',
+        gravity: ToastGravity.CENTER);
   }
 
-  _addMessageReceiver() {
+  Future<void> _onMessage(Map<String, dynamic> message) async {
+    Fluttertoast.showToast(
+        msg: 'onMessage: $message', gravity: ToastGravity.CENTER);
+  }
+
+  Future<void> _onNotificationOpened(Map<String, dynamic> message) async {
+    Fluttertoast.showToast(
+        msg: 'onNotificationOpened: $message', gravity: ToastGravity.CENTER);
+  }
+
+  Future<void> _onNotificationRemoved(Map<String, dynamic> message) async {
+    Fluttertoast.showToast(
+        msg: 'onNotificationRemoved: $message', gravity: ToastGravity.CENTER);
+  }
+
+  Future<void> _onAndroidNotificationClickedWithNoAction(
+      Map<String, dynamic> message) async {
+    Fluttertoast.showToast(
+        msg: 'onAndroidNotificationClickedWithNoAction: $message',
+        gravity: ToastGravity.CENTER);
+  }
+
+  Future<void> _onIOSChannelOpened(Map<String, dynamic> message) async {
+    Fluttertoast.showToast(
+        msg: 'onIOSChannelOpened: $message', gravity: ToastGravity.CENTER);
+  }
+
+  Future<void> _onIOSRegisterDeviceTokenSuccess(
+      Map<String, dynamic> message) async {
+    Fluttertoast.showToast(
+        msg: 'onIOSRegisterDeviceTokenSuccess: $message',
+        gravity: ToastGravity.CENTER);
+  }
+
+  Future<void> _onIOSRegisterDeviceTokenFailed(
+      Map<String, dynamic> message) async {
+    Fluttertoast.showToast(
+        msg: 'onIOSRegisterDeviceTokenFailed: $message',
+        gravity: ToastGravity.CENTER);
+  }
+
+  _addPushCallback() {
     _aliyunPush.addMessageReceiver(
-        onAndroidNotification: _onAndroidNotification,
+        onNotification: _onNotification,
+        onNotificationOpened: _onNotificationOpened,
+        onNotificationRemoved: _onNotificationRemoved,
+        onMessage: _onMessage,
         onAndroidNotificationReceivedInApp: _onAndroidNotificationReceivedInApp,
-        onAndroidMessage: _onAndroidMessage,
-        onAndroidNotificationOpened: _onAndroidNotificationOpened,
-        onAndroidNotificationRemoved: _onAndroidNotificationRemoved,
         onAndroidNotificationClickedWithNoAction:
-            _onAndroidNotificationClickedWithNoAction);
+            _onAndroidNotificationClickedWithNoAction,
+        onIOSChannelOpened: _onIOSChannelOpened,
+        onIOSRegisterDeviceTokenSuccess: _onIOSRegisterDeviceTokenSuccess,
+        onIOSRegisterDeviceTokenFailed: _onIOSRegisterDeviceTokenFailed);
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initAliyunPush() async {
-    _addMessageReceiver();
+    _addPushCallback();
 
-    _aliyunPush.initAndroidPush().then((initResult) {
+    String appKey;
+    String appSecret;
+    if (Platform.isIOS) {
+      appKey = "23793506";
+      appSecret = "226c59086b35aaa711eac776e87c617c";
+    } else {
+      appKey = "";
+      appSecret = "";
+    }
+
+    _aliyunPush.initPush(appKey: appKey, appSecret: appSecret).then((initResult) {
       var code = initResult['code'];
       if (code == kAliyunPushSuccessCode) {
         Fluttertoast.showToast(
@@ -144,18 +185,13 @@ class _HomePageState extends State<HomePage> {
                 },
                 child: const Text('初始化AliyunPush'),
               ),
-              ElevatedButton(
-                onPressed: () {
-                  initAliyunThirdPush();
-                },
-                child: const Text('初始化厂商通道'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  _aliyunPush.closePushLog();
-                },
-                child: const Text('关闭AliyunPush Log'),
-              ),
+              if (Platform.isAndroid)
+                ElevatedButton(
+                  onPressed: () {
+                    initAliyunThirdPush();
+                  },
+                  child: const Text('初始化厂商通道'),
+                ),
               ElevatedButton(
                   onPressed: () {
                     _aliyunPush.getDeviceId().then((deviceId) {
@@ -170,53 +206,6 @@ class _HomePageState extends State<HomePage> {
                   "deviceId: $_deviceId",
                   style: const TextStyle(fontSize: 16),
                 ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton2(
-                    hint: Text(
-                      'Select Item',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Theme.of(context).hintColor,
-                      ),
-                    ),
-                    items: _logLevelList
-                        .map((item) => DropdownMenuItem<String>(
-                              value: item,
-                              child: Text(
-                                item,
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ))
-                        .toList(),
-                    value: _selectedLogLevel,
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedLogLevel = value as String;
-                      });
-                    },
-                    buttonHeight: 40,
-                    buttonWidth: 140,
-                    itemHeight: 40,
-                  ),
-                ),
-              ),
-              ElevatedButton(
-                  onPressed: () {
-                    int logLevel;
-                    if (_selectedLogLevel == 'ERROR') {
-                      logLevel = kAliyunPushLogLevelError;
-                    } else if (_selectedLogLevel == 'INFO') {
-                      logLevel = kAliyunPushLogLevelInfo;
-                    } else {
-                      logLevel = kAliyunPushLogLevelDebug;
-                    }
-                    _aliyunPush.setLogLevel(logLevel);
-                  },
-                  child: Text('设置LogLevel为 $_selectedLogLevel')),
               ElevatedButton(
                   onPressed: () {
                     Navigator.push(
@@ -236,7 +225,17 @@ class _HomePageState extends State<HomePage> {
                       }),
                     );
                   },
-                  child: const Text('Android平台特定方法'))
+                  child: const Text('Android平台特定方法')),
+              ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) {
+                        return const IOSPage();
+                      }),
+                    );
+                  },
+                  child: const Text('iOS平台特定方法'))
             ],
           ),
         ),
