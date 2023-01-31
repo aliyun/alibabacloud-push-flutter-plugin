@@ -19,21 +19,30 @@ class _IOSPageState extends State<IOSPage> {
   @override
   Widget build(BuildContext context) {
     List<Widget> children = [];
-    children.add(ElevatedButton(
-        onPressed: () {
-          _aliyunPush.turnOnIOSDebug();
-        },
-        child: const Text('打开debug日志')));
-    children.add(ElevatedButton(
-        onPressed: () {
-          _aliyunPush.showIOSNoticeWhenForeground(true);
-        },
-        child: const Text('前台显示通知')));
-    children.add(ElevatedButton(
-        onPressed: () {
-          _aliyunPush.showIOSNoticeWhenForeground(false);
-        },
-        child: const Text('前台不显示通知')));
+    children.add(Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+      child: ElevatedButton(
+          onPressed: () {
+            _aliyunPush.turnOnIOSDebug();
+          },
+          child: const Text('打开debug日志')),
+    ));
+    children.add(Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+      child: ElevatedButton(
+          onPressed: () {
+            _aliyunPush.showIOSNoticeWhenForeground(true);
+          },
+          child: const Text('前台显示通知')),
+    ));
+    children.add(Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+      child: ElevatedButton(
+          onPressed: () {
+            _aliyunPush.showIOSNoticeWhenForeground(false);
+          },
+          child: const Text('前台不显示通知')),
+    ));
     children.add(
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10.0),
@@ -76,26 +85,31 @@ class _IOSPageState extends State<IOSPage> {
           },
           child: const Text('同步角标个数')),
     ));
-    children.add(ElevatedButton(
-        onPressed: () {
-          _aliyunPush.getApnsDeviceToken().then((apnsToken) {
-            setState(() {
-              _apnsToken = apnsToken;
+    children.add(Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: ElevatedButton(
+          onPressed: () {
+            _aliyunPush.getApnsDeviceToken().then((apnsToken) {
+              setState(() {
+                _apnsToken = apnsToken;
+              });
             });
-          });
-        },
-        child: const Text('查询ApnsToken')));
+          },
+          child: const Text('查询ApnsToken')),
+    ));
     children
-        .add(ElevatedButton(onPressed: () {
-          _aliyunPush.isIOSChannelOpened().then((opened) {
-            print('opened $opened');
-            if (opened) {
-              Fluttertoast.showToast(msg: '通道已打开', gravity: ToastGravity.CENTER);
-            } else {
-              Fluttertoast.showToast(msg: '通道未打开', gravity: ToastGravity.CENTER);
-            }
-          });
-    }, child: const Text('通知通道是否打开')));
+        .add(Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ElevatedButton(onPressed: () {
+            _aliyunPush.isIOSChannelOpened().then((opened) {
+              if (opened) {
+                Fluttertoast.showToast(msg: '通道已打开', gravity: ToastGravity.CENTER);
+              } else {
+                Fluttertoast.showToast(msg: '通道未打开', gravity: ToastGravity.CENTER);
+              }
+            });
+    }, child: const Text('通知通道是否打开')),
+        ));
     if (_apnsToken != "") {
       children.add(Text(
         "apnsToken: $_apnsToken",

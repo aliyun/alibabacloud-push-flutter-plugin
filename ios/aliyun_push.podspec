@@ -3,11 +3,11 @@
 # Run `pod lib lint push.podspec` to validate before publishing.
 #
 Pod::Spec.new do |s|
-  s.name             = 'push'
+  s.name             = 'aliyun_push'
   s.version          = '0.0.1'
   s.summary          = 'A new Flutter plugin project.'
   s.description      = <<-DESC
-A new Flutter plugin project.
+Aliyun Push Flutter Plugin.
                        DESC
   s.homepage         = 'http://example.com'
   s.license          = { :file => '../LICENSE' }
