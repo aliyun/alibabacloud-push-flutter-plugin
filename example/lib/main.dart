@@ -125,7 +125,9 @@ class _HomePageState extends State<HomePage> {
       appSecret = "";
     }
 
-    _aliyunPush.initPush(appKey: appKey, appSecret: appSecret).then((initResult) {
+    _aliyunPush
+        .initPush(appKey: appKey, appSecret: appSecret)
+        .then((initResult) {
       var code = initResult['code'];
       if (code == kAliyunPushSuccessCode) {
         Fluttertoast.showToast(

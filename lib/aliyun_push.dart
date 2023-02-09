@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -116,24 +115,21 @@ class AliyunPush {
   }
 
   ///注册推送
-  Future<Map<String, dynamic>> initPush(
+  Future<Map<dynamic, dynamic>> initPush(
       {String? appKey, String? appSecret}) async {
     if (Platform.isIOS) {
-      var resultJson = await methodChannel.invokeMethod(
+      Map<dynamic, dynamic> initResult = await methodChannel.invokeMethod(
           'initPushSdk', {'appKey': appKey, 'appSecret': appSecret});
-      Map<String, dynamic> initResult = jsonDecode(resultJson);
       return initResult;
     } else {
-      var resultJson = await methodChannel.invokeMethod('initPush');
-      Map<String, dynamic> initResult = jsonDecode(resultJson);
+      Map<dynamic, dynamic> initResult = await methodChannel.invokeMethod('initPush');
       return initResult;
     }
   }
 
   ///注册厂商通道
-  Future<Map<String, dynamic>> initAndroidThirdPush() async {
-    var resultJson = await methodChannel.invokeMethod('initThirdPush');
-    Map<String, dynamic> initResult = jsonDecode(resultJson);
+  Future<Map<dynamic, dynamic>> initAndroidThirdPush() async {
+    Map<dynamic, dynamic> initResult = await methodChannel.invokeMethod('initThirdPush');
     return initResult;
   }
 
@@ -154,39 +150,34 @@ class AliyunPush {
 
   ///绑定账号
   Future<Map<String, dynamic>> bindAccount(String account) async {
-    var resultJson =
+    Map<String, dynamic> bindResult =
         await methodChannel.invokeMethod('bindAccount', {'account': account});
-    Map<String, dynamic> bindResult = jsonDecode(resultJson);
     return bindResult;
   }
 
   ///解绑账号
   Future<Map<String, dynamic>> unbindAccount() async {
-    var resultJson = await methodChannel.invokeMethod('unbindAccount');
-    Map<String, dynamic> unbindResult = jsonDecode(resultJson);
+    Map<String, dynamic> unbindResult = await methodChannel.invokeMethod('unbindAccount');
     return unbindResult;
   }
 
   ///添加别名
   Future<Map<String, dynamic>> addAlias(String alias) async {
-    var resultJson =
+    Map<String, dynamic> addResult =
         await methodChannel.invokeMethod('addAlias', {'alias': alias});
-    Map<String, dynamic> addResult = jsonDecode(resultJson);
     return addResult;
   }
 
   ///移除别名
   Future<Map<String, dynamic>> removeAlias(String alias) async {
-    var resultJson =
+    Map<String, dynamic> removeResult =
         await methodChannel.invokeMethod('removeAlias', {'alias': alias});
-    Map<String, dynamic> removeResult = jsonDecode(resultJson);
     return removeResult;
   }
 
   ///查询绑定别名
   Future<Map<String, dynamic>> listAlias() async {
-    var resultJson = await methodChannel.invokeMethod('listAlias');
-    Map<String, dynamic> listResult = jsonDecode(resultJson);
+    Map<String, dynamic> listResult = await methodChannel.invokeMethod('listAlias');
     return listResult;
   }
 
@@ -195,11 +186,10 @@ class AliyunPush {
   /// @param tags     标签名
   /// @param target   目标类型，1: 本设备  2: 本设备绑定账号  3: 别名
   /// @param alias    别名（仅当target = 3时生效）
-  Future<Map<String, dynamic>> bindTag(List<String> tags,
+  Future<Map<dynamic, dynamic>> bindTag(List<String> tags,
       {int target = kAliyunTargetDevice, String? alias}) async {
-    var resultJson = await methodChannel.invokeMethod(
+    Map<dynamic, dynamic> bindResult = await methodChannel.invokeMethod(
         'bindTag', {'tags': tags, 'target': target, 'alias': alias});
-    Map<String, dynamic> bindResult = jsonDecode(resultJson);
     return bindResult;
   }
 
@@ -210,9 +200,8 @@ class AliyunPush {
   /// @param alias    别名（仅当target = 3时生效）
   Future<Map<String, dynamic>> unbindTag(List<String> tags,
       {int target = kAliyunTargetDevice, String? alias}) async {
-    var resultJson = await methodChannel.invokeMethod(
+    Map<String, dynamic> unbindResult = await methodChannel.invokeMethod(
         'unbindTag', {'tags': tags, 'target': target, 'alias': alias});
-    Map<String, dynamic> unbindResult = jsonDecode(resultJson);
     return unbindResult;
   }
 
@@ -221,24 +210,21 @@ class AliyunPush {
   /// @param target   目标类型，1: 本设备
   Future<Map<String, dynamic>> listTags(
       {int target = kAliyunTargetDevice}) async {
-    var resultJson =
+    Map<String, dynamic> listResult =
         await methodChannel.invokeMethod('listTags', {'target': target});
-    Map<String, dynamic> listResult = jsonDecode(resultJson);
     return listResult;
   }
 
   ///绑定手机号码
   Future<Map<String, dynamic>> bindPhoneNumber(String phone) async {
-    var resultJson =
+    Map<String, dynamic> bindResult =
         await methodChannel.invokeMethod('bindPhoneNumber', {'phone': phone});
-    Map<String, dynamic> bindResult = jsonDecode(resultJson);
     return bindResult;
   }
 
   ///绑定手机号码
   Future<Map<String, dynamic>> unbindPhoneNumber() async {
-    var resultJson = await methodChannel.invokeMethod('unbindPhoneNumber');
-    Map<String, dynamic> unbindResult = jsonDecode(resultJson);
+    Map<String, dynamic> unbindResult = await methodChannel.invokeMethod('unbindPhoneNumber');
     return unbindResult;
   }
 
@@ -277,7 +263,7 @@ class AliyunPush {
     if (!Platform.isAndroid) {
       return {'code': 'PUSH_31000', 'errorMsg': 'Only support Android'};
     }
-    var resultJson = await methodChannel.invokeMethod('createChannel', {
+    Map<String, dynamic> createResult = await methodChannel.invokeMethod('createChannel', {
       'id': id,
       'name': name,
       'importance': importance,
@@ -294,7 +280,6 @@ class AliyunPush {
       'vibration': vibration,
       'vibrationPatterns': vibrationPatterns
     });
-    Map<String, dynamic> createResult = jsonDecode(resultJson);
     return createResult;
   }
 
@@ -304,9 +289,8 @@ class AliyunPush {
     if (!Platform.isAndroid) {
       return {'code': 'PUSH_31000', 'errorMsg': 'Only support Android'};
     }
-    var resultJson = await methodChannel.invokeMethod(
+    Map<String, dynamic> createResult = await methodChannel.invokeMethod(
         'createChannelGroup', {'id': id, 'name': name, 'desc': desc});
-    Map<String, dynamic> createResult = jsonDecode(resultJson);
     return createResult;
   }
 

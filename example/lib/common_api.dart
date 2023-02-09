@@ -308,6 +308,7 @@ class _CommonApiPageState extends State<CommonApiPage> {
               var tags = <String>[];
               tags.add(tag);
               _pushPlugin.bindTag(tags).then((bindTagResult) {
+                print('$bindTagResult');
                 var code = bindTagResult['code'];
                 if (code == kAliyunPushSuccessCode) {
                   Fluttertoast.showToast(

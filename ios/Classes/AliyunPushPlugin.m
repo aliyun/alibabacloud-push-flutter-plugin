@@ -138,6 +138,8 @@ static BOOL logEnable = NO;
 
 - (BOOL)application:(UIApplication*)application didReceiveRemoteNotification:(nonnull NSDictionary *)userInfo fetchCompletionHandler:(nonnull void (^)(UIBackgroundFetchResult))completionHandler {
     
+    NSLog(@"#### ==> didReceiveRemoteNotification");
+    
     // 取得APNS通知内容
     NSDictionary *aps = [userInfo valueForKey:@"aps"];
     // 内容
@@ -191,7 +193,7 @@ static BOOL logEnable = NO;
     PushLogD(@"Notification, date: %@, title: %@, subtitle: %@, body: %@, badge: %d, extras: %@.", noticeDate, title, subtitle, body, badge, extras);
     
     NSMutableDictionary *dic = [NSMutableDictionary dictionary];
-    [dic setValue:noticeDate forKey:@"date"];
+    [dic setValue:noticeDate.description forKey:@"date"];
     [dic setValue:title forKey:@"title"];
     [dic setValue:subtitle forKey:@"subtitle"];
     [dic setValue:body forKey:@"body"];
@@ -307,14 +309,7 @@ static BOOL logEnable = NO;
     }
 
     //APNS注册，获取deviceToken并上报
-    @try {
-        [self registerAPNS];
-    } @catch (NSException *exception) {
-        NSLog(@"###### CloudPush error: %@", exception.reason);
-    } @finally {
-
-    }
-    
+    [self registerAPNS];
     
     //初始化
     [CloudPushSDK asyncInit:appKey appSecret:appSecret callback:^(CloudPushCallbackResult *res) {
@@ -366,7 +361,7 @@ static BOOL logEnable = NO;
  */
 - (void)onMessageReceived:(NSNotification *)notification {
     CCPSysMessage *message = [notification object];
-    
+    NSLog(@"onMessageReceive");
     NSMutableDictionary *dic = [NSMutableDictionary dictionary];
     [dic setValue:message.title forKey:@"title"];
     [dic setValue:message.body forKey:@"body"];

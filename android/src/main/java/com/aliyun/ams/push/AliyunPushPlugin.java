@@ -1,6 +1,7 @@
 package com.aliyun.ams.push;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,7 +25,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
 import android.text.TextUtils;
-import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationManagerCompat;
@@ -33,8 +33,6 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * PushPlugin
@@ -55,7 +53,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 	public AliyunPushPlugin() {
 		sInstance = this;
 	}
-	
+
 	public void callFlutterMethod(String method, Map<String, Object> arguments) {
 		if (TextUtils.isEmpty(method)) {
 			return;
@@ -124,8 +122,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 			if (enabled != null) {
 				AliyunPushLog.setLogEnabled(enabled);
 			}
-		}
-		else {
+		} else {
 			result.notImplemented();
 		}
 	}
@@ -142,27 +139,17 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 		pushService.register(mContext, new CommonCallback() {
 			@Override
 			public void onSuccess(String response) {
-				JSONObject obj = new JSONObject();
-				try {
-					obj.put(CODE_KEY, CODE_SUCCESS);
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-
-				result.success(obj.toString());
+				HashMap<String, String> obj = new HashMap<>();
+				obj.put(CODE_KEY, CODE_SUCCESS);
+				result.success(obj);
 			}
 
 			@Override
 			public void onFailed(String errorCode, String errorMessage) {
-				JSONObject obj = new JSONObject();
-				try {
-					obj.put(CODE_KEY, errorCode);
-					obj.put(ERROR_MSG_KEY, errorMessage);
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-
-				result.success(obj.toString());
+				HashMap<String, String> obj = new HashMap<>();
+				obj.put(CODE_KEY, errorCode);
+				obj.put(ERROR_MSG_KEY, errorMessage);
+				result.success(obj);
 			}
 		});
 		pushService.turnOnPushChannel(new CommonCallback() {
@@ -180,7 +167,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 
 	private void initThirdPush(Result result) {
 
-		JSONObject obj = new JSONObject();
+		HashMap<String, String> obj = new HashMap<>();
 		Context context = mContext.getApplicationContext();
 		if (context instanceof Application) {
 			Application application = (Application)context;
@@ -192,22 +179,14 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 			AliyunThirdPushUtils.registerGCM(application);
 			AliyunThirdPushUtils.registerHonorPush(application);
 
-			try {
-				obj.put(CODE_KEY, CODE_SUCCESS);
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+			obj.put(CODE_KEY, CODE_SUCCESS);
 
-			result.success(obj.toString());
+			result.success(obj);
 		} else {
-			try {
-				obj.put(CODE_KEY, "PUSH_30002");
-				obj.put(ERROR_MSG_KEY, "context is not Application");
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+			obj.put(CODE_KEY, "PUSH_30002");
+			obj.put(ERROR_MSG_KEY, "context is not Application");
 
-			result.success(obj.toString());
+			result.success(obj);
 		}
 
 	}
@@ -233,186 +212,128 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 
 	private void bindAccount(MethodCall call, Result result) {
 		String account = call.argument("account");
-		JSONObject obj = new JSONObject();
+		HashMap<String, String> obj = new HashMap<String, String>();
 		if (TextUtils.isEmpty(account)) {
-			try {
-				obj.put(CODE_KEY, CODE_PARAM_ILLEGAL);
-				obj.put(ERROR_MSG_KEY, "account can not be empty");
-				result.success(obj.toString());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+			obj.put(CODE_KEY, CODE_PARAM_ILLEGAL);
+			obj.put(ERROR_MSG_KEY, "account can not be empty");
+			result.success(obj);
 		} else {
 			final CloudPushService pushService = PushServiceFactory.getCloudPushService();
 			pushService.bindAccount(account, new CommonCallback() {
 				@Override
 				public void onSuccess(String response) {
-					try {
-						obj.put(CODE_KEY, CODE_SUCCESS);
-						result.success(obj.toString());
-					} catch (JSONException e) {
-						e.printStackTrace();
-					}
+					obj.put(CODE_KEY, CODE_SUCCESS);
+					result.success(obj);
 				}
 
 				@Override
 				public void onFailed(String errorCode, String errorMsg) {
-					try {
-						obj.put(CODE_KEY, errorCode);
-						obj.put(ERROR_MSG_KEY, errorMsg);
-						result.success(obj.toString());
-					} catch (JSONException e) {
-						e.printStackTrace();
-					}
-
+					obj.put(CODE_KEY, errorCode);
+					obj.put(ERROR_MSG_KEY, errorMsg);
+					result.success(obj);
 				}
 			});
 		}
 	}
 
 	private void unbindAccount(Result result) {
-		JSONObject obj = new JSONObject();
+		HashMap<String, String> obj = new HashMap<String, String>();
 		final CloudPushService pushService = PushServiceFactory.getCloudPushService();
 		pushService.unbindAccount(new CommonCallback() {
 			@Override
 			public void onSuccess(String response) {
-				try {
-					obj.put(CODE_KEY, CODE_SUCCESS);
-					result.success(obj.toString());
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
+				obj.put(CODE_KEY, CODE_SUCCESS);
+				result.success(obj);
 			}
 
 			@Override
 			public void onFailed(String errorCode, String errorMsg) {
-				try {
-					obj.put(CODE_KEY, errorCode);
-					obj.put(ERROR_MSG_KEY, errorMsg);
-					result.success(obj.toString());
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-
+				obj.put(CODE_KEY, errorCode);
+				obj.put(ERROR_MSG_KEY, errorMsg);
+				result.success(obj);
 			}
 		});
 	}
 
 	private void addAlias(MethodCall call, Result result) {
-		JSONObject obj = new JSONObject();
+		HashMap<String, String> obj = new HashMap<String, String>();
 		String alias = call.argument("alias");
 		if (TextUtils.isEmpty(alias)) {
-			try {
-				obj.put(CODE_KEY, CODE_PARAM_ILLEGAL);
-				obj.put(ERROR_MSG_KEY, "alias can not be empty");
-				result.success(obj.toString());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+			obj.put(CODE_KEY, CODE_PARAM_ILLEGAL);
+			obj.put(ERROR_MSG_KEY, "alias can not be empty");
+			result.success(obj);
 		} else {
 			final CloudPushService pushService = PushServiceFactory.getCloudPushService();
 			pushService.addAlias(alias, new CommonCallback() {
 				@Override
 				public void onSuccess(String response) {
-					try {
-						obj.put(CODE_KEY, CODE_SUCCESS);
-						result.success(obj.toString());
-					} catch (JSONException e) {
-						e.printStackTrace();
-					}
+					obj.put(CODE_KEY, CODE_SUCCESS);
+					result.success(obj);
 				}
 
 				@Override
 				public void onFailed(String errorCode, String errorMsg) {
-					try {
-						obj.put(CODE_KEY, errorCode);
-						obj.put(ERROR_MSG_KEY, errorMsg);
-						result.success(obj.toString());
-					} catch (JSONException e) {
-						e.printStackTrace();
-					}
+					obj.put(CODE_KEY, errorCode);
+					obj.put(ERROR_MSG_KEY, errorMsg);
+					result.success(obj);
 				}
 			});
 		}
 	}
 
 	private void removeAlias(MethodCall call, Result result) {
-		JSONObject obj = new JSONObject();
+		HashMap<String, String> obj = new HashMap<String, String>();
 		String alias = call.argument("alias");
 		if (TextUtils.isEmpty(alias)) {
-			try {
-				obj.put(CODE_KEY, CODE_PARAM_ILLEGAL);
-				obj.put(ERROR_MSG_KEY, "alias can not be empty");
-				result.success(obj.toString());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+			obj.put(CODE_KEY, CODE_PARAM_ILLEGAL);
+			obj.put(ERROR_MSG_KEY, "alias can not be empty");
+			result.success(obj);
 		} else {
 			final CloudPushService pushService = PushServiceFactory.getCloudPushService();
 			pushService.removeAlias(alias, new CommonCallback() {
 				@Override
 				public void onSuccess(String response) {
-					try {
-						obj.put(CODE_KEY, CODE_SUCCESS);
-						result.success(obj.toString());
-					} catch (JSONException e) {
-						e.printStackTrace();
-					}
+					obj.put(CODE_KEY, CODE_SUCCESS);
+					result.success(obj);
 				}
 
 				@Override
 				public void onFailed(String errorCode, String errorMsg) {
-					try {
-						obj.put(CODE_KEY, errorCode);
-						obj.put(ERROR_MSG_KEY, errorMsg);
-						result.success(obj.toString());
-					} catch (JSONException e) {
-						e.printStackTrace();
-					}
+					obj.put(CODE_KEY, errorCode);
+					obj.put(ERROR_MSG_KEY, errorMsg);
+					result.success(obj);
 				}
 			});
 		}
 	}
 
 	private void listAlias(Result result) {
-		JSONObject obj = new JSONObject();
+		HashMap<String, String> obj = new HashMap<String, String>();
 		final CloudPushService pushService = PushServiceFactory.getCloudPushService();
 		pushService.listAliases(new CommonCallback() {
 			@Override
 			public void onSuccess(String response) {
-				try {
-					obj.put(CODE_KEY, CODE_SUCCESS);
-					obj.put("alias_list", response);
-					result.success(obj.toString());
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
+				obj.put(CODE_KEY, CODE_SUCCESS);
+				obj.put("alias_list", response);
+				result.success(obj);
 			}
 
 			@Override
 			public void onFailed(String errorCode, String errorMsg) {
-				try {
-					obj.put(CODE_KEY, errorCode);
-					obj.put(ERROR_MSG_KEY, errorMsg);
-					result.success(obj.toString());
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
+				obj.put(CODE_KEY, errorCode);
+				obj.put(ERROR_MSG_KEY, errorMsg);
+				result.success(obj);
 			}
 		});
 	}
 
 	private void bindTag(MethodCall call, Result result) {
 		List<String> tags = call.argument("tags");
-		JSONObject obj = new JSONObject();
+		HashMap<String, String> obj = new HashMap<>();
 		if (tags == null || tags.isEmpty()) {
-			try {
-				obj.put(CODE_KEY, CODE_PARAM_ILLEGAL);
-				obj.put(ERROR_MSG_KEY, "tags can not be empty");
-				result.success(obj.toString());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+			obj.put(CODE_KEY, CODE_PARAM_ILLEGAL);
+			obj.put(ERROR_MSG_KEY, "tags can not be empty");
+			result.success(obj);
 		} else {
 			Integer target = call.argument("target");
 			if (target == null) {
@@ -426,23 +347,15 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 			pushService.bindTag(target, tagsArray, alias, new CommonCallback() {
 				@Override
 				public void onSuccess(String response) {
-					try {
-						obj.put(CODE_KEY, CODE_SUCCESS);
-						result.success(obj.toString());
-					} catch (JSONException e) {
-						e.printStackTrace();
-					}
+					//try {
+					result.success(obj);
 				}
 
 				@Override
 				public void onFailed(String errorCode, String errorMsg) {
-					try {
-						obj.put(CODE_KEY, errorCode);
-						obj.put(ERROR_MSG_KEY, errorMsg);
-						result.success(obj.toString());
-					} catch (JSONException e) {
-						e.printStackTrace();
-					}
+					obj.put(CODE_KEY, errorCode);
+					obj.put(ERROR_MSG_KEY, errorMsg);
+					result.success(obj);
 				}
 			});
 		}
@@ -450,15 +363,11 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 
 	private void unbindTag(MethodCall call, Result result) {
 		List<String> tags = call.argument("tags");
-		JSONObject obj = new JSONObject();
+		HashMap<String, String> obj = new HashMap<String, String>();
 		if (tags == null || tags.isEmpty()) {
-			try {
-				obj.put(CODE_KEY, CODE_PARAM_ILLEGAL);
-				obj.put(ERROR_MSG_KEY, "tags can not be empty");
-				result.success(obj.toString());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+			obj.put(CODE_KEY, CODE_PARAM_ILLEGAL);
+			obj.put(ERROR_MSG_KEY, "tags can not be empty");
+			result.success(obj);
 		} else {
 			Integer target = call.argument("target");
 			if (target == null) {
@@ -472,23 +381,15 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 			pushService.unbindTag(target, tagsArray, alias, new CommonCallback() {
 				@Override
 				public void onSuccess(String response) {
-					try {
-						obj.put(CODE_KEY, CODE_SUCCESS);
-						result.success(obj.toString());
-					} catch (JSONException e) {
-						e.printStackTrace();
-					}
+					obj.put(CODE_KEY, CODE_SUCCESS);
+					result.success(obj);
 				}
 
 				@Override
 				public void onFailed(String errorCode, String errorMsg) {
-					try {
-						obj.put(CODE_KEY, errorCode);
-						obj.put(ERROR_MSG_KEY, errorMsg);
-						result.success(obj.toString());
-					} catch (JSONException e) {
-						e.printStackTrace();
-					}
+					obj.put(CODE_KEY, errorCode);
+					obj.put(ERROR_MSG_KEY, errorMsg);
+					result.success(obj);
 				}
 			});
 		}
@@ -500,101 +401,73 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 			//默认本设备
 			target = 1;
 		}
-		JSONObject obj = new JSONObject();
+		HashMap<String, String> obj = new HashMap<String, String>();
 		final CloudPushService pushService = PushServiceFactory.getCloudPushService();
 		pushService.listTags(target, new CommonCallback() {
 			@Override
 			public void onSuccess(String response) {
-				try {
-					obj.put(CODE_KEY, CODE_SUCCESS);
-					obj.put("tags_list", response);
-					result.success(obj.toString());
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
+				obj.put(CODE_KEY, CODE_SUCCESS);
+				obj.put("tags_list", response);
+				result.success(obj);
 			}
 
 			@Override
 			public void onFailed(String errorCode, String errorMsg) {
-				try {
-					obj.put(CODE_KEY, errorCode);
-					obj.put(ERROR_MSG_KEY, errorMsg);
-					result.success(obj.toString());
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
+				obj.put(CODE_KEY, errorCode);
+				obj.put(ERROR_MSG_KEY, errorMsg);
+				result.success(obj);
 			}
 		});
 	}
 
 	private void bindPhoneNumber(MethodCall call, Result result) {
-		JSONObject obj = new JSONObject();
+		HashMap<String, String> obj = new HashMap<String, String>();
 		String alias = call.argument("phone");
 		if (TextUtils.isEmpty(alias)) {
-			try {
-				obj.put(CODE_KEY, CODE_PARAM_ILLEGAL);
-				obj.put(ERROR_MSG_KEY, "phone number can not be empty");
-				result.success(obj.toString());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+			obj.put(CODE_KEY, CODE_PARAM_ILLEGAL);
+			obj.put(ERROR_MSG_KEY, "phone number can not be empty");
+			result.success(obj);
 		} else {
 			final CloudPushService pushService = PushServiceFactory.getCloudPushService();
 			pushService.bindPhoneNumber(alias, new CommonCallback() {
 				@Override
 				public void onSuccess(String response) {
-					try {
-						obj.put(CODE_KEY, CODE_SUCCESS);
-						result.success(obj.toString());
-					} catch (JSONException e) {
-						e.printStackTrace();
-					}
+					obj.put(CODE_KEY, CODE_SUCCESS);
+					result.success(obj);
 				}
 
 				@Override
 				public void onFailed(String errorCode, String errorMsg) {
-					try {
-						obj.put(CODE_KEY, errorCode);
-						obj.put(ERROR_MSG_KEY, errorMsg);
-						result.success(obj.toString());
-					} catch (JSONException e) {
-						e.printStackTrace();
-					}
+					obj.put(CODE_KEY, errorCode);
+					obj.put(ERROR_MSG_KEY, errorMsg);
+					result.success(obj);
 				}
 			});
 		}
 	}
 
 	private void unbindPhoneNumber(Result result) {
-		JSONObject obj = new JSONObject();
+		HashMap<String, String> obj = new HashMap<String, String>();
 
 		final CloudPushService pushService = PushServiceFactory.getCloudPushService();
 		pushService.unbindPhoneNumber(new CommonCallback() {
 			@Override
 			public void onSuccess(String response) {
-				try {
-					obj.put(CODE_KEY, CODE_SUCCESS);
-					result.success(obj.toString());
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
+				obj.put(CODE_KEY, CODE_SUCCESS);
+				result.success(obj);
 			}
 
 			@Override
 			public void onFailed(String errorCode, String errorMsg) {
-				try {
-					obj.put(CODE_KEY, errorCode);
-					obj.put(ERROR_MSG_KEY, errorMsg);
-					result.success(obj.toString());
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
+				obj.put(CODE_KEY, errorCode);
+				obj.put(ERROR_MSG_KEY, errorMsg);
+				result.success(obj);
 			}
 		});
 	}
 
 	private void setNotificationInGroup(MethodCall call, Result result) {
-		JSONObject obj = new JSONObject();
+		HashMap<String, String> obj = new HashMap<String, String>();
 		Boolean inGroup = call.argument("inGroup");
 		if (inGroup == null) {
 			inGroup = false;
@@ -610,7 +483,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 	}
 
 	private void createChannel(MethodCall call, Result result) {
-		JSONObject obj = new JSONObject();
+		HashMap<String, String> obj = new HashMap<String, String>();
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
 			String id = call.argument("id");
@@ -683,26 +556,18 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 				channel.setVibrationPattern(pattern);
 			}
 			notificationManager.createNotificationChannel(channel);
-			try {
-				obj.put(CODE_KEY, CODE_SUCCESS);
-				result.success(obj.toString());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+			obj.put(CODE_KEY, CODE_SUCCESS);
+			result.success(obj);
 		} else {
-			try {
-				obj.put(CODE_KEY, "PUSH_30000");
-				obj.put(ERROR_MSG_KEY,
-					"Android version is below Android O which is not support create group");
-				result.success(obj.toString());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+			obj.put(CODE_KEY, "PUSH_30000");
+			obj.put(ERROR_MSG_KEY,
+				"Android version is below Android O which is not support create group");
+			result.success(obj);
 		}
 	}
 
 	private void createGroup(MethodCall call, Result result) {
-		JSONObject obj = new JSONObject();
+		HashMap<String, String> obj = new HashMap<String, String>();
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
 			String id = call.argument("id");
@@ -716,21 +581,13 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 				group.setDescription(desc);
 			}
 			notificationManager.createNotificationChannelGroup(group);
-			try {
-				obj.put(CODE_KEY, CODE_SUCCESS);
-				result.success(obj.toString());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+			obj.put(CODE_KEY, CODE_SUCCESS);
+			result.success(obj);
 		} else {
-			try {
-				obj.put(CODE_KEY, "PUSH_30000");
-				obj.put(ERROR_MSG_KEY,
-					"Android version is below Android O which is not support create group");
-				result.success(obj.toString());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+			obj.put(CODE_KEY, "PUSH_30000");
+			obj.put(ERROR_MSG_KEY,
+				"Android version is below Android O which is not support create group");
+			result.success(obj);
 		}
 	}
 
