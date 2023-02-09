@@ -82,23 +82,23 @@ static BOOL logEnable = NO;
             [self.channel invokeMethod:@"onRegisterDeviceTokenFailed" arguments:dic];
         }
     }];
-    
+    PushLogD(@"####### ===> APNs register success");
 }
 
 /*
  *  APNs注册失败回调
  */
 - (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
-    PushLogD(@"didFailToRegisterForRemoteNotificationsWithError %@", error);
     NSMutableDictionary *dic = [NSMutableDictionary dictionary];
-    [dic setValue:error forKey:@"error"];
+    [dic setValue:error.userInfo.description forKey:@"error"];
     [self.channel invokeMethod:@"onRegisterDeviceTokenFailed" arguments:dic];
-    
+    PushLogD(@"####### ===> APNs register failed, %@", error);
 }
 
 
 -(void)registerAPNS {
     float systemVersionNum = [[[UIDevice currentDevice] systemVersion] floatValue];
+    NSLog(@"####### ===> systemVersion: %f", systemVersionNum);
     if (systemVersionNum >= 10.0) {
         // iOS 10 notifications
         _notificationCenter = [UNUserNotificationCenter currentNotificationCenter];
@@ -107,14 +107,14 @@ static BOOL logEnable = NO;
         [_notificationCenter requestAuthorizationWithOptions:UNAuthorizationOptionAlert | UNAuthorizationOptionBadge | UNAuthorizationOptionSound completionHandler:^(BOOL granted, NSError * _Nullable error) {
             if (granted) {
                 // granted
-                NSLog(@"User authored notification.");
+                NSLog(@"####### ===> User authored notification.");
                 // 向APNs注册，获取deviceToken
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [[UIApplication sharedApplication] registerForRemoteNotifications];
                 });
             } else {
                 // not granted
-                NSLog(@"User denied notification.");
+                NSLog(@"####### ===> User denied notification.");
             }
         }];
     } else if (systemVersionNum >= 8.0) {
@@ -307,7 +307,14 @@ static BOOL logEnable = NO;
     }
 
     //APNS注册，获取deviceToken并上报
-    [self registerAPNS];
+    @try {
+        [self registerAPNS];
+    } @catch (NSException *exception) {
+        NSLog(@"###### CloudPush error: %@", exception.reason);
+    } @finally {
+
+    }
+    
     
     //初始化
     [CloudPushSDK asyncInit:appKey appSecret:appSecret callback:^(CloudPushCallbackResult *res) {
