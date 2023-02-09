@@ -149,35 +149,35 @@ class AliyunPush {
   }
 
   ///绑定账号
-  Future<Map<String, dynamic>> bindAccount(String account) async {
-    Map<String, dynamic> bindResult =
+  Future<Map<dynamic, dynamic>> bindAccount(String account) async {
+    Map<dynamic, dynamic> bindResult =
         await methodChannel.invokeMethod('bindAccount', {'account': account});
     return bindResult;
   }
 
   ///解绑账号
-  Future<Map<String, dynamic>> unbindAccount() async {
-    Map<String, dynamic> unbindResult = await methodChannel.invokeMethod('unbindAccount');
+  Future<Map<dynamic, dynamic>> unbindAccount() async {
+    Map<dynamic, dynamic> unbindResult = await methodChannel.invokeMethod('unbindAccount');
     return unbindResult;
   }
 
   ///添加别名
-  Future<Map<String, dynamic>> addAlias(String alias) async {
-    Map<String, dynamic> addResult =
+  Future<Map<dynamic, dynamic>> addAlias(String alias) async {
+    Map<dynamic, dynamic> addResult =
         await methodChannel.invokeMethod('addAlias', {'alias': alias});
     return addResult;
   }
 
   ///移除别名
-  Future<Map<String, dynamic>> removeAlias(String alias) async {
-    Map<String, dynamic> removeResult =
+  Future<Map<dynamic, dynamic>> removeAlias(String alias) async {
+    Map<dynamic, dynamic> removeResult =
         await methodChannel.invokeMethod('removeAlias', {'alias': alias});
     return removeResult;
   }
 
   ///查询绑定别名
-  Future<Map<String, dynamic>> listAlias() async {
-    Map<String, dynamic> listResult = await methodChannel.invokeMethod('listAlias');
+  Future<Map<dynamic, dynamic>> listAlias() async {
+    Map<dynamic, dynamic> listResult = await methodChannel.invokeMethod('listAlias');
     return listResult;
   }
 
@@ -198,9 +198,9 @@ class AliyunPush {
   /// @param tags     标签名
   /// @param target   目标类型，1: 本设备  2: 本设备绑定账号  3: 别名
   /// @param alias    别名（仅当target = 3时生效）
-  Future<Map<String, dynamic>> unbindTag(List<String> tags,
+  Future<Map<dynamic, dynamic>> unbindTag(List<String> tags,
       {int target = kAliyunTargetDevice, String? alias}) async {
-    Map<String, dynamic> unbindResult = await methodChannel.invokeMethod(
+    Map<dynamic, dynamic> unbindResult = await methodChannel.invokeMethod(
         'unbindTag', {'tags': tags, 'target': target, 'alias': alias});
     return unbindResult;
   }
@@ -208,22 +208,22 @@ class AliyunPush {
   /// 查询标签列表
   ///
   /// @param target   目标类型，1: 本设备
-  Future<Map<String, dynamic>> listTags(
+  Future<Map<dynamic, dynamic>> listTags(
       {int target = kAliyunTargetDevice}) async {
-    Map<String, dynamic> listResult =
+    Map<dynamic, dynamic> listResult =
         await methodChannel.invokeMethod('listTags', {'target': target});
     return listResult;
   }
 
   ///绑定手机号码
-  Future<Map<String, dynamic>> bindPhoneNumber(String phone) async {
-    Map<String, dynamic> bindResult =
+  Future<Map<dynamic, dynamic>> bindPhoneNumber(String phone) async {
+    Map<dynamic, dynamic> bindResult =
         await methodChannel.invokeMethod('bindPhoneNumber', {'phone': phone});
     return bindResult;
   }
 
   ///绑定手机号码
-  Future<Map<String, dynamic>> unbindPhoneNumber() async {
+  Future<Map<dynamic, dynamic>> unbindPhoneNumber() async {
     Map<String, dynamic> unbindResult = await methodChannel.invokeMethod('unbindPhoneNumber');
     return unbindResult;
   }
@@ -247,7 +247,7 @@ class AliyunPush {
   }
 
   ///创建Android平台的NotificationChannel
-  Future<Map<String, dynamic>> createAndroidChannel(
+  Future<Map<dynamic, dynamic>> createAndroidChannel(
       String id, String name, int importance, String description,
       {String? groupId,
       bool? allowBubbles,
@@ -263,7 +263,7 @@ class AliyunPush {
     if (!Platform.isAndroid) {
       return {'code': 'PUSH_31000', 'errorMsg': 'Only support Android'};
     }
-    Map<String, dynamic> createResult = await methodChannel.invokeMethod('createChannel', {
+    Map<dynamic, dynamic> createResult = await methodChannel.invokeMethod('createChannel', {
       'id': id,
       'name': name,
       'importance': importance,
@@ -284,12 +284,12 @@ class AliyunPush {
   }
 
   ///创建通知通道的分组
-  Future<Map<String, dynamic>> createAndroidChannelGroup(
+  Future<Map<dynamic, dynamic>> createAndroidChannelGroup(
       String id, String name, String desc) async {
     if (!Platform.isAndroid) {
       return {'code': 'PUSH_31000', 'errorMsg': 'Only support Android'};
     }
-    Map<String, dynamic> createResult = await methodChannel.invokeMethod(
+    Map<dynamic, dynamic> createResult = await methodChannel.invokeMethod(
         'createChannelGroup', {'id': id, 'name': name, 'desc': desc});
     return createResult;
   }
