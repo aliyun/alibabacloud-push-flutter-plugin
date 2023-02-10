@@ -107,14 +107,14 @@ static BOOL logEnable = NO;
         [_notificationCenter requestAuthorizationWithOptions:UNAuthorizationOptionAlert | UNAuthorizationOptionBadge | UNAuthorizationOptionSound completionHandler:^(BOOL granted, NSError * _Nullable error) {
             if (granted) {
                 // granted
-                NSLog(@"####### ===> User authored notification.");
+                PushLogD(@"####### ===> User authored notification.");
                 // 向APNs注册，获取deviceToken
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [[UIApplication sharedApplication] registerForRemoteNotifications];
                 });
             } else {
                 // not granted
-                NSLog(@"####### ===> User denied notification.");
+                PushLogD(@"####### ===> User denied notification.");
             }
         }];
     } else if (systemVersionNum >= 8.0) {
@@ -246,7 +246,7 @@ static BOOL logEnable = NO;
   } else if ([@"getDeviceId" isEqualToString:call.method]) {
       [self getDeviceId:result];
   } else if ([@"turnOnDebug" isEqualToString:call.method]) {
-      [self turnOnDebug];
+      [self turnOnDebug:result];
   } else if ([@"bindAccount" isEqualToString:call.method]) {
       [self bindAccount:call result:result];
   } else if ([@"unbindAccount" isEqualToString:call.method]) {
@@ -264,7 +264,7 @@ static BOOL logEnable = NO;
   } else if ([@"listTags" isEqualToString:call.method]) {
       [self listTags:call result:result];
   } else if ([@"showNoticeWhenForeground" isEqualToString:call.method]) {
-      [self showNoticeWhenForeground:call];
+      [self showNoticeWhenForeground:call result:result];
   } else if ([@"registerAPNS" isEqualToString:call.method]) {
       [self registerAPNS];
   } else if ([@"setBadgeNum" isEqualToString:call.method]) {
@@ -314,10 +314,10 @@ static BOOL logEnable = NO;
     //初始化
     [CloudPushSDK asyncInit:appKey appSecret:appSecret callback:^(CloudPushCallbackResult *res) {
         if (res.success) {
-            NSLog(@"Push SDK init success, deviceId: %@.", [CloudPushSDK getDeviceId]);
+            PushLogD(@"Push SDK init success, deviceId: %@.", [CloudPushSDK getDeviceId]);
             result(@{KEY_CODE:CODE_SUCCESS});
         } else {
-            NSLog(@"Push SDK init failed, error: %@", res.error);
+            PushLogD(@"Push SDK init failed, error: %@", res.error);
             result(@{KEY_CODE:CODE_FAILED, @"errorMsg": res.error.userInfo});
         }
     }];
@@ -386,7 +386,7 @@ static BOOL logEnable = NO;
         } else {
             PushLogD(@"Sync badge num: [%lu] failed, error: %@", (unsigned long)badgeNum, res.error);
             if (result) {
-                result(@{KEY_CODE: CODE_FAILED, @"errorMsg": res.error});
+                result(@{KEY_CODE: CODE_FAILED, KEY_ERROR_MSG: res.error.userInfo});
             }
         }
     }];
@@ -396,14 +396,16 @@ static BOOL logEnable = NO;
     result([CloudPushSDK getDeviceId]);
 }
 
-- (void) turnOnDebug {
+- (void) turnOnDebug:(FlutterResult)result {
     [CloudPushSDK turnOnDebug];
+    result(@{KEY_CODE:CODE_SUCCESS});
 }
 
-- (void) showNoticeWhenForeground:(FlutterMethodCall*)call  {
+- (void) showNoticeWhenForeground:(FlutterMethodCall*)call result:(FlutterResult)result  {
     NSDictionary *arguments = call.arguments;
     BOOL enable = arguments[@"enable"];
     _showNoticeWhenForeground = enable;
+    result(@{KEY_CODE:CODE_SUCCESS});
 }
 
 - (void) getApnsDeviceToken:(FlutterResult) result {
@@ -418,7 +420,7 @@ static BOOL logEnable = NO;
             if (res.success) {
                 result(@{KEY_CODE:CODE_SUCCESS});
             } else {
-                result(@{KEY_CODE:CODE_FAILED, KEY_ERROR_MSG: res.error});
+                result(@{KEY_CODE:CODE_FAILED, KEY_ERROR_MSG: res.error.userInfo});
             }
         }];
     } else {
@@ -431,7 +433,7 @@ static BOOL logEnable = NO;
         if (res.success) {
             result(@{KEY_CODE:CODE_SUCCESS});
         } else {
-            result(@{KEY_CODE:CODE_FAILED, KEY_ERROR_MSG: res.error});
+            result(@{KEY_CODE:CODE_FAILED, KEY_ERROR_MSG: res.error.userInfo});
         }
     }];
 }
@@ -444,7 +446,7 @@ static BOOL logEnable = NO;
             if (res.success) {
                 result(@{KEY_CODE:CODE_SUCCESS});
             } else {
-                result(@{KEY_CODE:CODE_FAILED, KEY_ERROR_MSG: res.error});
+                result(@{KEY_CODE:CODE_FAILED, KEY_ERROR_MSG: res.error.userInfo});
             }
         }];
     } else {
@@ -460,7 +462,7 @@ static BOOL logEnable = NO;
             if (res.success) {
                 result(@{KEY_CODE:CODE_SUCCESS});
             } else {
-                result(@{KEY_CODE:CODE_FAILED, KEY_ERROR_MSG: res.error});
+                result(@{KEY_CODE:CODE_FAILED, KEY_ERROR_MSG: res.error.userInfo});
             }
         }];
     } else {
@@ -471,9 +473,9 @@ static BOOL logEnable = NO;
 - (void) listAlias:(FlutterResult)result {
     [CloudPushSDK listAliases:^(CloudPushCallbackResult *res) {
         if (res.success) {
-            result(@{KEY_CODE:CODE_SUCCESS});
+            result(@{KEY_CODE:CODE_SUCCESS, @"alias_list": res.data});
         } else {
-            result(@{KEY_CODE:CODE_FAILED, KEY_ERROR_MSG: res.error});
+            result(@{KEY_CODE:CODE_FAILED, KEY_ERROR_MSG: res.error.userInfo});
         }
     }];
 }
@@ -496,7 +498,8 @@ static BOOL logEnable = NO;
             if (res.success) {
                 result(@{KEY_CODE:CODE_SUCCESS});
             } else {
-                result(@{KEY_CODE:CODE_FAILED, KEY_ERROR_MSG: res.error});
+                PushLogD(@"#### ===> %@", res.error);
+                result(@{KEY_CODE:CODE_FAILED, KEY_ERROR_MSG: res.error.userInfo});
             }
         }];
     } else {
@@ -522,7 +525,7 @@ static BOOL logEnable = NO;
             if (res.success) {
                 result(@{KEY_CODE:CODE_SUCCESS});
             } else {
-                result(@{KEY_CODE:CODE_FAILED, KEY_ERROR_MSG: res.error});
+                result(@{KEY_CODE:CODE_FAILED, KEY_ERROR_MSG: res.error.userInfo});
             }
         }];
     } else {
@@ -541,9 +544,9 @@ static BOOL logEnable = NO;
     }
     [CloudPushSDK listTags:target withCallback:^(CloudPushCallbackResult *res) {
         if (res.success) {
-            result(@{KEY_CODE:CODE_SUCCESS});
+            result(@{KEY_CODE:CODE_SUCCESS, @"tags_list": res.data});
         } else {
-            result(@{KEY_CODE:CODE_FAILED, KEY_ERROR_MSG: res.error});
+            result(@{KEY_CODE:CODE_FAILED, KEY_ERROR_MSG: res.error.userInfo});
         }
     }];
 }

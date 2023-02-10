@@ -258,7 +258,7 @@ class _CommonApiPageState extends State<CommonApiPage> {
                   msg: '请输入要删除的别名', gravity: ToastGravity.CENTER);
             }
           },
-          child: const Text('添加别名')),
+          child: const Text('删除别名')),
     ));
   }
 

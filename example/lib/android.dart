@@ -34,7 +34,13 @@ class _AndroidPageState extends State<AndroidPage> {
     children.add(
       ElevatedButton(
         onPressed: () {
-          _aliyunPush.closePushLog();
+          _aliyunPush.closeAndroidPushLog().then((result) {
+            var code = result['code'];
+            if (code == kAliyunPushSuccessCode) {
+              Fluttertoast.showToast(
+                  msg: '关闭AliyunPush Log成功', gravity: ToastGravity.CENTER);
+            }
+          });
         },
         child: const Text('关闭AliyunPush Log'),
       ),
@@ -68,7 +74,13 @@ class _AndroidPageState extends State<AndroidPage> {
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
       child: ElevatedButton(
           onPressed: () {
-            _aliyunPush.setNotificationInGroup(true);
+            _aliyunPush.setNotificationInGroup(true).then((result){
+              var code = result['code'];
+              if (code == kAliyunPushSuccessCode) {
+                Fluttertoast.showToast(
+                    msg: '开启通知分组展示成功', gravity: ToastGravity.CENTER);
+              }
+            });
           },
           child: const Text('开启通知分组展示')),
     ));
@@ -76,7 +88,13 @@ class _AndroidPageState extends State<AndroidPage> {
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
       child: ElevatedButton(
           onPressed: () {
-            _aliyunPush.setNotificationInGroup(false);
+            _aliyunPush.setNotificationInGroup(false).then((result) {
+              var code = result['code'];
+              if (code == kAliyunPushSuccessCode) {
+                Fluttertoast.showToast(
+                    msg: '关闭通知分组展示成功', gravity: ToastGravity.CENTER);
+              }
+            });
           },
           child: const Text('关闭通知分组展示')),
     ));
@@ -84,7 +102,13 @@ class _AndroidPageState extends State<AndroidPage> {
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
       child: ElevatedButton(
           onPressed: () {
-            _aliyunPush.clearNotifications();
+            _aliyunPush.clearNotifications().then((result) {
+              var code = result['code'];
+              if (code == kAliyunPushSuccessCode) {
+                Fluttertoast.showToast(
+                    msg: '清除所有通知', gravity: ToastGravity.CENTER);
+              }
+            });
           },
           child: const Text('清除所有通知')),
     ));
@@ -224,7 +248,19 @@ class _AndroidPageState extends State<AndroidPage> {
           } else {
             logLevel = kAliyunPushLogLevelDebug;
           }
-          _aliyunPush.setAndroidLogLevel(logLevel);
+          _aliyunPush.setAndroidLogLevel(logLevel).then((result) {
+            var code = result['code'];
+            if (code == kAliyunPushSuccessCode) {
+              Fluttertoast.showToast(
+                  msg: '成功设置LogLevel为 $_selectedLogLevel', gravity: ToastGravity.CENTER);
+            } else {
+              var errorCode = result['code'];
+              var errorMsg = result['errorMsg'];
+              Fluttertoast.showToast(
+                  msg: '设置LogLevel失败, $errorCode - $errorMsg',
+                  gravity: ToastGravity.CENTER);
+            }
+          });
         },
         child: Text('设置LogLevel为 $_selectedLogLevel')));
   }

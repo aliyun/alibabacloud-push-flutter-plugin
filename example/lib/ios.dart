@@ -1,6 +1,6 @@
+import 'package:aliyun_push/aliyun_push.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:aliyun_push/aliyun_push.dart';
 
 class IOSPage extends StatefulWidget {
   const IOSPage({super.key});
@@ -23,7 +23,13 @@ class _IOSPageState extends State<IOSPage> {
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
       child: ElevatedButton(
           onPressed: () {
-            _aliyunPush.turnOnIOSDebug();
+            _aliyunPush.turnOnIOSDebug().then((result) {
+              var code = result['code'];
+              if (code == kAliyunPushSuccessCode) {
+                Fluttertoast.showToast(
+                    msg: '打开debug日志成功', gravity: ToastGravity.CENTER);
+              }
+            });
           },
           child: const Text('打开debug日志')),
     ));
@@ -31,7 +37,13 @@ class _IOSPageState extends State<IOSPage> {
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
       child: ElevatedButton(
           onPressed: () {
-            _aliyunPush.showIOSNoticeWhenForeground(true);
+            _aliyunPush.showIOSNoticeWhenForeground(true).then((result){
+              var code = result['code'];
+              if (code == kAliyunPushSuccessCode) {
+                Fluttertoast.showToast(
+                    msg: '设置前台显示通知成功', gravity: ToastGravity.CENTER);
+              }
+            });
           },
           child: const Text('前台显示通知')),
     ));
@@ -39,7 +51,13 @@ class _IOSPageState extends State<IOSPage> {
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
       child: ElevatedButton(
           onPressed: () {
-            _aliyunPush.showIOSNoticeWhenForeground(false);
+            _aliyunPush.showIOSNoticeWhenForeground(false).then((result) {
+              var code = result['code'];
+              if (code == kAliyunPushSuccessCode) {
+                Fluttertoast.showToast(
+                    msg: '设置前台不显示通知成功', gravity: ToastGravity.CENTER);
+              }
+            });
           },
           child: const Text('前台不显示通知')),
     ));
@@ -67,7 +85,13 @@ class _IOSPageState extends State<IOSPage> {
               return;
             }
             int badgeNum = int.parse(_badgeController.text);
-            _aliyunPush.setIOSBadgeNum(badgeNum);
+            _aliyunPush.setIOSBadgeNum(badgeNum).then((result) {
+              var code = result['code'];
+              if (code == kAliyunPushSuccessCode) {
+                Fluttertoast.showToast(
+                    msg: '设置角标个数$badgeNum成功', gravity: ToastGravity.CENTER);
+              }
+            });
           },
           child: const Text('设置角标个数')),
     ));
@@ -81,7 +105,13 @@ class _IOSPageState extends State<IOSPage> {
               return;
             }
             int badgeNum = int.parse(_badgeController.text);
-            _aliyunPush.syncIOSBadgeNum(badgeNum);
+            _aliyunPush.syncIOSBadgeNum(badgeNum).then((result) {
+              var code = result['code'];
+              if (code == kAliyunPushSuccessCode) {
+                Fluttertoast.showToast(
+                    msg: '同步角标个数$badgeNum成功', gravity: ToastGravity.CENTER);
+              }
+            });
           },
           child: const Text('同步角标个数')),
     ));
@@ -97,19 +127,22 @@ class _IOSPageState extends State<IOSPage> {
           },
           child: const Text('查询ApnsToken')),
     ));
-    children
-        .add(Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: ElevatedButton(onPressed: () {
+    children.add(Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: ElevatedButton(
+          onPressed: () {
             _aliyunPush.isIOSChannelOpened().then((opened) {
               if (opened) {
-                Fluttertoast.showToast(msg: '通道已打开', gravity: ToastGravity.CENTER);
+                Fluttertoast.showToast(
+                    msg: '通道已打开', gravity: ToastGravity.CENTER);
               } else {
-                Fluttertoast.showToast(msg: '通道未打开', gravity: ToastGravity.CENTER);
+                Fluttertoast.showToast(
+                    msg: '通道未打开', gravity: ToastGravity.CENTER);
               }
             });
-    }, child: const Text('通知通道是否打开')),
-        ));
+          },
+          child: const Text('通知通道是否打开')),
+    ));
     if (_apnsToken != "") {
       children.add(Text(
         "apnsToken: $_apnsToken",

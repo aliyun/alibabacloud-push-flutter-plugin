@@ -44,54 +44,54 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<void> _onNotification(Map<String, dynamic> message) async {
+  Future<void> _onNotification(Map<dynamic, dynamic> message) async {
     Fluttertoast.showToast(
         msg: 'onNotification: $message', gravity: ToastGravity.CENTER);
   }
 
   Future<void> _onAndroidNotificationReceivedInApp(
-      Map<String, dynamic> message) async {
+      Map<dynamic, dynamic> message) async {
     Fluttertoast.showToast(
         msg: 'onAndroidNotificationReceivedInApp: $message',
         gravity: ToastGravity.CENTER);
   }
 
-  Future<void> _onMessage(Map<String, dynamic> message) async {
+  Future<void> _onMessage(Map<dynamic, dynamic> message) async {
     Fluttertoast.showToast(
         msg: 'onMessage: $message', gravity: ToastGravity.CENTER);
   }
 
-  Future<void> _onNotificationOpened(Map<String, dynamic> message) async {
+  Future<void> _onNotificationOpened(Map<dynamic, dynamic> message) async {
     Fluttertoast.showToast(
         msg: 'onNotificationOpened: $message', gravity: ToastGravity.CENTER);
   }
 
-  Future<void> _onNotificationRemoved(Map<String, dynamic> message) async {
+  Future<void> _onNotificationRemoved(Map<dynamic, dynamic> message) async {
     Fluttertoast.showToast(
         msg: 'onNotificationRemoved: $message', gravity: ToastGravity.CENTER);
   }
 
   Future<void> _onAndroidNotificationClickedWithNoAction(
-      Map<String, dynamic> message) async {
+      Map<dynamic, dynamic> message) async {
     Fluttertoast.showToast(
         msg: 'onAndroidNotificationClickedWithNoAction: $message',
         gravity: ToastGravity.CENTER);
   }
 
-  Future<void> _onIOSChannelOpened(Map<String, dynamic> message) async {
+  Future<void> _onIOSChannelOpened(Map<dynamic, dynamic> message) async {
     Fluttertoast.showToast(
         msg: 'onIOSChannelOpened: $message', gravity: ToastGravity.CENTER);
   }
 
   Future<void> _onIOSRegisterDeviceTokenSuccess(
-      Map<String, dynamic> message) async {
+      Map<dynamic, dynamic> message) async {
     Fluttertoast.showToast(
         msg: 'onIOSRegisterDeviceTokenSuccess: $message',
         gravity: ToastGravity.CENTER);
   }
 
   Future<void> _onIOSRegisterDeviceTokenFailed(
-      Map<String, dynamic> message) async {
+      Map<dynamic, dynamic> message) async {
     Fluttertoast.showToast(
         msg: 'onIOSRegisterDeviceTokenFailed: $message',
         gravity: ToastGravity.CENTER);

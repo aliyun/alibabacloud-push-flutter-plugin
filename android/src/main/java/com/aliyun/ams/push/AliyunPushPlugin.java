@@ -39,11 +39,13 @@ import io.flutter.plugin.common.MethodChannel.Result;
  */
 public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 
-	private static final String CODE_SUCCESS = "0";
-	private static final String CODE_PARAM_ILLEGAL = "-1";
+	private static final String CODE_SUCCESS = "10000";
+	private static final String CODE_PARAM_ILLEGAL = "10001";
+	private static final String CODE_FAILED = "10002";
+	private static final String CODE_NOT_SUPPORT = "10005";
 
 	private static final String CODE_KEY = "code";
-	private static final String ERROR_MSG_KEY = "code";
+	private static final String ERROR_MSG_KEY = "errorMsg";
 
 	private MethodChannel channel;
 	private Context mContext;
@@ -80,9 +82,9 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 		} else if ("getDeviceId".equals(methodName)) {
 			getDeviceId(result);
 		} else if ("closePushLog".equals(methodName)) {
-			closePushLog();
+			closePushLog(result);
 		} else if ("setLogLevel".equals(methodName)) {
-			setLogLevel(call);
+			setLogLevel(call, result);
 		} else if ("bindAccount".equals(methodName)) {
 			bindAccount(call, result);
 		} else if ("unbindAccount".equals(methodName)) {
@@ -106,7 +108,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 		} else if ("setNotificationInGroup".equals(methodName)) {
 			setNotificationInGroup(call, result);
 		} else if ("clearNotifications".equals(methodName)) {
-			clearNotifications();
+			clearNotifications(result);
 		} else if ("createChannel".equals(methodName)) {
 			createChannel(call, result);
 		} else if ("createGroup".equals(methodName)) {
@@ -183,7 +185,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 
 			result.success(obj);
 		} else {
-			obj.put(CODE_KEY, "PUSH_30002");
+			obj.put(CODE_KEY, CODE_FAILED);
 			obj.put(ERROR_MSG_KEY, "context is not Application");
 
 			result.success(obj);
@@ -191,9 +193,12 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 
 	}
 
-	private void closePushLog() {
+	private void closePushLog(Result result) {
 		CloudPushService service = PushServiceFactory.getCloudPushService();
 		service.setLogLevel(CloudPushService.LOG_OFF);
+		HashMap<String, String> map = new HashMap<>();
+		map.put(CODE_KEY, CODE_SUCCESS);
+		result.success(map);
 	}
 
 	private void getDeviceId(Result result) {
@@ -202,17 +207,25 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 		result.success(deviceId);
 	}
 
-	private void setLogLevel(MethodCall call) {
+	private void setLogLevel(MethodCall call, Result result) {
 		Integer level = call.argument("level");
 		if (level != null) {
 			final CloudPushService pushService = PushServiceFactory.getCloudPushService();
 			pushService.setLogLevel(level);
+			HashMap<String, String> map = new HashMap<>();
+			map.put(CODE_KEY, CODE_SUCCESS);
+			result.success(map);
+		} else {
+			HashMap<String, String> map = new HashMap<>();
+			map.put(CODE_KEY, CODE_PARAM_ILLEGAL);
+			map.put(ERROR_MSG_KEY, "Log level is empty");
+			result.success(map);
 		}
 	}
 
 	private void bindAccount(MethodCall call, Result result) {
 		String account = call.argument("account");
-		HashMap<String, String> obj = new HashMap<String, String>();
+		HashMap<String, String> obj = new HashMap<>();
 		if (TextUtils.isEmpty(account)) {
 			obj.put(CODE_KEY, CODE_PARAM_ILLEGAL);
 			obj.put(ERROR_MSG_KEY, "account can not be empty");
@@ -237,7 +250,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 	}
 
 	private void unbindAccount(Result result) {
-		HashMap<String, String> obj = new HashMap<String, String>();
+		HashMap<String, String> obj = new HashMap<>();
 		final CloudPushService pushService = PushServiceFactory.getCloudPushService();
 		pushService.unbindAccount(new CommonCallback() {
 			@Override
@@ -256,7 +269,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 	}
 
 	private void addAlias(MethodCall call, Result result) {
-		HashMap<String, String> obj = new HashMap<String, String>();
+		HashMap<String, String> obj = new HashMap<>();
 		String alias = call.argument("alias");
 		if (TextUtils.isEmpty(alias)) {
 			obj.put(CODE_KEY, CODE_PARAM_ILLEGAL);
@@ -282,7 +295,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 	}
 
 	private void removeAlias(MethodCall call, Result result) {
-		HashMap<String, String> obj = new HashMap<String, String>();
+		HashMap<String, String> obj = new HashMap<>();
 		String alias = call.argument("alias");
 		if (TextUtils.isEmpty(alias)) {
 			obj.put(CODE_KEY, CODE_PARAM_ILLEGAL);
@@ -308,7 +321,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 	}
 
 	private void listAlias(Result result) {
-		HashMap<String, String> obj = new HashMap<String, String>();
+		HashMap<String, String> obj = new HashMap<>();
 		final CloudPushService pushService = PushServiceFactory.getCloudPushService();
 		pushService.listAliases(new CommonCallback() {
 			@Override
@@ -347,7 +360,6 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 			pushService.bindTag(target, tagsArray, alias, new CommonCallback() {
 				@Override
 				public void onSuccess(String response) {
-					//try {
 					result.success(obj);
 				}
 
@@ -363,7 +375,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 
 	private void unbindTag(MethodCall call, Result result) {
 		List<String> tags = call.argument("tags");
-		HashMap<String, String> obj = new HashMap<String, String>();
+		HashMap<String, String> obj = new HashMap<>();
 		if (tags == null || tags.isEmpty()) {
 			obj.put(CODE_KEY, CODE_PARAM_ILLEGAL);
 			obj.put(ERROR_MSG_KEY, "tags can not be empty");
@@ -401,7 +413,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 			//默认本设备
 			target = 1;
 		}
-		HashMap<String, String> obj = new HashMap<String, String>();
+		HashMap<String, String> obj = new HashMap<>();
 		final CloudPushService pushService = PushServiceFactory.getCloudPushService();
 		pushService.listTags(target, new CommonCallback() {
 			@Override
@@ -421,7 +433,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 	}
 
 	private void bindPhoneNumber(MethodCall call, Result result) {
-		HashMap<String, String> obj = new HashMap<String, String>();
+		HashMap<String, String> obj = new HashMap<>();
 		String alias = call.argument("phone");
 		if (TextUtils.isEmpty(alias)) {
 			obj.put(CODE_KEY, CODE_PARAM_ILLEGAL);
@@ -447,7 +459,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 	}
 
 	private void unbindPhoneNumber(Result result) {
-		HashMap<String, String> obj = new HashMap<String, String>();
+		HashMap<String, String> obj = new HashMap<>();
 
 		final CloudPushService pushService = PushServiceFactory.getCloudPushService();
 		pushService.unbindPhoneNumber(new CommonCallback() {
@@ -467,23 +479,27 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 	}
 
 	private void setNotificationInGroup(MethodCall call, Result result) {
-		HashMap<String, String> obj = new HashMap<String, String>();
 		Boolean inGroup = call.argument("inGroup");
 		if (inGroup == null) {
 			inGroup = false;
 		}
-
 		final CloudPushService pushService = PushServiceFactory.getCloudPushService();
-		//pushService.setNotificationShowInGroup(inGroup);
+		pushService.setNotificationShowInGroup(inGroup);
+		HashMap<String, String> map = new HashMap<>();
+		map.put(CODE_KEY, CODE_SUCCESS);
+		result.success(map);
 	}
 
-	private void clearNotifications() {
+	private void clearNotifications(Result result) {
 		final CloudPushService pushService = PushServiceFactory.getCloudPushService();
 		pushService.clearNotifications();
+		HashMap<String, String> map = new HashMap<>();
+		map.put(CODE_KEY, CODE_SUCCESS);
+		result.success(map);
 	}
 
 	private void createChannel(MethodCall call, Result result) {
-		HashMap<String, String> obj = new HashMap<String, String>();
+		HashMap<String, String> obj = new HashMap<>();
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
 			String id = call.argument("id");
@@ -559,15 +575,15 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 			obj.put(CODE_KEY, CODE_SUCCESS);
 			result.success(obj);
 		} else {
-			obj.put(CODE_KEY, "PUSH_30000");
+			obj.put(CODE_KEY, CODE_NOT_SUPPORT);
 			obj.put(ERROR_MSG_KEY,
-				"Android version is below Android O which is not support create group");
+				"Android version is below Android O which is not support create channel");
 			result.success(obj);
 		}
 	}
 
 	private void createGroup(MethodCall call, Result result) {
-		HashMap<String, String> obj = new HashMap<String, String>();
+		HashMap<String, String> obj = new HashMap<>();
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
 			String id = call.argument("id");
@@ -584,7 +600,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 			obj.put(CODE_KEY, CODE_SUCCESS);
 			result.success(obj);
 		} else {
-			obj.put(CODE_KEY, "PUSH_30000");
+			obj.put(CODE_KEY, CODE_NOT_SUPPORT);
 			obj.put(ERROR_MSG_KEY,
 				"Android version is below Android O which is not support create group");
 			result.success(obj);
