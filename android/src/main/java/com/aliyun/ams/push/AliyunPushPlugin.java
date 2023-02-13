@@ -327,7 +327,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 			@Override
 			public void onSuccess(String response) {
 				obj.put(CODE_KEY, CODE_SUCCESS);
-				obj.put("alias_list", response);
+				obj.put("aliasList", response);
 				result.success(obj);
 			}
 
@@ -420,7 +420,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 			@Override
 			public void onSuccess(String response) {
 				obj.put(CODE_KEY, CODE_SUCCESS);
-				obj.put("tags_list", response);
+				obj.put("tagsList", response);
 				result.success(obj);
 			}
 

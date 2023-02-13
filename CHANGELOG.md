@@ -1,3 +1,3 @@
 ## 0.0.1
 
-* TODO: Describe initial release.
+* 集成Android推送 3.8.2版本，iOS推送1.9.9.7版本

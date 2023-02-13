@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:aliyun_push/aliyun_push.dart';
@@ -8,40 +7,46 @@ class CommonApiPage extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() => _CommonApiPageState();
-
 }
 
 class _CommonApiPageState extends State<CommonApiPage> {
-
   final _pushPlugin = AliyunPush();
 
   final TextEditingController _accountController = TextEditingController();
   final TextEditingController _addAliasController = TextEditingController();
   final TextEditingController _removeAliasController = TextEditingController();
   final TextEditingController _addTagController = TextEditingController();
-  final TextEditingController _addAccountTagController = TextEditingController();
+  final TextEditingController _addAccountTagController =
+      TextEditingController();
   final TextEditingController _removeTagController = TextEditingController();
-  final TextEditingController _removeAccountTagController = TextEditingController();
+  final TextEditingController _removeAccountTagController =
+      TextEditingController();
 
   String _boundAccount = "";
 
   @override
   Widget build(BuildContext context) {
     final children = <Widget>[];
-    children.add( Padding(
+    children.add(Padding(
       padding: const EdgeInsets.all(8.0),
       child: ListTile(
-        title: const Text('账号绑定/解绑', style: TextStyle(color: Colors.white),),
+        title: const Text(
+          '账号绑定/解绑',
+          style: TextStyle(color: Colors.white),
+        ),
         tileColor: Colors.grey.shade400,
         trailing: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
       ),
     ));
     _addBindAccountView(children);
     _addUnbindAccountView(children);
-    children.add( Padding(
+    children.add(Padding(
       padding: const EdgeInsets.all(8.0),
       child: ListTile(
-        title: const Text('别名添加/删除', style: TextStyle(color: Colors.white),),
+        title: const Text(
+          '别名添加/删除',
+          style: TextStyle(color: Colors.white),
+        ),
         tileColor: Colors.grey.shade400,
         trailing: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
       ),
@@ -49,25 +54,29 @@ class _CommonApiPageState extends State<CommonApiPage> {
     _addBindAliasView(children);
     _addUnbindAliasView(children);
     _addListAliasView(children);
-    children.add( Padding(
+    children.add(Padding(
       padding: const EdgeInsets.all(8.0),
       child: ListTile(
-        title: const Text('设备标签添加/删除/查询', style: TextStyle(color: Colors.white),),
+        title: const Text(
+          '设备标签添加/删除/查询',
+          style: TextStyle(color: Colors.white),
+        ),
         tileColor: Colors.grey.shade400,
-        trailing: const Icon(Icons.keyboard_arrow_down,color: Colors.white),
+        trailing: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
       ),
     ));
     _addBindDeviceTagView(children);
     _addUnbindDeviceTagView(children);
     children.add(ElevatedButton(
         onPressed: () {
-          _pushPlugin.listTags(target: kAliyunTargetDevice).then((listTagsResult) {
+          _pushPlugin
+              .listTags(target: kAliyunTargetDevice)
+              .then((listTagsResult) {
             var code = listTagsResult['code'];
             if (code == kAliyunPushSuccessCode) {
-              var tagsList = listTagsResult['tags_list'];
+              var tagsList = listTagsResult['tagsList'];
               Fluttertoast.showToast(
-                  msg: '查询标签列表结果为 $tagsList',
-                  gravity: ToastGravity.CENTER);
+                  msg: '查询标签列表结果为 $tagsList', gravity: ToastGravity.CENTER);
             } else {
               var errorCode = listTagsResult['code'];
               var errorMsg = listTagsResult['errorMsg'];
@@ -78,29 +87,33 @@ class _CommonApiPageState extends State<CommonApiPage> {
           });
         },
         child: const Text('查询设备标签列表')));
-    children.add( Padding(
+    children.add(Padding(
       padding: const EdgeInsets.all(8.0),
       child: ListTile(
-        title: const Text('账号标签添加/删除', style: TextStyle(color: Colors.white),),
+        title: const Text(
+          '账号标签添加/删除',
+          style: TextStyle(color: Colors.white),
+        ),
         tileColor: Colors.grey.shade400,
-        trailing: const Icon(Icons.keyboard_arrow_down, color: Colors.white,),
+        trailing: const Icon(
+          Icons.keyboard_arrow_down,
+          color: Colors.white,
+        ),
       ),
     ));
     _addBindAccountTagView(children);
     _addUnbindAccountTagView(children);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Account/Alias/Tag'),
-      ),
-      body:ListView(
-            shrinkWrap: true,
-            children: children,
-          )
-
-    );
+        appBar: AppBar(
+          title: const Text('Account/Alias/Tag'),
+        ),
+        body: ListView(
+          shrinkWrap: true,
+          children: children,
+        ));
   }
-  
+
   _addBindAccountView(List<Widget> children) {
     children.add(
       Padding(
@@ -125,8 +138,7 @@ class _CommonApiPageState extends State<CommonApiPage> {
                 var code = bindResult['code'];
                 if (code == kAliyunPushSuccessCode) {
                   Fluttertoast.showToast(
-                      msg: '绑定账号$account成功',
-                      gravity: ToastGravity.CENTER);
+                      msg: '绑定账号$account成功', gravity: ToastGravity.CENTER);
                   setState(() {
                     _boundAccount = account;
                   });
@@ -150,7 +162,7 @@ class _CommonApiPageState extends State<CommonApiPage> {
       children.add(Text('已绑定账号: $_boundAccount'));
     }
   }
-  
+
   _addUnbindAccountView(List<Widget> children) {
     children.add(Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
@@ -200,8 +212,7 @@ class _CommonApiPageState extends State<CommonApiPage> {
                 var code = addResult['code'];
                 if (code == kAliyunPushSuccessCode) {
                   Fluttertoast.showToast(
-                      msg: '添加别名$alias成功',
-                      gravity: ToastGravity.CENTER);
+                      msg: '添加别名$alias成功', gravity: ToastGravity.CENTER);
                   _addAliasController.clear();
                 } else {
                   var errorCode = addResult['code'];
@@ -221,17 +232,19 @@ class _CommonApiPageState extends State<CommonApiPage> {
   }
 
   _addUnbindAliasView(List<Widget> children) {
-    children.add(Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      child: TextField(
-        autofocus: false,
-        decoration: const InputDecoration(
-          labelText: "删除的别名",
-          hintText: "删除的别名",
+    children.add(
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+        child: TextField(
+          autofocus: false,
+          decoration: const InputDecoration(
+            labelText: "删除的别名",
+            hintText: "删除的别名",
+          ),
+          controller: _removeAliasController,
         ),
-        controller: _removeAliasController,
       ),
-    ),);
+    );
     children.add(Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
       child: ElevatedButton(
@@ -242,8 +255,7 @@ class _CommonApiPageState extends State<CommonApiPage> {
                 var code = removeResult['code'];
                 if (code == kAliyunPushSuccessCode) {
                   Fluttertoast.showToast(
-                      msg: '删除别名$alias成功',
-                      gravity: ToastGravity.CENTER);
+                      msg: '删除别名$alias成功', gravity: ToastGravity.CENTER);
                   _removeAliasController.clear();
                 } else {
                   var errorCode = removeResult['code'];
@@ -270,10 +282,9 @@ class _CommonApiPageState extends State<CommonApiPage> {
             _pushPlugin.listAlias().then((listAliasResult) {
               var code = listAliasResult['code'];
               if (code == kAliyunPushSuccessCode) {
-                var aliasList = listAliasResult['alias_list'];
+                var aliasList = listAliasResult['aliasList'];
                 Fluttertoast.showToast(
-                    msg: '查询别名列表结果为 $aliasList',
-                    gravity: ToastGravity.CENTER);
+                    msg: '查询别名列表结果为 $aliasList', gravity: ToastGravity.CENTER);
               } else {
                 var errorCode = listAliasResult['code'];
                 var errorMsg = listAliasResult['errorMsg'];
@@ -332,17 +343,19 @@ class _CommonApiPageState extends State<CommonApiPage> {
   }
 
   _addUnbindDeviceTagView(List<Widget> children) {
-    children.add(Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      child: TextField(
-        autofocus: false,
-        decoration: const InputDecoration(
-          labelText: "删除的设备标签",
-          hintText: "删除的设备标签",
+    children.add(
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+        child: TextField(
+          autofocus: false,
+          decoration: const InputDecoration(
+            labelText: "删除的设备标签",
+            hintText: "删除的设备标签",
+          ),
+          controller: _removeTagController,
         ),
-        controller: _removeTagController,
       ),
-    ),);
+    );
     children.add(Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
       child: ElevatedButton(
@@ -375,17 +388,19 @@ class _CommonApiPageState extends State<CommonApiPage> {
   }
 
   _addBindAccountTagView(List<Widget> children) {
-    children.add(Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      child: TextField(
-        autofocus: false,
-        decoration: const InputDecoration(
-          labelText: "给账号添加的标签",
-          hintText: "给账号添加的标签",
+    children.add(
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+        child: TextField(
+          autofocus: false,
+          decoration: const InputDecoration(
+            labelText: "给账号添加的标签",
+            hintText: "给账号添加的标签",
+          ),
+          controller: _addAccountTagController,
         ),
-        controller: _addAccountTagController,
       ),
-    ),);
+    );
     children.add(Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
       child: ElevatedButton(
@@ -394,7 +409,9 @@ class _CommonApiPageState extends State<CommonApiPage> {
             if (tag != '') {
               var tags = <String>[];
               tags.add(tag);
-              _pushPlugin.bindTag(tags, target: kAliyunTargetAccount).then((bindTagResult) {
+              _pushPlugin
+                  .bindTag(tags, target: kAliyunTargetAccount)
+                  .then((bindTagResult) {
                 var code = bindTagResult['code'];
                 if (code == kAliyunPushSuccessCode) {
                   Fluttertoast.showToast(
@@ -437,7 +454,9 @@ class _CommonApiPageState extends State<CommonApiPage> {
             if (tag != '') {
               var tags = <String>[];
               tags.add(tag);
-              _pushPlugin.unbindTag(tags, target: kAliyunTargetAccount).then((bindTagResult) {
+              _pushPlugin
+                  .unbindTag(tags, target: kAliyunTargetAccount)
+                  .then((bindTagResult) {
                 var code = bindTagResult['code'];
                 if (code == kAliyunPushSuccessCode) {
                   Fluttertoast.showToast(
@@ -459,5 +478,4 @@ class _CommonApiPageState extends State<CommonApiPage> {
           child: const Text('删除账号标签')),
     ));
   }
-
 }

@@ -118,8 +118,8 @@ class _HomePageState extends State<HomePage> {
     String appKey;
     String appSecret;
     if (Platform.isIOS) {
-      appKey = "23793506";
-      appSecret = "226c59086b35aaa711eac776e87c617c";
+      appKey = "填写自己iOS项目的appKey";
+      appSecret = "填写自己iOS项目的appSecret";
     } else {
       appKey = "";
       appSecret = "";

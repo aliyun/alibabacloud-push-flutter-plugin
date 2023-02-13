@@ -142,14 +142,15 @@ class AliyunPush {
     return initResult;
   }
 
-  Future<Map<dynamic, dynamic>> closeAndroidPushLog() async{
+  Future<Map<dynamic, dynamic>> closeAndroidPushLog() async {
     if (!Platform.isAndroid) {
       return {
         'code': kAliyunPushOnlyAndroid,
         'errorMsg': 'Only support Android'
       };
     }
-    Map<dynamic, dynamic> result = await methodChannel.invokeMethod('closePushLog');
+    Map<dynamic, dynamic> result =
+        await methodChannel.invokeMethod('closePushLog');
     return result;
   }
 
@@ -160,14 +161,15 @@ class AliyunPush {
   }
 
   ///设置log的级别
-  Future<Map<dynamic, dynamic>> setAndroidLogLevel(int level) async{
+  Future<Map<dynamic, dynamic>> setAndroidLogLevel(int level) async {
     if (!Platform.isAndroid) {
       return {
         'code': kAliyunPushOnlyAndroid,
         'errorMsg': 'Only support Android'
       };
     }
-    Map<dynamic, dynamic> result = await methodChannel.invokeMethod('setLogLevel', {'level': level});
+    Map<dynamic, dynamic> result =
+        await methodChannel.invokeMethod('setLogLevel', {'level': level});
     return result;
   }
 
@@ -242,6 +244,12 @@ class AliyunPush {
 
   ///绑定手机号码
   Future<Map<dynamic, dynamic>> bindPhoneNumber(String phone) async {
+    if (!Platform.isAndroid) {
+      return {
+        'code': kAliyunPushOnlyAndroid,
+        'errorMsg': 'Only support Android'
+      };
+    }
     Map<dynamic, dynamic> bindResult =
         await methodChannel.invokeMethod('bindPhoneNumber', {'phone': phone});
     return bindResult;
@@ -249,6 +257,12 @@ class AliyunPush {
 
   ///绑定手机号码
   Future<Map<dynamic, dynamic>> unbindPhoneNumber() async {
+    if (!Platform.isAndroid) {
+      return {
+        'code': kAliyunPushOnlyAndroid,
+        'errorMsg': 'Only support Android'
+      };
+    }
     Map<dynamic, dynamic> unbindResult =
         await methodChannel.invokeMethod('unbindPhoneNumber');
     return unbindResult;
@@ -257,26 +271,28 @@ class AliyunPush {
   ///设置通知分组展示，只针对android
   ///
   ///@param inGroup 是否分组折叠展示
-  Future<Map<dynamic, dynamic>> setNotificationInGroup(bool inGroup) async{
+  Future<Map<dynamic, dynamic>> setNotificationInGroup(bool inGroup) async {
     if (!Platform.isAndroid) {
       return {
         'code': kAliyunPushOnlyAndroid,
         'errorMsg': 'Only support Android'
       };
     }
-    Map<dynamic, dynamic> result = await methodChannel.invokeMethod('setNotificationInGroup', {'inGroup': inGroup});
+    Map<dynamic, dynamic> result = await methodChannel
+        .invokeMethod('setNotificationInGroup', {'inGroup': inGroup});
     return result;
   }
 
   ///清除所有通知
-  Future<Map<dynamic, dynamic>> clearNotifications() async{
+  Future<Map<dynamic, dynamic>> clearNotifications() async {
     if (!Platform.isAndroid) {
       return {
         'code': kAliyunPushOnlyAndroid,
         'errorMsg': 'Only support Android'
       };
     }
-    Map<dynamic, dynamic> result = await methodChannel.invokeMethod('clearNotifications');
+    Map<dynamic, dynamic> result =
+        await methodChannel.invokeMethod('clearNotifications');
     return result;
   }
 

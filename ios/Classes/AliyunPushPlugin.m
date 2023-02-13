@@ -473,7 +473,7 @@ static BOOL logEnable = NO;
 - (void) listAlias:(FlutterResult)result {
     [CloudPushSDK listAliases:^(CloudPushCallbackResult *res) {
         if (res.success) {
-            result(@{KEY_CODE:CODE_SUCCESS, @"alias_list": res.data});
+            result(@{KEY_CODE:CODE_SUCCESS, @"aliasList": res.data});
         } else {
             result(@{KEY_CODE:CODE_FAILED, KEY_ERROR_MSG: res.error.userInfo});
         }
@@ -544,7 +544,7 @@ static BOOL logEnable = NO;
     }
     [CloudPushSDK listTags:target withCallback:^(CloudPushCallbackResult *res) {
         if (res.success) {
-            result(@{KEY_CODE:CODE_SUCCESS, @"tags_list": res.data});
+            result(@{KEY_CODE:CODE_SUCCESS, @"tagsList": res.data});
         } else {
             result(@{KEY_CODE:CODE_FAILED, KEY_ERROR_MSG: res.error.userInfo});
         }
