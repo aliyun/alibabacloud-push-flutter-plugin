@@ -360,6 +360,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 			pushService.bindTag(target, tagsArray, alias, new CommonCallback() {
 				@Override
 				public void onSuccess(String response) {
+					obj.put(CODE_KEY, CODE_SUCCESS);
 					result.success(obj);
 				}
 
