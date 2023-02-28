@@ -467,7 +467,7 @@ _pushPlugin.listAlias(account).then((result) {
 
 | 参数名 | 类型 | 是否必须 | 含义 |
 | --- | --- | ---| --- |
-| tags | List<String> | 必须参数 |  要绑定的标签列表 |
+| tags | List\<String> | 必须参数 |  要绑定的标签列表 |
 | target | int | 可选参数 |  目标类型，1: 本设备  2: 本设备绑定账号  3: 别名</br>默认是1 |
 | alias | String| 可选参数 | 别名（仅当target = 3时生效）
 
@@ -592,7 +592,7 @@ _aliyunPush.closeAndroidPushLog().then((result) {
 
 | 参数名 | 类型 | 是否必须 | 含义 |
 | --- | --- | ---| --- |
-| level | int | 必须参数 |  日志级别<br/>0 - Error <br /> 1 - Info <br/> 2- Debug|
+| level | int | 必须参数 |  日志级别</br>0 - Error </br> 1 - Info </br> 2- Debug|
 
 返回值：
 
