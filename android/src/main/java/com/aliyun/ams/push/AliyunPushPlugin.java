@@ -435,14 +435,14 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 
 	private void bindPhoneNumber(MethodCall call, Result result) {
 		HashMap<String, String> obj = new HashMap<>();
-		String alias = call.argument("phone");
-		if (TextUtils.isEmpty(alias)) {
+		String phone = call.argument("phone");
+		if (TextUtils.isEmpty(phone)) {
 			obj.put(CODE_KEY, CODE_PARAM_ILLEGAL);
 			obj.put(ERROR_MSG_KEY, "phone number can not be empty");
 			result.success(obj);
 		} else {
 			final CloudPushService pushService = PushServiceFactory.getCloudPushService();
-			pushService.bindPhoneNumber(alias, new CommonCallback() {
+			pushService.bindPhoneNumber(phone, new CommonCallback() {
 				@Override
 				public void onSuccess(String response) {
 					obj.put(CODE_KEY, CODE_SUCCESS);
