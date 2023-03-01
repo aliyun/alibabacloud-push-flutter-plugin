@@ -255,7 +255,7 @@ class AliyunPush {
     return bindResult;
   }
 
-  ///绑定手机号码
+  ///解绑手机号码
   Future<Map<dynamic, dynamic>> unbindPhoneNumber() async {
     if (!Platform.isAndroid) {
       return {
