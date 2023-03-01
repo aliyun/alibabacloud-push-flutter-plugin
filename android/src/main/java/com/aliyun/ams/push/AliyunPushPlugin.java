@@ -544,7 +544,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 			if (showBadge != null) {
 				channel.setShowBadge(showBadge);
 			}
-			if (soundPath != null) {
+			if (!TextUtils.isEmpty(soundPath)) {
 				File file = new File(soundPath);
 				if (file.exists() && file.canRead() && file.isFile()) {
 					if (soundUsage == null) {
