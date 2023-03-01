@@ -971,16 +971,6 @@ _aliyunPush.isIOSChannelOpened().then((opened) {
 });
 ```
 
-## 五、错误码
-
-| 名称 | 值 |  含义 |
-| --- | --- | --- |
-| kAliyunPushSuccessCode | "10000" | 成功 |
-| kAliyunPushFailedCode | "10001" | 通用失败码 |
-| kAliyunPushOnlyAndroid | "10002" | 方法只支持Android平台|
-| kAliyunPushOnlyIOS | "10003" | 方法只支持iOS平台 |
-| kAliyunPushNotSupport | "10004" | 平台不支持，比如Android创建group只支持Android 8.0以上版本|
-
 ### setPluginLogEnabled
 
 `void setPluginLogEnabled(bool enabled)`
@@ -992,3 +982,15 @@ _aliyunPush.isIOSChannelOpened().then((opened) {
 ```dart
 _aliyunPush.setPluginLogEnabled(true);
 ```
+
+## 五、错误码
+
+| 名称 | 值 |  含义 |
+| --- | --- | --- |
+| kAliyunPushSuccessCode | "10000" | 成功 |
+| kAliyunPushFailedCode | "10001" | 通用失败码 |
+| kAliyunPushOnlyAndroid | "10002" | 方法只支持Android平台|
+| kAliyunPushOnlyIOS | "10003" | 方法只支持iOS平台 |
+| kAliyunPushNotSupport | "10004" | 平台不支持，比如Android创建group只支持Android 8.0以上版本|
+
+
