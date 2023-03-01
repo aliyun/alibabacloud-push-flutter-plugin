@@ -420,6 +420,9 @@ class AliyunPush {
   }
 
   Future<bool> isIOSChannelOpened() async {
+    if (!Platform.isIOS) {
+      return false;
+    }
     var opened = await methodChannel.invokeMethod('isChannelOpened');
     return opened;
   }
