@@ -141,17 +141,17 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 		pushService.register(mContext, new CommonCallback() {
 			@Override
 			public void onSuccess(String response) {
-				HashMap<String, String> obj = new HashMap<>();
-				obj.put(CODE_KEY, CODE_SUCCESS);
-				result.success(obj);
+				HashMap<String, String> map = new HashMap<>();
+				map.put(CODE_KEY, CODE_SUCCESS);
+				result.success(map);
 			}
 
 			@Override
 			public void onFailed(String errorCode, String errorMessage) {
-				HashMap<String, String> obj = new HashMap<>();
-				obj.put(CODE_KEY, errorCode);
-				obj.put(ERROR_MSG_KEY, errorMessage);
-				result.success(obj);
+				HashMap<String, String> map = new HashMap<>();
+				map.put(CODE_KEY, errorCode);
+				map.put(ERROR_MSG_KEY, errorMessage);
+				result.success(map);
 			}
 		});
 		pushService.turnOnPushChannel(new CommonCallback() {
@@ -169,7 +169,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 
 	private void initThirdPush(Result result) {
 
-		HashMap<String, String> obj = new HashMap<>();
+		HashMap<String, String> map = new HashMap<>();
 		Context context = mContext.getApplicationContext();
 		if (context instanceof Application) {
 			Application application = (Application)context;
@@ -181,16 +181,13 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 			AliyunThirdPushUtils.registerGCM(application);
 			AliyunThirdPushUtils.registerHonorPush(application);
 
-			obj.put(CODE_KEY, CODE_SUCCESS);
-
-			result.success(obj);
+			map.put(CODE_KEY, CODE_SUCCESS);
 		} else {
-			obj.put(CODE_KEY, CODE_FAILED);
-			obj.put(ERROR_MSG_KEY, "context is not Application");
-
-			result.success(obj);
+			map.put(CODE_KEY, CODE_FAILED);
+			map.put(ERROR_MSG_KEY, "context is not Application");
 		}
 
+		result.success(map);
 	}
 
 	private void closePushLog(Result result) {
@@ -209,144 +206,142 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 
 	private void setLogLevel(MethodCall call, Result result) {
 		Integer level = call.argument("level");
+		HashMap<String, String> map = new HashMap<>();
 		if (level != null) {
 			final CloudPushService pushService = PushServiceFactory.getCloudPushService();
 			pushService.setLogLevel(level);
-			HashMap<String, String> map = new HashMap<>();
 			map.put(CODE_KEY, CODE_SUCCESS);
-			result.success(map);
 		} else {
-			HashMap<String, String> map = new HashMap<>();
 			map.put(CODE_KEY, CODE_PARAM_ILLEGAL);
 			map.put(ERROR_MSG_KEY, "Log level is empty");
-			result.success(map);
 		}
+		result.success(map);
 	}
 
 	private void bindAccount(MethodCall call, Result result) {
 		String account = call.argument("account");
-		HashMap<String, String> obj = new HashMap<>();
+		HashMap<String, String> map = new HashMap<>();
 		if (TextUtils.isEmpty(account)) {
-			obj.put(CODE_KEY, CODE_PARAM_ILLEGAL);
-			obj.put(ERROR_MSG_KEY, "account can not be empty");
-			result.success(obj);
+			map.put(CODE_KEY, CODE_PARAM_ILLEGAL);
+			map.put(ERROR_MSG_KEY, "account can not be empty");
+			result.success(map);
 		} else {
 			final CloudPushService pushService = PushServiceFactory.getCloudPushService();
 			pushService.bindAccount(account, new CommonCallback() {
 				@Override
 				public void onSuccess(String response) {
-					obj.put(CODE_KEY, CODE_SUCCESS);
-					result.success(obj);
+					map.put(CODE_KEY, CODE_SUCCESS);
+					result.success(map);
 				}
 
 				@Override
 				public void onFailed(String errorCode, String errorMsg) {
-					obj.put(CODE_KEY, errorCode);
-					obj.put(ERROR_MSG_KEY, errorMsg);
-					result.success(obj);
+					map.put(CODE_KEY, errorCode);
+					map.put(ERROR_MSG_KEY, errorMsg);
+					result.success(map);
 				}
 			});
 		}
 	}
 
 	private void unbindAccount(Result result) {
-		HashMap<String, String> obj = new HashMap<>();
+		HashMap<String, String> map = new HashMap<>();
 		final CloudPushService pushService = PushServiceFactory.getCloudPushService();
 		pushService.unbindAccount(new CommonCallback() {
 			@Override
 			public void onSuccess(String response) {
-				obj.put(CODE_KEY, CODE_SUCCESS);
-				result.success(obj);
+				map.put(CODE_KEY, CODE_SUCCESS);
+				result.success(map);
 			}
 
 			@Override
 			public void onFailed(String errorCode, String errorMsg) {
-				obj.put(CODE_KEY, errorCode);
-				obj.put(ERROR_MSG_KEY, errorMsg);
-				result.success(obj);
+				map.put(CODE_KEY, errorCode);
+				map.put(ERROR_MSG_KEY, errorMsg);
+				result.success(map);
 			}
 		});
 	}
 
 	private void addAlias(MethodCall call, Result result) {
-		HashMap<String, String> obj = new HashMap<>();
+		HashMap<String, String> map = new HashMap<>();
 		String alias = call.argument("alias");
 		if (TextUtils.isEmpty(alias)) {
-			obj.put(CODE_KEY, CODE_PARAM_ILLEGAL);
-			obj.put(ERROR_MSG_KEY, "alias can not be empty");
-			result.success(obj);
+			map.put(CODE_KEY, CODE_PARAM_ILLEGAL);
+			map.put(ERROR_MSG_KEY, "alias can not be empty");
+			result.success(map);
 		} else {
 			final CloudPushService pushService = PushServiceFactory.getCloudPushService();
 			pushService.addAlias(alias, new CommonCallback() {
 				@Override
 				public void onSuccess(String response) {
-					obj.put(CODE_KEY, CODE_SUCCESS);
-					result.success(obj);
+					map.put(CODE_KEY, CODE_SUCCESS);
+					result.success(map);
 				}
 
 				@Override
 				public void onFailed(String errorCode, String errorMsg) {
-					obj.put(CODE_KEY, errorCode);
-					obj.put(ERROR_MSG_KEY, errorMsg);
-					result.success(obj);
+					map.put(CODE_KEY, errorCode);
+					map.put(ERROR_MSG_KEY, errorMsg);
+					result.success(map);
 				}
 			});
 		}
 	}
 
 	private void removeAlias(MethodCall call, Result result) {
-		HashMap<String, String> obj = new HashMap<>();
+		HashMap<String, String> map = new HashMap<>();
 		String alias = call.argument("alias");
 		if (TextUtils.isEmpty(alias)) {
-			obj.put(CODE_KEY, CODE_PARAM_ILLEGAL);
-			obj.put(ERROR_MSG_KEY, "alias can not be empty");
-			result.success(obj);
+			map.put(CODE_KEY, CODE_PARAM_ILLEGAL);
+			map.put(ERROR_MSG_KEY, "alias can not be empty");
+			result.success(map);
 		} else {
 			final CloudPushService pushService = PushServiceFactory.getCloudPushService();
 			pushService.removeAlias(alias, new CommonCallback() {
 				@Override
 				public void onSuccess(String response) {
-					obj.put(CODE_KEY, CODE_SUCCESS);
-					result.success(obj);
+					map.put(CODE_KEY, CODE_SUCCESS);
+					result.success(map);
 				}
 
 				@Override
 				public void onFailed(String errorCode, String errorMsg) {
-					obj.put(CODE_KEY, errorCode);
-					obj.put(ERROR_MSG_KEY, errorMsg);
-					result.success(obj);
+					map.put(CODE_KEY, errorCode);
+					map.put(ERROR_MSG_KEY, errorMsg);
+					result.success(map);
 				}
 			});
 		}
 	}
 
 	private void listAlias(Result result) {
-		HashMap<String, String> obj = new HashMap<>();
+		HashMap<String, String> map = new HashMap<>();
 		final CloudPushService pushService = PushServiceFactory.getCloudPushService();
 		pushService.listAliases(new CommonCallback() {
 			@Override
 			public void onSuccess(String response) {
-				obj.put(CODE_KEY, CODE_SUCCESS);
-				obj.put("aliasList", response);
-				result.success(obj);
+				map.put(CODE_KEY, CODE_SUCCESS);
+				map.put("aliasList", response);
+				result.success(map);
 			}
 
 			@Override
 			public void onFailed(String errorCode, String errorMsg) {
-				obj.put(CODE_KEY, errorCode);
-				obj.put(ERROR_MSG_KEY, errorMsg);
-				result.success(obj);
+				map.put(CODE_KEY, errorCode);
+				map.put(ERROR_MSG_KEY, errorMsg);
+				result.success(map);
 			}
 		});
 	}
 
 	private void bindTag(MethodCall call, Result result) {
 		List<String> tags = call.argument("tags");
-		HashMap<String, String> obj = new HashMap<>();
+		HashMap<String, String> map = new HashMap<>();
 		if (tags == null || tags.isEmpty()) {
-			obj.put(CODE_KEY, CODE_PARAM_ILLEGAL);
-			obj.put(ERROR_MSG_KEY, "tags can not be empty");
-			result.success(obj);
+			map.put(CODE_KEY, CODE_PARAM_ILLEGAL);
+			map.put(ERROR_MSG_KEY, "tags can not be empty");
+			result.success(map);
 		} else {
 			Integer target = call.argument("target");
 			if (target == null) {
@@ -360,15 +355,15 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 			pushService.bindTag(target, tagsArray, alias, new CommonCallback() {
 				@Override
 				public void onSuccess(String response) {
-					obj.put(CODE_KEY, CODE_SUCCESS);
-					result.success(obj);
+					map.put(CODE_KEY, CODE_SUCCESS);
+					result.success(map);
 				}
 
 				@Override
 				public void onFailed(String errorCode, String errorMsg) {
-					obj.put(CODE_KEY, errorCode);
-					obj.put(ERROR_MSG_KEY, errorMsg);
-					result.success(obj);
+					map.put(CODE_KEY, errorCode);
+					map.put(ERROR_MSG_KEY, errorMsg);
+					result.success(map);
 				}
 			});
 		}
@@ -376,11 +371,11 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 
 	private void unbindTag(MethodCall call, Result result) {
 		List<String> tags = call.argument("tags");
-		HashMap<String, String> obj = new HashMap<>();
+		HashMap<String, String> map = new HashMap<>();
 		if (tags == null || tags.isEmpty()) {
-			obj.put(CODE_KEY, CODE_PARAM_ILLEGAL);
-			obj.put(ERROR_MSG_KEY, "tags can not be empty");
-			result.success(obj);
+			map.put(CODE_KEY, CODE_PARAM_ILLEGAL);
+			map.put(ERROR_MSG_KEY, "tags can not be empty");
+			result.success(map);
 		} else {
 			Integer target = call.argument("target");
 			if (target == null) {
@@ -394,15 +389,15 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 			pushService.unbindTag(target, tagsArray, alias, new CommonCallback() {
 				@Override
 				public void onSuccess(String response) {
-					obj.put(CODE_KEY, CODE_SUCCESS);
-					result.success(obj);
+					map.put(CODE_KEY, CODE_SUCCESS);
+					result.success(map);
 				}
 
 				@Override
 				public void onFailed(String errorCode, String errorMsg) {
-					obj.put(CODE_KEY, errorCode);
-					obj.put(ERROR_MSG_KEY, errorMsg);
-					result.success(obj);
+					map.put(CODE_KEY, errorCode);
+					map.put(ERROR_MSG_KEY, errorMsg);
+					result.success(map);
 				}
 			});
 		}
@@ -414,67 +409,67 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 			//默认本设备
 			target = 1;
 		}
-		HashMap<String, String> obj = new HashMap<>();
+		HashMap<String, String> map = new HashMap<>();
 		final CloudPushService pushService = PushServiceFactory.getCloudPushService();
 		pushService.listTags(target, new CommonCallback() {
 			@Override
 			public void onSuccess(String response) {
-				obj.put(CODE_KEY, CODE_SUCCESS);
-				obj.put("tagsList", response);
-				result.success(obj);
+				map.put(CODE_KEY, CODE_SUCCESS);
+				map.put("tagsList", response);
+				result.success(map);
 			}
 
 			@Override
 			public void onFailed(String errorCode, String errorMsg) {
-				obj.put(CODE_KEY, errorCode);
-				obj.put(ERROR_MSG_KEY, errorMsg);
-				result.success(obj);
+				map.put(CODE_KEY, errorCode);
+				map.put(ERROR_MSG_KEY, errorMsg);
+				result.success(map);
 			}
 		});
 	}
 
 	private void bindPhoneNumber(MethodCall call, Result result) {
-		HashMap<String, String> obj = new HashMap<>();
+		HashMap<String, String> map = new HashMap<>();
 		String phone = call.argument("phone");
 		if (TextUtils.isEmpty(phone)) {
-			obj.put(CODE_KEY, CODE_PARAM_ILLEGAL);
-			obj.put(ERROR_MSG_KEY, "phone number can not be empty");
-			result.success(obj);
+			map.put(CODE_KEY, CODE_PARAM_ILLEGAL);
+			map.put(ERROR_MSG_KEY, "phone number can not be empty");
+			result.success(map);
 		} else {
 			final CloudPushService pushService = PushServiceFactory.getCloudPushService();
 			pushService.bindPhoneNumber(phone, new CommonCallback() {
 				@Override
 				public void onSuccess(String response) {
-					obj.put(CODE_KEY, CODE_SUCCESS);
-					result.success(obj);
+					map.put(CODE_KEY, CODE_SUCCESS);
+					result.success(map);
 				}
 
 				@Override
 				public void onFailed(String errorCode, String errorMsg) {
-					obj.put(CODE_KEY, errorCode);
-					obj.put(ERROR_MSG_KEY, errorMsg);
-					result.success(obj);
+					map.put(CODE_KEY, errorCode);
+					map.put(ERROR_MSG_KEY, errorMsg);
+					result.success(map);
 				}
 			});
 		}
 	}
 
 	private void unbindPhoneNumber(Result result) {
-		HashMap<String, String> obj = new HashMap<>();
+		HashMap<String, String> map = new HashMap<>();
 
 		final CloudPushService pushService = PushServiceFactory.getCloudPushService();
 		pushService.unbindPhoneNumber(new CommonCallback() {
 			@Override
 			public void onSuccess(String response) {
-				obj.put(CODE_KEY, CODE_SUCCESS);
-				result.success(obj);
+				map.put(CODE_KEY, CODE_SUCCESS);
+				result.success(map);
 			}
 
 			@Override
 			public void onFailed(String errorCode, String errorMsg) {
-				obj.put(CODE_KEY, errorCode);
-				obj.put(ERROR_MSG_KEY, errorMsg);
-				result.success(obj);
+				map.put(CODE_KEY, errorCode);
+				map.put(ERROR_MSG_KEY, errorMsg);
+				result.success(map);
 			}
 		});
 	}
@@ -500,7 +495,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 	}
 
 	private void createChannel(MethodCall call, Result result) {
-		HashMap<String, String> obj = new HashMap<>();
+		HashMap<String, String> map = new HashMap<>();
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
 			String id = call.argument("id");
@@ -573,18 +568,18 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 				channel.setVibrationPattern(pattern);
 			}
 			notificationManager.createNotificationChannel(channel);
-			obj.put(CODE_KEY, CODE_SUCCESS);
-			result.success(obj);
+			map.put(CODE_KEY, CODE_SUCCESS);
+			result.success(map);
 		} else {
-			obj.put(CODE_KEY, CODE_NOT_SUPPORT);
-			obj.put(ERROR_MSG_KEY,
+			map.put(CODE_KEY, CODE_NOT_SUPPORT);
+			map.put(ERROR_MSG_KEY,
 				"Android version is below Android O which is not support create channel");
-			result.success(obj);
+			result.success(map);
 		}
 	}
 
 	private void createGroup(MethodCall call, Result result) {
-		HashMap<String, String> obj = new HashMap<>();
+		HashMap<String, String> map = new HashMap<>();
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
 			String id = call.argument("id");
@@ -598,13 +593,13 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 				group.setDescription(desc);
 			}
 			notificationManager.createNotificationChannelGroup(group);
-			obj.put(CODE_KEY, CODE_SUCCESS);
-			result.success(obj);
+			map.put(CODE_KEY, CODE_SUCCESS);
+			result.success(map);
 		} else {
-			obj.put(CODE_KEY, CODE_NOT_SUPPORT);
-			obj.put(ERROR_MSG_KEY,
+			map.put(CODE_KEY, CODE_NOT_SUPPORT);
+			map.put(ERROR_MSG_KEY,
 				"Android version is below Android O which is not support create group");
-			result.success(obj);
+			result.success(map);
 		}
 	}
 

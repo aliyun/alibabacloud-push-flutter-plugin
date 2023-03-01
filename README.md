@@ -980,3 +980,15 @@ _aliyunPush.isIOSChannelOpened().then((opened) {
 | kAliyunPushOnlyAndroid | "10002" | 方法只支持Android平台|
 | kAliyunPushOnlyIOS | "10003" | 方法只支持iOS平台 |
 | kAliyunPushNotSupport | "10004" | 平台不支持，比如Android创建group只支持Android 8.0以上版本|
+
+### setPluginLogEnabled
+
+`void setPluginLogEnabled(bool enabled)`
+
+设置插件的日志是否开启
+
+代码示例:
+
+```dart
+_aliyunPush.setPluginLogEnabled(true);
+```

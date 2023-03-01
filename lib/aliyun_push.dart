@@ -426,4 +426,8 @@ class AliyunPush {
     var opened = await methodChannel.invokeMethod('isChannelOpened');
     return opened;
   }
+
+  void setPluginLogEnabled(bool enabled) {
+    methodChannel.invokeMethod('setPluginLogEnabled', {'enabled': enabled});
+  }
 }
