@@ -321,7 +321,7 @@ class AliyunPush {
       'id': id,
       'name': name,
       'importance': importance,
-      'description': description,
+      'desc': description,
       'groupId': groupId,
       'allowBubbles': allowBubbles,
       'light': light,

@@ -74,7 +74,7 @@ class _AndroidPageState extends State<AndroidPage> {
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
       child: ElevatedButton(
           onPressed: () {
-            _aliyunPush.setNotificationInGroup(true).then((result){
+            _aliyunPush.setNotificationInGroup(true).then((result) {
               var code = result['code'];
               if (code == kAliyunPushSuccessCode) {
                 Fluttertoast.showToast(
@@ -252,7 +252,8 @@ class _AndroidPageState extends State<AndroidPage> {
             var code = result['code'];
             if (code == kAliyunPushSuccessCode) {
               Fluttertoast.showToast(
-                  msg: '成功设置LogLevel为 $_selectedLogLevel', gravity: ToastGravity.CENTER);
+                  msg: '成功设置LogLevel为 $_selectedLogLevel',
+                  gravity: ToastGravity.CENTER);
             } else {
               var errorCode = result['code'];
               var errorMsg = result['errorMsg'];
@@ -289,7 +290,7 @@ class _AndroidPageState extends State<AndroidPage> {
                 var code = bindResult['code'];
                 if (code == kAliyunPushSuccessCode) {
                   Fluttertoast.showToast(
-                      msg: '绑定手机吗$phone成功', gravity: ToastGravity.CENTER);
+                      msg: '绑定手机$phone成功', gravity: ToastGravity.CENTER);
                   setState(() {
                     _boundPhone = phone;
                   });
