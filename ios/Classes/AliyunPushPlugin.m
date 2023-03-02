@@ -98,7 +98,6 @@ static BOOL logEnable = NO;
 
 -(void)registerAPNS {
     float systemVersionNum = [[[UIDevice currentDevice] systemVersion] floatValue];
-    NSLog(@"####### ===> systemVersion: %f", systemVersionNum);
     if (systemVersionNum >= 10.0) {
         // iOS 10 notifications
         _notificationCenter = [UNUserNotificationCenter currentNotificationCenter];
@@ -137,8 +136,6 @@ static BOOL logEnable = NO;
 
 
 - (BOOL)application:(UIApplication*)application didReceiveRemoteNotification:(nonnull NSDictionary *)userInfo fetchCompletionHandler:(nonnull void (^)(UIBackgroundFetchResult))completionHandler {
-    
-    NSLog(@"#### ==> didReceiveRemoteNotification");
     
     // 取得APNS通知内容
     NSDictionary *aps = [userInfo valueForKey:@"aps"];
@@ -361,7 +358,6 @@ static BOOL logEnable = NO;
  */
 - (void)onMessageReceived:(NSNotification *)notification {
     CCPSysMessage *message = [notification object];
-    NSLog(@"onMessageReceive");
     NSMutableDictionary *dic = [NSMutableDictionary dictionary];
     [dic setValue:message.title forKey:@"title"];
     [dic setValue:message.body forKey:@"body"];

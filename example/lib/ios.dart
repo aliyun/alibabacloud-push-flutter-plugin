@@ -37,7 +37,7 @@ class _IOSPageState extends State<IOSPage> {
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
       child: ElevatedButton(
           onPressed: () {
-            _aliyunPush.showIOSNoticeWhenForeground(true).then((result){
+            _aliyunPush.showIOSNoticeWhenForeground(true).then((result) {
               var code = result['code'];
               if (code == kAliyunPushSuccessCode) {
                 Fluttertoast.showToast(

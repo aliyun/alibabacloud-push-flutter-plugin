@@ -237,7 +237,12 @@ class _HomePageState extends State<HomePage> {
                       }),
                     );
                   },
-                  child: const Text('iOS平台特定方法'))
+                  child: const Text('iOS平台特定方法')),
+              ElevatedButton(
+                  onPressed: () {
+                    _aliyunPush.setPluginLogEnabled(true);
+                  },
+                  child: const Text('开启插件日志'))
             ],
           ),
         ),
