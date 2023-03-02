@@ -15,3 +15,7 @@
 * README优化
 * 代码优化
 * 增加控制插件日志是否开启的API
+
+## 0.0.5
+
+* 修复Android创建Channel时desc字段key值不一致问题
