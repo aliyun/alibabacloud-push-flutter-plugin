@@ -916,19 +916,90 @@ _aliyunPush.turnOnIOSDebug().then((result) {
 
 ### showIOSNoticeWhenForeground
 
+`Future<Map<dynamic, dynamic>> showIOSNoticeWhenForeground(bool enable) async`
+
+App处于前台时显示通知
+
 > **注意：只支持iOS平台**
 
+返回值：
+
+`Map<dynamic, dynamic>`
+
+map中包含两个key值:
+
++ `code`: 错误码
++ `errorMsg`: 错误信息
+
+代码示例：
+
+```dart
+_aliyunPush.showIOSNoticeWhenForeground(true).then((result) {
+    var code = result['code'];
+    if (code == kAliyunPushSuccessCode) {
+        Fluttertoast.showToast(
+            msg: '设置前台显示通知成功', gravity: ToastGravity.CENTER);
+    }
+});
+```
+
 ### setIOSBadgeNum
+
+`Future<Map<dynamic, dynamic>> setIOSBadgeNum(int num) async`
 
 设置角标数
 
 > **注意：只支持iOS平台**
 
+返回值：
+
+`Map<dynamic, dynamic>`
+
+map中包含两个key值:
+
++ `code`: 错误码
++ `errorMsg`: 错误信息
+
+代码示例：
+
+```dart
+_aliyunPush.setIOSBadgeNum(badgeNum).then((result) {
+    var code = result['code'];
+        if (code == kAliyunPushSuccessCode) {
+            Fluttertoast.showToast(
+                    msg: '设置角标个数$badgeNum成功', gravity: ToastGravity.CENTER);
+        }
+    });
+```
+
 ### syncIOSBadgeNum
+
+`Future<Map<dynamic, dynamic>> syncIOSBadgeNum(int num) async`
 
 同步角标数
 
 > **注意：只支持iOS平台**
+
+返回值：
+
+`Map<dynamic, dynamic>`
+
+map中包含两个key值:
+
++ `code`: 错误码
++ `errorMsg`: 错误信息
+
+代码示例：
+
+```dart
+_aliyunPush.syncIOSBadgeNum(badgeNum).then((result) {
+    var code = result['code'];
+        if (code == kAliyunPushSuccessCode) {
+            Fluttertoast.showToast(
+                    msg: '同步角标个数$badgeNum成功', gravity: ToastGravity.CENTER);
+        }
+    });
+```
 
 ### getApnsDeviceToken
 
