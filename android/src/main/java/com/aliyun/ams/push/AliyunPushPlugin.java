@@ -25,6 +25,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
 import android.text.TextUtils;
+import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationManagerCompat;
@@ -38,6 +39,8 @@ import io.flutter.plugin.common.MethodChannel.Result;
  * PushPlugin
  */
 public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
+
+	private static final String TAG = "MPS:PushPlugin";
 
 	private static final String CODE_SUCCESS = "10000";
 	private static final String CODE_PARAM_ILLEGAL = "10001";
@@ -114,7 +117,11 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 		} else if ("createGroup".equals(methodName)) {
 			createGroup(call, result);
 		} else if ("isNotificationEnabled".equals(methodName)) {
-			isNotificationEnabled(call, result);
+			try {
+				isNotificationEnabled(call, result);
+			} catch (Exception e) {
+				AliyunPushLog.e(TAG, Log.getStackTraceString(e));
+			}
 		} else if ("jumpToNotificationSettings".equals(methodName)) {
 			if (VERSION.SDK_INT >= VERSION_CODES.O) {
 				jumpToAndroidNotificationSettings(call);
@@ -143,7 +150,11 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 			public void onSuccess(String response) {
 				HashMap<String, String> map = new HashMap<>();
 				map.put(CODE_KEY, CODE_SUCCESS);
-				result.success(map);
+				try {
+					result.success(map);
+				} catch (Exception e) {
+					AliyunPushLog.e(TAG, Log.getStackTraceString(e));
+				}
 			}
 
 			@Override
@@ -151,7 +162,11 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 				HashMap<String, String> map = new HashMap<>();
 				map.put(CODE_KEY, errorCode);
 				map.put(ERROR_MSG_KEY, errorMessage);
-				result.success(map);
+				try {
+					result.success(map);
+				} catch (Exception e) {
+					AliyunPushLog.e(TAG, Log.getStackTraceString(e));
+				}
 			}
 		});
 		pushService.turnOnPushChannel(new CommonCallback() {
@@ -187,7 +202,11 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 			map.put(ERROR_MSG_KEY, "context is not Application");
 		}
 
-		result.success(map);
+		try {
+			result.success(map);
+		} catch (Exception e) {
+			AliyunPushLog.e(TAG, Log.getStackTraceString(e));
+		}
 	}
 
 	private void closePushLog(Result result) {
@@ -195,13 +214,21 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 		service.setLogLevel(CloudPushService.LOG_OFF);
 		HashMap<String, String> map = new HashMap<>();
 		map.put(CODE_KEY, CODE_SUCCESS);
-		result.success(map);
+		try {
+			result.success(map);
+		} catch (Exception e) {
+			AliyunPushLog.e(TAG, Log.getStackTraceString(e));
+		}
 	}
 
 	private void getDeviceId(Result result) {
 		final CloudPushService pushService = PushServiceFactory.getCloudPushService();
 		String deviceId = pushService.getDeviceId();
-		result.success(deviceId);
+		try {
+			result.success(deviceId);
+		} catch (Exception e) {
+			AliyunPushLog.e(TAG, Log.getStackTraceString(e));
+		}
 	}
 
 	private void setLogLevel(MethodCall call, Result result) {
@@ -215,7 +242,11 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 			map.put(CODE_KEY, CODE_PARAM_ILLEGAL);
 			map.put(ERROR_MSG_KEY, "Log level is empty");
 		}
-		result.success(map);
+		try {
+			result.success(map);
+		} catch (Exception e) {
+			AliyunPushLog.e(TAG, Log.getStackTraceString(e));
+		}
 	}
 
 	private void bindAccount(MethodCall call, Result result) {
@@ -224,21 +255,33 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 		if (TextUtils.isEmpty(account)) {
 			map.put(CODE_KEY, CODE_PARAM_ILLEGAL);
 			map.put(ERROR_MSG_KEY, "account can not be empty");
-			result.success(map);
+			try {
+				result.success(map);
+			} catch (Exception e) {
+				AliyunPushLog.e(TAG, Log.getStackTraceString(e));
+			}
 		} else {
 			final CloudPushService pushService = PushServiceFactory.getCloudPushService();
 			pushService.bindAccount(account, new CommonCallback() {
 				@Override
 				public void onSuccess(String response) {
 					map.put(CODE_KEY, CODE_SUCCESS);
-					result.success(map);
+					try {
+						result.success(map);
+					} catch (Exception e) {
+						AliyunPushLog.e(TAG, Log.getStackTraceString(e));
+					}
 				}
 
 				@Override
 				public void onFailed(String errorCode, String errorMsg) {
 					map.put(CODE_KEY, errorCode);
 					map.put(ERROR_MSG_KEY, errorMsg);
-					result.success(map);
+					try {
+						result.success(map);
+					} catch (Exception e){
+						AliyunPushLog.e(TAG, Log.getStackTraceString(e));
+					}
 				}
 			});
 		}
@@ -251,14 +294,22 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 			@Override
 			public void onSuccess(String response) {
 				map.put(CODE_KEY, CODE_SUCCESS);
-				result.success(map);
+				try {
+					result.success(map);
+				} catch (Exception e) {
+					AliyunPushLog.e(TAG, Log.getStackTraceString(e));
+				}
 			}
 
 			@Override
 			public void onFailed(String errorCode, String errorMsg) {
 				map.put(CODE_KEY, errorCode);
 				map.put(ERROR_MSG_KEY, errorMsg);
-				result.success(map);
+				try {
+					result.success(map);
+				} catch (Exception e) {
+					AliyunPushLog.e(TAG, Log.getStackTraceString(e));
+				}
 			}
 		});
 	}
@@ -269,21 +320,33 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 		if (TextUtils.isEmpty(alias)) {
 			map.put(CODE_KEY, CODE_PARAM_ILLEGAL);
 			map.put(ERROR_MSG_KEY, "alias can not be empty");
-			result.success(map);
+			try {
+				result.success(map);
+			} catch (Exception e){
+				AliyunPushLog.e(TAG, Log.getStackTraceString(e));
+			}
 		} else {
 			final CloudPushService pushService = PushServiceFactory.getCloudPushService();
 			pushService.addAlias(alias, new CommonCallback() {
 				@Override
 				public void onSuccess(String response) {
 					map.put(CODE_KEY, CODE_SUCCESS);
-					result.success(map);
+					try {
+						result.success(map);
+					} catch (Exception e) {
+						AliyunPushLog.e(TAG, Log.getStackTraceString(e));
+					}
 				}
 
 				@Override
 				public void onFailed(String errorCode, String errorMsg) {
 					map.put(CODE_KEY, errorCode);
 					map.put(ERROR_MSG_KEY, errorMsg);
-					result.success(map);
+					try {
+						result.success(map);
+					} catch (Exception e) {
+						AliyunPushLog.e(TAG, Log.getStackTraceString(e));
+					}
 				}
 			});
 		}
@@ -295,21 +358,33 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 		if (TextUtils.isEmpty(alias)) {
 			map.put(CODE_KEY, CODE_PARAM_ILLEGAL);
 			map.put(ERROR_MSG_KEY, "alias can not be empty");
-			result.success(map);
+			try {
+				result.success(map);
+			} catch (Exception e){
+				AliyunPushLog.e(TAG, Log.getStackTraceString(e));
+			}
 		} else {
 			final CloudPushService pushService = PushServiceFactory.getCloudPushService();
 			pushService.removeAlias(alias, new CommonCallback() {
 				@Override
 				public void onSuccess(String response) {
 					map.put(CODE_KEY, CODE_SUCCESS);
-					result.success(map);
+					try {
+						result.success(map);
+					} catch (Exception e){
+						AliyunPushLog.e(TAG, Log.getStackTraceString(e));
+					}
 				}
 
 				@Override
 				public void onFailed(String errorCode, String errorMsg) {
 					map.put(CODE_KEY, errorCode);
 					map.put(ERROR_MSG_KEY, errorMsg);
-					result.success(map);
+					try {
+						result.success(map);
+					} catch (Exception e) {
+						AliyunPushLog.e(TAG, Log.getStackTraceString(e));
+					}
 				}
 			});
 		}
@@ -323,14 +398,22 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 			public void onSuccess(String response) {
 				map.put(CODE_KEY, CODE_SUCCESS);
 				map.put("aliasList", response);
-				result.success(map);
+				try {
+					result.success(map);
+				} catch (Exception e) {
+					AliyunPushLog.e(TAG, Log.getStackTraceString(e));
+				}
 			}
 
 			@Override
 			public void onFailed(String errorCode, String errorMsg) {
 				map.put(CODE_KEY, errorCode);
 				map.put(ERROR_MSG_KEY, errorMsg);
-				result.success(map);
+				try {
+					result.success(map);
+				} catch (Exception e) {
+					AliyunPushLog.e(TAG, Log.getStackTraceString(e));
+				}
 			}
 		});
 	}
@@ -341,7 +424,11 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 		if (tags == null || tags.isEmpty()) {
 			map.put(CODE_KEY, CODE_PARAM_ILLEGAL);
 			map.put(ERROR_MSG_KEY, "tags can not be empty");
-			result.success(map);
+			try {
+				result.success(map);
+			} catch (Exception e) {
+				AliyunPushLog.e(TAG, Log.getStackTraceString(e));
+			}
 		} else {
 			Integer target = call.argument("target");
 			if (target == null) {
@@ -356,14 +443,22 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 				@Override
 				public void onSuccess(String response) {
 					map.put(CODE_KEY, CODE_SUCCESS);
-					result.success(map);
+					try {
+						result.success(map);
+					} catch (Exception e) {
+						AliyunPushLog.e(TAG, Log.getStackTraceString(e));
+					}
 				}
 
 				@Override
 				public void onFailed(String errorCode, String errorMsg) {
 					map.put(CODE_KEY, errorCode);
 					map.put(ERROR_MSG_KEY, errorMsg);
-					result.success(map);
+					try {
+						result.success(map);
+					} catch (Exception e) {
+						AliyunPushLog.e(TAG, Log.getStackTraceString(e));
+					}
 				}
 			});
 		}
@@ -375,7 +470,11 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 		if (tags == null || tags.isEmpty()) {
 			map.put(CODE_KEY, CODE_PARAM_ILLEGAL);
 			map.put(ERROR_MSG_KEY, "tags can not be empty");
-			result.success(map);
+			try {
+				result.success(map);
+			} catch (Exception e) {
+				AliyunPushLog.e(TAG, Log.getStackTraceString(e));
+			}
 		} else {
 			Integer target = call.argument("target");
 			if (target == null) {
@@ -390,14 +489,22 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 				@Override
 				public void onSuccess(String response) {
 					map.put(CODE_KEY, CODE_SUCCESS);
-					result.success(map);
+					try {
+						result.success(map);
+					} catch (Exception e) {
+						AliyunPushLog.e(TAG, Log.getStackTraceString(e));
+					}
 				}
 
 				@Override
 				public void onFailed(String errorCode, String errorMsg) {
 					map.put(CODE_KEY, errorCode);
 					map.put(ERROR_MSG_KEY, errorMsg);
-					result.success(map);
+					try {
+						result.success(map);
+					} catch (Exception e) {
+						AliyunPushLog.e(TAG, Log.getStackTraceString(e));
+					}
 				}
 			});
 		}
@@ -416,14 +523,22 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 			public void onSuccess(String response) {
 				map.put(CODE_KEY, CODE_SUCCESS);
 				map.put("tagsList", response);
-				result.success(map);
+				try {
+					result.success(map);
+				} catch (Exception e) {
+					AliyunPushLog.e(TAG, Log.getStackTraceString(e));
+				}
 			}
 
 			@Override
 			public void onFailed(String errorCode, String errorMsg) {
 				map.put(CODE_KEY, errorCode);
 				map.put(ERROR_MSG_KEY, errorMsg);
-				result.success(map);
+				try {
+					result.success(map);
+				} catch (Exception e) {
+					AliyunPushLog.e(TAG, Log.getStackTraceString(e));
+				}
 			}
 		});
 	}
@@ -434,21 +549,33 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 		if (TextUtils.isEmpty(phone)) {
 			map.put(CODE_KEY, CODE_PARAM_ILLEGAL);
 			map.put(ERROR_MSG_KEY, "phone number can not be empty");
-			result.success(map);
+			try {
+				result.success(map);
+			} catch (Exception e) {
+				AliyunPushLog.e(TAG, Log.getStackTraceString(e));
+			}
 		} else {
 			final CloudPushService pushService = PushServiceFactory.getCloudPushService();
 			pushService.bindPhoneNumber(phone, new CommonCallback() {
 				@Override
 				public void onSuccess(String response) {
 					map.put(CODE_KEY, CODE_SUCCESS);
-					result.success(map);
+					try {
+						result.success(map);
+					} catch (Exception e) {
+						AliyunPushLog.e(TAG, Log.getStackTraceString(e));
+					}
 				}
 
 				@Override
 				public void onFailed(String errorCode, String errorMsg) {
 					map.put(CODE_KEY, errorCode);
 					map.put(ERROR_MSG_KEY, errorMsg);
-					result.success(map);
+					try {
+						result.success(map);
+					} catch (Exception e) {
+						AliyunPushLog.e(TAG, Log.getStackTraceString(e));
+					}
 				}
 			});
 		}
@@ -462,14 +589,22 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 			@Override
 			public void onSuccess(String response) {
 				map.put(CODE_KEY, CODE_SUCCESS);
-				result.success(map);
+				try {
+					result.success(map);
+				} catch (Exception e) {
+					AliyunPushLog.e(TAG, Log.getStackTraceString(e));
+				}
 			}
 
 			@Override
 			public void onFailed(String errorCode, String errorMsg) {
 				map.put(CODE_KEY, errorCode);
 				map.put(ERROR_MSG_KEY, errorMsg);
-				result.success(map);
+				try {
+					result.success(map);
+				} catch (Exception e) {
+					AliyunPushLog.e(TAG, Log.getStackTraceString(e));
+				}
 			}
 		});
 	}
@@ -483,7 +618,11 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 		pushService.setNotificationShowInGroup(inGroup);
 		HashMap<String, String> map = new HashMap<>();
 		map.put(CODE_KEY, CODE_SUCCESS);
-		result.success(map);
+		try {
+			result.success(map);
+		} catch (Exception e) {
+			AliyunPushLog.e(TAG, Log.getStackTraceString(e));
+		}
 	}
 
 	private void clearNotifications(Result result) {
@@ -491,7 +630,11 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 		pushService.clearNotifications();
 		HashMap<String, String> map = new HashMap<>();
 		map.put(CODE_KEY, CODE_SUCCESS);
-		result.success(map);
+		try {
+			result.success(map);
+		} catch (Exception e) {
+			AliyunPushLog.e(TAG, Log.getStackTraceString(e));
+		}
 	}
 
 	private void createChannel(MethodCall call, Result result) {
@@ -569,12 +712,20 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 			}
 			notificationManager.createNotificationChannel(channel);
 			map.put(CODE_KEY, CODE_SUCCESS);
-			result.success(map);
+			try {
+				result.success(map);
+			} catch (Exception e) {
+				AliyunPushLog.e(TAG, Log.getStackTraceString(e));
+			}
 		} else {
 			map.put(CODE_KEY, CODE_NOT_SUPPORT);
 			map.put(ERROR_MSG_KEY,
 				"Android version is below Android O which is not support create channel");
-			result.success(map);
+			try {
+				result.success(map);
+			} catch (Exception e) {
+				AliyunPushLog.e(TAG, Log.getStackTraceString(e));
+			}
 		}
 	}
 
@@ -594,12 +745,20 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 			}
 			notificationManager.createNotificationChannelGroup(group);
 			map.put(CODE_KEY, CODE_SUCCESS);
-			result.success(map);
+			try {
+				result.success(map);
+			} catch (Exception e) {
+				AliyunPushLog.e(TAG, Log.getStackTraceString(e));
+			}
 		} else {
 			map.put(CODE_KEY, CODE_NOT_SUPPORT);
 			map.put(ERROR_MSG_KEY,
 				"Android version is below Android O which is not support create group");
-			result.success(map);
+			try {
+				result.success(map);
+			} catch (Exception e) {
+				AliyunPushLog.e(TAG, Log.getStackTraceString(e));
+			}
 		}
 	}
 
@@ -632,6 +791,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 							}
 						}
 						result.success(true);
+						return;
 					}
 				}
 			}

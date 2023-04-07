@@ -19,3 +19,7 @@
 ## 0.0.5
 
 * 修复Android创建Channel时desc字段key值不一致问题
+
+## 0.0.6 
+
+* android代码增加保护机制
