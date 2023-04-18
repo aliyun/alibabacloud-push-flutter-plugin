@@ -117,6 +117,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 		} else if ("createGroup".equals(methodName)) {
 			createGroup(call, result);
 		} else if ("isNotificationEnabled".equals(methodName)) {
+
 			try {
 				isNotificationEnabled(call, result);
 			} catch (Exception e) {
@@ -207,6 +208,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 		} catch (Exception e) {
 			AliyunPushLog.e(TAG, Log.getStackTraceString(e));
 		}
+
 	}
 
 	private void closePushLog(Result result) {
@@ -214,11 +216,13 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 		service.setLogLevel(CloudPushService.LOG_OFF);
 		HashMap<String, String> map = new HashMap<>();
 		map.put(CODE_KEY, CODE_SUCCESS);
+
 		try {
 			result.success(map);
 		} catch (Exception e) {
 			AliyunPushLog.e(TAG, Log.getStackTraceString(e));
 		}
+
 	}
 
 	private void getDeviceId(Result result) {
@@ -229,6 +233,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 		} catch (Exception e) {
 			AliyunPushLog.e(TAG, Log.getStackTraceString(e));
 		}
+
 	}
 
 	private void setLogLevel(MethodCall call, Result result) {
@@ -247,6 +252,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 		} catch (Exception e) {
 			AliyunPushLog.e(TAG, Log.getStackTraceString(e));
 		}
+
 	}
 
 	private void bindAccount(MethodCall call, Result result) {
@@ -260,6 +266,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 			} catch (Exception e) {
 				AliyunPushLog.e(TAG, Log.getStackTraceString(e));
 			}
+
 		} else {
 			final CloudPushService pushService = PushServiceFactory.getCloudPushService();
 			pushService.bindAccount(account, new CommonCallback() {
@@ -282,6 +289,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 					} catch (Exception e){
 						AliyunPushLog.e(TAG, Log.getStackTraceString(e));
 					}
+
 				}
 			});
 		}
@@ -299,6 +307,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 				} catch (Exception e) {
 					AliyunPushLog.e(TAG, Log.getStackTraceString(e));
 				}
+
 			}
 
 			@Override
@@ -310,6 +319,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 				} catch (Exception e) {
 					AliyunPushLog.e(TAG, Log.getStackTraceString(e));
 				}
+
 			}
 		});
 	}
@@ -325,6 +335,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 			} catch (Exception e){
 				AliyunPushLog.e(TAG, Log.getStackTraceString(e));
 			}
+
 		} else {
 			final CloudPushService pushService = PushServiceFactory.getCloudPushService();
 			pushService.addAlias(alias, new CommonCallback() {
@@ -336,6 +347,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 					} catch (Exception e) {
 						AliyunPushLog.e(TAG, Log.getStackTraceString(e));
 					}
+
 				}
 
 				@Override
@@ -347,6 +359,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 					} catch (Exception e) {
 						AliyunPushLog.e(TAG, Log.getStackTraceString(e));
 					}
+
 				}
 			});
 		}
@@ -363,6 +376,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 			} catch (Exception e){
 				AliyunPushLog.e(TAG, Log.getStackTraceString(e));
 			}
+
 		} else {
 			final CloudPushService pushService = PushServiceFactory.getCloudPushService();
 			pushService.removeAlias(alias, new CommonCallback() {
@@ -385,6 +399,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 					} catch (Exception e) {
 						AliyunPushLog.e(TAG, Log.getStackTraceString(e));
 					}
+
 				}
 			});
 		}
@@ -429,6 +444,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 			} catch (Exception e) {
 				AliyunPushLog.e(TAG, Log.getStackTraceString(e));
 			}
+
 		} else {
 			Integer target = call.argument("target");
 			if (target == null) {
@@ -475,6 +491,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 			} catch (Exception e) {
 				AliyunPushLog.e(TAG, Log.getStackTraceString(e));
 			}
+
 		} else {
 			Integer target = call.argument("target");
 			if (target == null) {
@@ -505,6 +522,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 					} catch (Exception e) {
 						AliyunPushLog.e(TAG, Log.getStackTraceString(e));
 					}
+
 				}
 			});
 		}
@@ -528,6 +546,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 				} catch (Exception e) {
 					AliyunPushLog.e(TAG, Log.getStackTraceString(e));
 				}
+
 			}
 
 			@Override
@@ -539,6 +558,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 				} catch (Exception e) {
 					AliyunPushLog.e(TAG, Log.getStackTraceString(e));
 				}
+
 			}
 		});
 	}
@@ -554,6 +574,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 			} catch (Exception e) {
 				AliyunPushLog.e(TAG, Log.getStackTraceString(e));
 			}
+
 		} else {
 			final CloudPushService pushService = PushServiceFactory.getCloudPushService();
 			pushService.bindPhoneNumber(phone, new CommonCallback() {
@@ -565,6 +586,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 					} catch (Exception e) {
 						AliyunPushLog.e(TAG, Log.getStackTraceString(e));
 					}
+
 				}
 
 				@Override
@@ -576,6 +598,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 					} catch (Exception e) {
 						AliyunPushLog.e(TAG, Log.getStackTraceString(e));
 					}
+
 				}
 			});
 		}
@@ -594,6 +617,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 				} catch (Exception e) {
 					AliyunPushLog.e(TAG, Log.getStackTraceString(e));
 				}
+
 			}
 
 			@Override
@@ -605,6 +629,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 				} catch (Exception e) {
 					AliyunPushLog.e(TAG, Log.getStackTraceString(e));
 				}
+
 			}
 		});
 	}
@@ -635,6 +660,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 		} catch (Exception e) {
 			AliyunPushLog.e(TAG, Log.getStackTraceString(e));
 		}
+
 	}
 
 	private void createChannel(MethodCall call, Result result) {
@@ -717,6 +743,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 			} catch (Exception e) {
 				AliyunPushLog.e(TAG, Log.getStackTraceString(e));
 			}
+
 		} else {
 			map.put(CODE_KEY, CODE_NOT_SUPPORT);
 			map.put(ERROR_MSG_KEY,
@@ -726,6 +753,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 			} catch (Exception e) {
 				AliyunPushLog.e(TAG, Log.getStackTraceString(e));
 			}
+
 		}
 	}
 
@@ -750,6 +778,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 			} catch (Exception e) {
 				AliyunPushLog.e(TAG, Log.getStackTraceString(e));
 			}
+
 		} else {
 			map.put(CODE_KEY, CODE_NOT_SUPPORT);
 			map.put(ERROR_MSG_KEY,
@@ -759,6 +788,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 			} catch (Exception e) {
 				AliyunPushLog.e(TAG, Log.getStackTraceString(e));
 			}
+
 		}
 	}
 

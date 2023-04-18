@@ -1001,6 +1001,7 @@ _aliyunPush.syncIOSBadgeNum(badgeNum).then((result) {
     });
 ```
 
+
 ### getApnsDeviceToken
 
 `Future<String> getApnsDeviceToken() async`

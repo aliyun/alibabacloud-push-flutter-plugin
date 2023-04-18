@@ -4,6 +4,7 @@
 #import <UserNotifications/UserNotifications.h>
 #import <AlicloudUtils/AlicloudUtils.h>
 
+
 @interface AliyunPushLog : NSObject
 
 + (void)enableLog;
@@ -314,6 +315,7 @@ static BOOL logEnable = NO;
         result(@{KEY_CODE: CODE_NO_NET, @"errorMsg": @"no network"});
         return;
     }
+
 
     //APNS注册，获取deviceToken并上报
     [self registerAPNS];
