@@ -2,6 +2,7 @@
 #import <CloudPushSDK/CloudPushSDK.h>
 // iOS 10 notification
 #import <UserNotifications/UserNotifications.h>
+#import <AlicloudUtils/AlicloudUtils.h>
 
 @interface AliyunPushLog : NSObject
 
@@ -237,6 +238,10 @@ static BOOL logEnable = NO;
     completionHandler();
 }
 
+- (BOOL)isNetworkReachable {
+    return [[AlicloudReachabilityManager shareInstance] checkInternetConnection];
+}
+
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
   if ([@"initPushSdk" isEqualToString:call.method]) {
       [self initPushSdk:call result: result];
@@ -302,6 +307,11 @@ static BOOL logEnable = NO;
 
     if (!appSecret|| !appSecret.length) {
         result(@{KEY_CODE: CODE_PARAMS_ILLEGAL, @"errorMsg": @"appSecret config error"});
+        return;
+    }
+    
+    if (![self isNetworkReachable]) {
+        result(@{KEY_CODE: CODE_NO_NET, @"errorMsg": @"no network"});
         return;
     }
 
