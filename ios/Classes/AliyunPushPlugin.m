@@ -326,8 +326,9 @@ static BOOL logEnable = NO;
             PushLogD(@"Push SDK init success, deviceId: %@.", [CloudPushSDK getDeviceId]);
             result(@{KEY_CODE:CODE_SUCCESS});
         } else {
-            PushLogD(@"Push SDK init failed, error: %@", res.error);
-            result(@{KEY_CODE:CODE_FAILED, @"errorMsg": res.error.userInfo});
+            PushLogD(@"###### Push SDK init failed, error: %@", res.error);
+            NSLog(@"=======> Push SDK init failed, error: %@", res.error);
+            result(@{KEY_CODE:CODE_FAILED, @"errorMsg": [NSString stringWithFormat:@"%@", res.error.userInfo]});
         }
     }];
     // 监听推送通道打开动作
