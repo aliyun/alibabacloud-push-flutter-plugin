@@ -1,10 +1,10 @@
 name: aliyun_push
 description: Aliyun Push Flutter plugin.
-version: 0.0.9
+version: 0.1.0
 homepage: https://help.aliyun.com/document_detail/434552.html
 
 environment:
-  sdk: '>=2.18.5 <3.0.0'
+  sdk: ">=2.18.5 <3.0.0"
   flutter: ">=2.5.0"
 
 dependencies:
