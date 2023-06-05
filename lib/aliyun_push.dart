@@ -97,27 +97,27 @@ class AliyunPush {
   Future<dynamic> _methodCallHandler(MethodCall call) async {
     switch (call.method) {
       case 'onNotification':
-        return _onNotification!(call.arguments.cast<dynamic, dynamic>());
+        return _onNotification!(call.arguments as Map<dynamic, dynamic>);
       case 'onNotificationReceivedInApp':
         return _onAndroidNotificationReceivedInApp!(
-            call.arguments.cast<dynamic, dynamic>());
+            call.arguments as Map<dynamic, dynamic>);
       case 'onMessage':
-        return _onMessage!(call.arguments.cast<dynamic, dynamic>());
+        return _onMessage!(call.arguments as Map<dynamic, dynamic>);
       case 'onNotificationOpened':
-        return _onNotificationOpened!(call.arguments.cast<dynamic, dynamic>());
+        return _onNotificationOpened!(call.arguments as Map<dynamic, dynamic>);
       case 'onNotificationRemoved':
-        return _onNotificationRemoved!(call.arguments.cast<dynamic, dynamic>());
+        return _onNotificationRemoved!(call.arguments as Map<dynamic, dynamic>);
       case 'onNotificationClickedWithNoAction':
         return _onAndroidNotificationClickedWithNoAction!(
-            call.arguments.cast<dynamic, dynamic>());
+            call.arguments as Map<dynamic, dynamic>);
       case 'onChannelOpened':
-        return _onIOSChannelOpened!(call.arguments.cast<dynamic, dynamic>());
+        return _onIOSChannelOpened!(call.arguments as Map<dynamic, dynamic>);
       case 'onRegisterDeviceTokenSuccess':
         return _onIOSRegisterDeviceTokenSuccess!(
-            call.arguments.cast<dynamic, dynamic>());
+            call.arguments as Map<dynamic, dynamic>);
       case 'onRegisterDeviceTokenFailed':
         return _onIOSRegisterDeviceTokenFailed!(
-            call.arguments.cast<dynamic, dynamic>());
+            call.arguments as Map<dynamic, dynamic>);
     }
   }
 
