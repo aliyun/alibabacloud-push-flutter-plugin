@@ -139,27 +139,12 @@ static BOOL logEnable = NO;
 
 - (BOOL)application:(UIApplication*)application didReceiveRemoteNotification:(nonnull NSDictionary *)userInfo fetchCompletionHandler:(nonnull void (^)(UIBackgroundFetchResult))completionHandler {
     
-    // 取得APNS通知内容
-    NSDictionary *aps = [userInfo valueForKey:@"aps"];
-    // 内容
-    NSString *content = [aps valueForKey:@"alert"];
-    // badge数量
-    NSInteger badge = [[aps valueForKey:@"badge"] integerValue];
-    // 播放声音
-    NSString *sound = [aps valueForKey:@"sound"];
-    // 取得通知自定义字段内容，例：获取key为"Extras"的内容
-    NSString *extras = [userInfo valueForKey:@"Extras"]; //服务端中Extras字段，key是自己定义的
-    PushLogD(@"content = [%@], badge = [%ld], sound = [%@], Extras = [%@]", content, (long)badge, sound, extras);
+
+    PushLogD(@"onNotification, userInfo = [%@]", userInfo);
     
     [CloudPushSDK sendNotificationAck:userInfo];
     
-    NSMutableDictionary *dic = [NSMutableDictionary dictionary];
-    [dic setValue:content forKey:@"content"];
-    [dic setValue:@(badge) forKey:@"badge"];
-    [dic setValue:sound forKey:@"sound"];
-    [dic setValue:extras forKey:@"extras"];
-    
-    [self.channel invokeMethod:@"onNotification" arguments:dic];
+    [self.channel invokeMethod:@"onNotification" arguments:userInfo];
     
     return YES;
 }
@@ -168,19 +153,7 @@ static BOOL logEnable = NO;
     UNNotificationRequest *request = notification.request;
     UNNotificationContent *content = request.content;
     NSDictionary *userInfo = content.userInfo;
-    // 通知时间
-    NSDate *noticeDate = notification.date;
-    // 标题
-    NSString *title = content.title;
-    // 副标题
-    NSString *subtitle = content.subtitle;
-    // 内容
-    NSString *body = content.body;
-    // 角标
-    int badge = [content.badge intValue];
-    // 取得通知自定义字段内容，例：获取key为"Extras"的内容
-    NSString *extras = [userInfo valueForKey:@"Extras"];
-    
+
     // 通知角标数清0
     [UIApplication sharedApplication].applicationIconBadgeNumber = 0;
     //  同步角标数到服务端
@@ -189,17 +162,7 @@ static BOOL logEnable = NO;
     
     // 通知打开回执上报
     [CloudPushSDK sendNotificationAck:userInfo];
-    PushLogD(@"Notification, date: %@, title: %@, subtitle: %@, body: %@, badge: %d, extras: %@.", noticeDate, title, subtitle, body, badge, extras);
-    
-    NSMutableDictionary *dic = [NSMutableDictionary dictionary];
-    [dic setValue:noticeDate.description forKey:@"date"];
-    [dic setValue:title forKey:@"title"];
-    [dic setValue:subtitle forKey:@"subtitle"];
-    [dic setValue:body forKey:@"body"];
-    [dic setValue:@(badge) forKey:@"badge"];
-    [dic setValue:extras forKey:@"extras"];
-    
-    [self.channel invokeMethod:@"onNotification" arguments:dic];
+    [self.channel invokeMethod:@"onNotification" arguments:userInfo];
 }
 
 /*
