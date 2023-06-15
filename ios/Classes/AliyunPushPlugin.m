@@ -139,7 +139,6 @@ static BOOL logEnable = NO;
 
 - (BOOL)application:(UIApplication*)application didReceiveRemoteNotification:(nonnull NSDictionary *)userInfo fetchCompletionHandler:(nonnull void (^)(UIBackgroundFetchResult))completionHandler {
     
-
     PushLogD(@"onNotification, userInfo = [%@]", userInfo);
     
     [CloudPushSDK sendNotificationAck:userInfo];
@@ -158,8 +157,7 @@ static BOOL logEnable = NO;
     [UIApplication sharedApplication].applicationIconBadgeNumber = 0;
     //  同步角标数到服务端
     [self syncBadgeNum:0 result:nil];
-    
-    
+
     // 通知打开回执上报
     [CloudPushSDK sendNotificationAck:userInfo];
     [self.channel invokeMethod:@"onNotification" arguments:userInfo];
