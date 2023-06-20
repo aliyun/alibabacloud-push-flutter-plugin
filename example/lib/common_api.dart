@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:aliyun_push/aliyun_push.dart';
+import 'package:push_example/base_state.dart';
 
 class CommonApiPage extends StatefulWidget {
   const CommonApiPage({super.key});
@@ -9,7 +9,7 @@ class CommonApiPage extends StatefulWidget {
   State<StatefulWidget> createState() => _CommonApiPageState();
 }
 
-class _CommonApiPageState extends State<CommonApiPage> {
+class _CommonApiPageState extends BaseState<CommonApiPage> {
   final _pushPlugin = AliyunPush();
 
   final TextEditingController _accountController = TextEditingController();
@@ -75,14 +75,11 @@ class _CommonApiPageState extends State<CommonApiPage> {
             var code = listTagsResult['code'];
             if (code == kAliyunPushSuccessCode) {
               var tagsList = listTagsResult['tagsList'];
-              Fluttertoast.showToast(
-                  msg: '查询标签列表结果为 $tagsList', gravity: ToastGravity.CENTER);
+              showOkDialog('查询标签列表结果为 $tagsList');
             } else {
               var errorCode = listTagsResult['code'];
               var errorMsg = listTagsResult['errorMsg'];
-              Fluttertoast.showToast(
-                  msg: '查询标签列表失败, $errorCode - $errorMsg',
-                  gravity: ToastGravity.CENTER);
+              showErrorDialog('查询标签列表失败, $errorCode - $errorMsg');
             }
           });
         },
@@ -137,8 +134,7 @@ class _CommonApiPageState extends State<CommonApiPage> {
               _pushPlugin.bindAccount(account).then((bindResult) {
                 var code = bindResult['code'];
                 if (code == kAliyunPushSuccessCode) {
-                  Fluttertoast.showToast(
-                      msg: '绑定账号$account成功', gravity: ToastGravity.CENTER);
+                  showOkDialog('绑定账号$account成功');
                   setState(() {
                     _boundAccount = account;
                   });
@@ -146,14 +142,11 @@ class _CommonApiPageState extends State<CommonApiPage> {
                 } else {
                   var errorCode = bindResult['code'];
                   var errorMsg = bindResult['errorMsg'];
-                  Fluttertoast.showToast(
-                      msg: '绑定账号$account失败, $errorCode - $errorMsg',
-                      gravity: ToastGravity.CENTER);
+                  showErrorDialog('绑定账号$account失败, $errorCode - $errorMsg');
                 }
               });
             } else {
-              Fluttertoast.showToast(
-                  msg: '请输入要绑定的账号', gravity: ToastGravity.CENTER);
+              showWarningDialog('请输入要绑定的账号');
             }
           },
           child: const Text('绑定账号')),
@@ -171,8 +164,7 @@ class _CommonApiPageState extends State<CommonApiPage> {
             _pushPlugin.unbindAccount().then((unbindResult) {
               var code = unbindResult['code'];
               if (code == kAliyunPushSuccessCode) {
-                Fluttertoast.showToast(
-                    msg: '解绑账号成功', gravity: ToastGravity.CENTER);
+                showOkDialog('解绑账号成功');
                 setState(() {
                   _boundAccount = "";
                 });
@@ -180,9 +172,7 @@ class _CommonApiPageState extends State<CommonApiPage> {
               } else {
                 var errorCode = unbindResult['code'];
                 var errorMsg = unbindResult['errorMsg'];
-                Fluttertoast.showToast(
-                    msg: '解绑账号失败, $errorCode - $errorMsg',
-                    gravity: ToastGravity.CENTER);
+                showErrorDialog('解绑账号失败, $errorCode - $errorMsg');
               }
             });
           },
@@ -211,20 +201,16 @@ class _CommonApiPageState extends State<CommonApiPage> {
               _pushPlugin.addAlias(alias).then((addResult) {
                 var code = addResult['code'];
                 if (code == kAliyunPushSuccessCode) {
-                  Fluttertoast.showToast(
-                      msg: '添加别名$alias成功', gravity: ToastGravity.CENTER);
+                  showOkDialog('添加别名$alias成功');
                   _addAliasController.clear();
                 } else {
                   var errorCode = addResult['code'];
                   var errorMsg = addResult['errorMsg'];
-                  Fluttertoast.showToast(
-                      msg: '添加别名$alias失败, $errorCode - $errorMsg',
-                      gravity: ToastGravity.CENTER);
+                  showErrorDialog('添加别名$alias失败, $errorCode - $errorMsg');
                 }
               });
             } else {
-              Fluttertoast.showToast(
-                  msg: '请输入要添加的别名', gravity: ToastGravity.CENTER);
+              showWarningDialog('请输入要添加的别名');
             }
           },
           child: const Text('添加别名')),
@@ -254,20 +240,16 @@ class _CommonApiPageState extends State<CommonApiPage> {
               _pushPlugin.removeAlias(alias).then((removeResult) {
                 var code = removeResult['code'];
                 if (code == kAliyunPushSuccessCode) {
-                  Fluttertoast.showToast(
-                      msg: '删除别名$alias成功', gravity: ToastGravity.CENTER);
+                  showOkDialog('删除别名$alias成功');
                   _removeAliasController.clear();
                 } else {
                   var errorCode = removeResult['code'];
                   var errorMsg = removeResult['errorMsg'];
-                  Fluttertoast.showToast(
-                      msg: '删除别名$alias失败, $errorCode - $errorMsg',
-                      gravity: ToastGravity.CENTER);
+                  showErrorDialog('删除别名$alias失败, $errorCode - $errorMsg');
                 }
               });
             } else {
-              Fluttertoast.showToast(
-                  msg: '请输入要删除的别名', gravity: ToastGravity.CENTER);
+              showWarningDialog('请输入要删除的别名');
             }
           },
           child: const Text('删除别名')),
@@ -283,14 +265,11 @@ class _CommonApiPageState extends State<CommonApiPage> {
               var code = listAliasResult['code'];
               if (code == kAliyunPushSuccessCode) {
                 var aliasList = listAliasResult['aliasList'];
-                Fluttertoast.showToast(
-                    msg: '查询别名列表结果为 $aliasList', gravity: ToastGravity.CENTER);
+                showOkDialog('查询别名列表结果为 $aliasList');
               } else {
                 var errorCode = listAliasResult['code'];
                 var errorMsg = listAliasResult['errorMsg'];
-                Fluttertoast.showToast(
-                    msg: '查询别名列表失败, $errorCode - $errorMsg',
-                    gravity: ToastGravity.CENTER);
+                showErrorDialog('查询别名列表失败, $errorCode - $errorMsg');
               }
             });
           },
@@ -319,23 +298,18 @@ class _CommonApiPageState extends State<CommonApiPage> {
               var tags = <String>[];
               tags.add(tag);
               _pushPlugin.bindTag(tags).then((bindTagResult) {
-                print('$bindTagResult');
                 var code = bindTagResult['code'];
                 if (code == kAliyunPushSuccessCode) {
-                  Fluttertoast.showToast(
-                      msg: '添加标签$tag成功', gravity: ToastGravity.CENTER);
+                  showOkDialog('添加标签$tag成功');
                   _addTagController.clear();
                 } else {
                   var errorCode = bindTagResult['code'];
                   var errorMsg = bindTagResult['errorMsg'];
-                  Fluttertoast.showToast(
-                      msg: '添加标签$tag失败, $errorCode - $errorMsg',
-                      gravity: ToastGravity.CENTER);
+                  showErrorDialog('添加标签$tag失败, $errorCode - $errorMsg');
                 }
               });
             } else {
-              Fluttertoast.showToast(
-                  msg: '请输入要添加的标签', gravity: ToastGravity.CENTER);
+              showWarningDialog('请输入要添加的标签');
             }
           },
           child: const Text('给设备添加标签')),
@@ -367,20 +341,16 @@ class _CommonApiPageState extends State<CommonApiPage> {
               _pushPlugin.unbindTag(tags).then((bindTagResult) {
                 var code = bindTagResult['code'];
                 if (code == kAliyunPushSuccessCode) {
-                  Fluttertoast.showToast(
-                      msg: '删除标签$tag成功', gravity: ToastGravity.CENTER);
+                  showOkDialog('删除标签$tag成功');
                   _removeTagController.clear();
                 } else {
                   var errorCode = bindTagResult['code'];
                   var errorMsg = bindTagResult['errorMsg'];
-                  Fluttertoast.showToast(
-                      msg: '删除标签$tag失败, $errorCode - $errorMsg',
-                      gravity: ToastGravity.CENTER);
+                  showErrorDialog('删除标签$tag失败, $errorCode - $errorMsg');
                 }
               });
             } else {
-              Fluttertoast.showToast(
-                  msg: '请输入要删除的标签', gravity: ToastGravity.CENTER);
+              showWarningDialog('请输入要删除的标签');
             }
           },
           child: const Text('删除设备标签')),
@@ -414,20 +384,16 @@ class _CommonApiPageState extends State<CommonApiPage> {
                   .then((bindTagResult) {
                 var code = bindTagResult['code'];
                 if (code == kAliyunPushSuccessCode) {
-                  Fluttertoast.showToast(
-                      msg: '添加标签$tag成功', gravity: ToastGravity.CENTER);
+                  showOkDialog('添加标签$tag成功');
                   _addAccountTagController.clear();
                 } else {
                   var errorCode = bindTagResult['code'];
                   var errorMsg = bindTagResult['errorMsg'];
-                  Fluttertoast.showToast(
-                      msg: '添加标签$tag失败, $errorCode - $errorMsg',
-                      gravity: ToastGravity.CENTER);
+                  showErrorDialog('添加标签$tag失败, $errorCode - $errorMsg');
                 }
               });
             } else {
-              Fluttertoast.showToast(
-                  msg: '请输入要添加的标签', gravity: ToastGravity.CENTER);
+              showWarningDialog('请输入要添加的标签');
             }
           },
           child: const Text('给账号添加标签')),
@@ -459,20 +425,16 @@ class _CommonApiPageState extends State<CommonApiPage> {
                   .then((bindTagResult) {
                 var code = bindTagResult['code'];
                 if (code == kAliyunPushSuccessCode) {
-                  Fluttertoast.showToast(
-                      msg: '删除标签$tag成功', gravity: ToastGravity.CENTER);
+                  showOkDialog('删除标签$tag成功');
                   _removeAccountTagController.clear();
                 } else {
                   var errorCode = bindTagResult['code'];
                   var errorMsg = bindTagResult['errorMsg'];
-                  Fluttertoast.showToast(
-                      msg: '删除标签$tag失败, $errorCode - $errorMsg',
-                      gravity: ToastGravity.CENTER);
+                  showErrorDialog('删除标签$tag失败, $errorCode - $errorMsg');
                 }
               });
             } else {
-              Fluttertoast.showToast(
-                  msg: '请输入要删除的标签', gravity: ToastGravity.CENTER);
+              showWarningDialog('请输入要删除的标签');
             }
           },
           child: const Text('删除账号标签')),

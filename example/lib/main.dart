@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:aliyun_push/aliyun_push.dart';
+import 'package:flutter/material.dart';
+import 'package:push_example/base_state.dart';
 import 'package:push_example/ios.dart';
 
 import 'android.dart';
@@ -31,7 +31,7 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends BaseState<HomePage> {
   final _aliyunPush = AliyunPush();
 
   var _deviceId = "";
@@ -42,59 +42,45 @@ class _HomePageState extends State<HomePage> {
     if (Platform.isAndroid) {
       _aliyunPush.createAndroidChannel('8.0up', '测试通道A', 3, '测试创建通知通道');
     }
+    _addPushCallback();
   }
 
   Future<void> _onNotification(Map<dynamic, dynamic> message) async {
-    Fluttertoast.showToast(
-        msg: 'onNotification: $message', gravity: ToastGravity.CENTER);
+    showOkDialog('onNotification: $message');
   }
 
   Future<void> _onAndroidNotificationReceivedInApp(
       Map<dynamic, dynamic> message) async {
-    Fluttertoast.showToast(
-        msg: 'onAndroidNotificationReceivedInApp: $message',
-        gravity: ToastGravity.CENTER);
+    showOkDialog('onAndroidNotificationReceivedInApp: $message');
   }
 
   Future<void> _onMessage(Map<dynamic, dynamic> message) async {
-    Fluttertoast.showToast(
-        msg: 'onMessage: $message', gravity: ToastGravity.CENTER);
+    showOkDialog('onMessage: $message');
   }
 
   Future<void> _onNotificationOpened(Map<dynamic, dynamic> message) async {
-    Fluttertoast.showToast(
-        msg: 'onNotificationOpened: $message', gravity: ToastGravity.CENTER);
+    showOkDialog('onNotificationOpened: $message');
   }
 
   Future<void> _onNotificationRemoved(Map<dynamic, dynamic> message) async {
-    Fluttertoast.showToast(
-        msg: 'onNotificationRemoved: $message', gravity: ToastGravity.CENTER);
+    showOkDialog('onNotificationRemoved: $message');
   }
 
   Future<void> _onAndroidNotificationClickedWithNoAction(
       Map<dynamic, dynamic> message) async {
-    Fluttertoast.showToast(
-        msg: 'onAndroidNotificationClickedWithNoAction: $message',
-        gravity: ToastGravity.CENTER);
+    showOkDialog('onAndroidNotificationClickedWithNoAction: $message');
   }
 
-  Future<void> _onIOSChannelOpened(Map<dynamic, dynamic> message) async {
-    Fluttertoast.showToast(
-        msg: 'onIOSChannelOpened: $message', gravity: ToastGravity.CENTER);
-  }
+  Future<void> _onIOSChannelOpened(Map<dynamic, dynamic> message) async {}
 
   Future<void> _onIOSRegisterDeviceTokenSuccess(
       Map<dynamic, dynamic> message) async {
-    Fluttertoast.showToast(
-        msg: 'onIOSRegisterDeviceTokenSuccess: $message',
-        gravity: ToastGravity.CENTER);
+    showOkDialog('APNs注册成功, $message');
   }
 
   Future<void> _onIOSRegisterDeviceTokenFailed(
       Map<dynamic, dynamic> message) async {
-    Fluttertoast.showToast(
-        msg: 'onIOSRegisterDeviceTokenFailed: $message',
-        gravity: ToastGravity.CENTER);
+    showErrorDialog('注册APNs失败, errorMsg: $message');
   }
 
   _addPushCallback() {
@@ -113,8 +99,6 @@ class _HomePageState extends State<HomePage> {
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initAliyunPush() async {
-    _addPushCallback();
-
     String appKey;
     String appSecret;
     if (Platform.isIOS) {
@@ -130,13 +114,10 @@ class _HomePageState extends State<HomePage> {
         .then((initResult) {
       var code = initResult['code'];
       if (code == kAliyunPushSuccessCode) {
-        Fluttertoast.showToast(
-            msg: "Init Aliyun Push successfully", gravity: ToastGravity.CENTER);
+        showOkDialog("初始化推送成功");
       } else {
         String errorMsg = initResult['errorMsg'];
-        Fluttertoast.showToast(
-            msg: 'Aliyun Push init failed, errorMsg is: $errorMsg',
-            gravity: ToastGravity.CENTER);
+        showErrorDialog('初始化推送失败, errorMsg: $errorMsg}');
       }
     });
 
@@ -152,14 +133,11 @@ class _HomePageState extends State<HomePage> {
     _aliyunPush.initAndroidThirdPush().then((initResult) {
       var code = initResult['code'];
       if (code == kAliyunPushSuccessCode) {
-        Fluttertoast.showToast(
-            msg: "Init Aliyun Third Push successfully",
-            gravity: ToastGravity.CENTER);
+        showOkDialog("初始化辅助通道成功");
       } else {
         String errorMsg = initResult['errorMsg'];
-        Fluttertoast.showToast(
-            msg: 'Aliyun Third Push init failed, errorMsg is: $errorMsg',
-            gravity: ToastGravity.CENTER);
+        showErrorDialog(
+            '初始化辅助通道成功, errorMsg: $errorMsg');
       }
     });
 
