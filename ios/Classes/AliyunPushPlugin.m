@@ -54,6 +54,7 @@ static BOOL logEnable = NO;
     UNUserNotificationCenter *_notificationCenter;
     BOOL _showNoticeWhenForeground;
     NSData* _deviceToken;
+    NSDictionary* _remoteNotification;
 }
 
 
@@ -66,6 +67,16 @@ static BOOL logEnable = NO;
   [registrar addApplicationDelegate:instance];
   [registrar addMethodCallDelegate:instance channel:channel];
 }
+
+- (BOOL) application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    NSLog(@"###### didFinishLaunchingWithOptions launchOptions %@", launchOptions);
+    if (launchOptions && [launchOptions valueForKey:UIApplicationLaunchOptionsRemoteNotificationKey]) {
+        _remoteNotification = [launchOptions valueForKey:UIApplicationLaunchOptionsRemoteNotificationKey];
+    }
+    
+    return YES;
+}
+
 
 /*
  * APNs注册成功回调，将返回的deviceToken上传到CloudPush服务器
@@ -140,10 +151,23 @@ static BOOL logEnable = NO;
 - (BOOL)application:(UIApplication*)application didReceiveRemoteNotification:(nonnull NSDictionary *)userInfo fetchCompletionHandler:(nonnull void (^)(UIBackgroundFetchResult))completionHandler {
     
     PushLogD(@"onNotification, userInfo = [%@]", userInfo);
+    NSLog(@"###### onNotification  userInfo = [%@]", userInfo);
     
     [CloudPushSDK sendNotificationAck:userInfo];
     
     [self.channel invokeMethod:@"onNotification" arguments:userInfo];
+    
+    if (_remoteNotification && userInfo) {
+        NSString* msgId = [userInfo valueForKey:@"m"];
+        NSString* remoteMsgId = [_remoteNotification valueForKey:@"m"];
+        if (msgId && remoteMsgId && [msgId isEqualToString:remoteMsgId]) {
+            [CloudPushSDK sendNotificationAck:_remoteNotification];
+            NSLog(@"###### onNotificationOpened  argument = [%@]", _remoteNotification);
+            [self.channel invokeMethod:@"onNotificationOpened" arguments:_remoteNotification];
+            _remoteNotification = nil;
+        }
+    }
+
     
     return YES;
 }

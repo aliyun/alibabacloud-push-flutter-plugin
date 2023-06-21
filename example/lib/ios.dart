@@ -1,6 +1,6 @@
 import 'package:aliyun_push/aliyun_push.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:push_example/base_state.dart';
 
 class IOSPage extends StatefulWidget {
   const IOSPage({super.key});
@@ -9,12 +9,13 @@ class IOSPage extends StatefulWidget {
   State<StatefulWidget> createState() => _IOSPageState();
 }
 
-class _IOSPageState extends State<IOSPage> {
+class _IOSPageState extends BaseState<IOSPage> {
   final _aliyunPush = AliyunPush();
 
   final TextEditingController _badgeController = TextEditingController();
 
   String _apnsToken = "";
+  
 
   @override
   Widget build(BuildContext context) {
@@ -26,8 +27,7 @@ class _IOSPageState extends State<IOSPage> {
             _aliyunPush.turnOnIOSDebug().then((result) {
               var code = result['code'];
               if (code == kAliyunPushSuccessCode) {
-                Fluttertoast.showToast(
-                    msg: '打开debug日志成功', gravity: ToastGravity.CENTER);
+                showOkDialog('打开debug日志成功');
               }
             });
           },
@@ -40,8 +40,7 @@ class _IOSPageState extends State<IOSPage> {
             _aliyunPush.showIOSNoticeWhenForeground(true).then((result) {
               var code = result['code'];
               if (code == kAliyunPushSuccessCode) {
-                Fluttertoast.showToast(
-                    msg: '设置前台显示通知成功', gravity: ToastGravity.CENTER);
+                showOkDialog('设置前台显示通知成功');
               }
             });
           },
@@ -54,8 +53,7 @@ class _IOSPageState extends State<IOSPage> {
             _aliyunPush.showIOSNoticeWhenForeground(false).then((result) {
               var code = result['code'];
               if (code == kAliyunPushSuccessCode) {
-                Fluttertoast.showToast(
-                    msg: '设置前台不显示通知成功', gravity: ToastGravity.CENTER);
+                showOkDialog('设置前台不显示通知成功');
               }
             });
           },
@@ -80,16 +78,14 @@ class _IOSPageState extends State<IOSPage> {
       child: ElevatedButton(
           onPressed: () {
             if (_badgeController.text == '') {
-              Fluttertoast.showToast(
-                  msg: '角标个数不能为空', gravity: ToastGravity.CENTER);
+              showWarningDialog('角标个数不能为空');
               return;
             }
             int badgeNum = int.parse(_badgeController.text);
             _aliyunPush.setIOSBadgeNum(badgeNum).then((result) {
               var code = result['code'];
               if (code == kAliyunPushSuccessCode) {
-                Fluttertoast.showToast(
-                    msg: '设置角标个数$badgeNum成功', gravity: ToastGravity.CENTER);
+                showOkDialog('设置角标个数$badgeNum成功');
               }
             });
           },
@@ -100,16 +96,14 @@ class _IOSPageState extends State<IOSPage> {
       child: ElevatedButton(
           onPressed: () {
             if (_badgeController.text == '') {
-              Fluttertoast.showToast(
-                  msg: '角标个数不能为空', gravity: ToastGravity.CENTER);
+              showWarningDialog('角标个数不能为空');
               return;
             }
             int badgeNum = int.parse(_badgeController.text);
             _aliyunPush.syncIOSBadgeNum(badgeNum).then((result) {
               var code = result['code'];
               if (code == kAliyunPushSuccessCode) {
-                Fluttertoast.showToast(
-                    msg: '同步角标个数$badgeNum成功', gravity: ToastGravity.CENTER);
+                showOkDialog('同步角标个数$badgeNum成功');
               }
             });
           },
@@ -133,11 +127,9 @@ class _IOSPageState extends State<IOSPage> {
           onPressed: () {
             _aliyunPush.isIOSChannelOpened().then((opened) {
               if (opened) {
-                Fluttertoast.showToast(
-                    msg: '通道已打开', gravity: ToastGravity.CENTER);
+                showOkDialog('通道已打开');
               } else {
-                Fluttertoast.showToast(
-                    msg: '通道未打开', gravity: ToastGravity.CENTER);
+                showOkDialog('通道未打开');
               }
             });
           },

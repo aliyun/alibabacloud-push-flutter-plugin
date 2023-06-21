@@ -1,7 +1,7 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:aliyun_push/aliyun_push.dart';
+import 'package:push_example/base_state.dart';
 
 class AndroidPage extends StatefulWidget {
   const AndroidPage({super.key});
@@ -10,7 +10,7 @@ class AndroidPage extends StatefulWidget {
   State<StatefulWidget> createState() => _AndroidPageState();
 }
 
-class _AndroidPageState extends State<AndroidPage> {
+class _AndroidPageState extends BaseState<AndroidPage> {
   final _aliyunPush = AliyunPush();
 
   final TextEditingController _addPhoneController = TextEditingController();
@@ -37,8 +37,7 @@ class _AndroidPageState extends State<AndroidPage> {
           _aliyunPush.closeAndroidPushLog().then((result) {
             var code = result['code'];
             if (code == kAliyunPushSuccessCode) {
-              Fluttertoast.showToast(
-                  msg: '关闭AliyunPush Log成功', gravity: ToastGravity.CENTER);
+              showOkDialog('关闭AliyunPush Log成功');
             }
           });
         },
@@ -77,8 +76,7 @@ class _AndroidPageState extends State<AndroidPage> {
             _aliyunPush.setNotificationInGroup(true).then((result) {
               var code = result['code'];
               if (code == kAliyunPushSuccessCode) {
-                Fluttertoast.showToast(
-                    msg: '开启通知分组展示成功', gravity: ToastGravity.CENTER);
+                showOkDialog('开启通知分组展示成功');
               }
             });
           },
@@ -91,8 +89,7 @@ class _AndroidPageState extends State<AndroidPage> {
             _aliyunPush.setNotificationInGroup(false).then((result) {
               var code = result['code'];
               if (code == kAliyunPushSuccessCode) {
-                Fluttertoast.showToast(
-                    msg: '关闭通知分组展示成功', gravity: ToastGravity.CENTER);
+                showOkDialog('关闭通知分组展示成功');
               }
             });
           },
@@ -105,8 +102,7 @@ class _AndroidPageState extends State<AndroidPage> {
             _aliyunPush.clearNotifications().then((result) {
               var code = result['code'];
               if (code == kAliyunPushSuccessCode) {
-                Fluttertoast.showToast(
-                    msg: '清除所有通知', gravity: ToastGravity.CENTER);
+                showOkDialog('清除所有通知');
               }
             });
           },
@@ -130,8 +126,7 @@ class _AndroidPageState extends State<AndroidPage> {
       child: ElevatedButton(
           onPressed: () {
             if (_channelController.text == '') {
-              Fluttertoast.showToast(
-                  msg: '通道名称不能为空', gravity: ToastGravity.CENTER);
+              showWarningDialog('通道名称不能为空');
               return;
             }
             var channel = _channelController.text;
@@ -141,14 +136,12 @@ class _AndroidPageState extends State<AndroidPage> {
                 .then((createResult) {
               var code = createResult['code'];
               if (code == kAliyunPushSuccessCode) {
-                Fluttertoast.showToast(
-                    msg: '创建$channel通道成功', gravity: ToastGravity.CENTER);
+
+                showOkDialog('创建$channel通道成功');
               } else {
                 var errorCode = createResult['code'];
                 var errorMsg = createResult['errorMsg'];
-                Fluttertoast.showToast(
-                    msg: '创建$channel通道失败, $errorCode - $errorMsg',
-                    gravity: ToastGravity.CENTER);
+                showErrorDialog('创建$channel通道失败, $errorCode - $errorMsg');
               }
             });
           },
@@ -159,8 +152,7 @@ class _AndroidPageState extends State<AndroidPage> {
       child: ElevatedButton(
           onPressed: () async {
             bool isEnabled = await _aliyunPush.isAndroidNotificationEnabled();
-            Fluttertoast.showToast(
-                msg: '通知状态: $isEnabled', gravity: ToastGravity.CENTER);
+            showOkDialog('通知状态: $isEnabled');
           },
           child: const Text('检查通知状态')),
     ));
@@ -170,8 +162,7 @@ class _AndroidPageState extends State<AndroidPage> {
           onPressed: () async {
             bool isEnabled = await _aliyunPush.isAndroidNotificationEnabled(
                 id: _channelController.text);
-            Fluttertoast.showToast(
-                msg: '通知状态: $isEnabled', gravity: ToastGravity.CENTER);
+            showOkDialog('通知状态: $isEnabled');
           },
           child: const Text('检查通知通道状态')),
     ));
@@ -251,15 +242,11 @@ class _AndroidPageState extends State<AndroidPage> {
           _aliyunPush.setAndroidLogLevel(logLevel).then((result) {
             var code = result['code'];
             if (code == kAliyunPushSuccessCode) {
-              Fluttertoast.showToast(
-                  msg: '成功设置LogLevel为 $_selectedLogLevel',
-                  gravity: ToastGravity.CENTER);
+              showOkDialog('成功设置LogLevel为 $_selectedLogLevel');
             } else {
               var errorCode = result['code'];
               var errorMsg = result['errorMsg'];
-              Fluttertoast.showToast(
-                  msg: '设置LogLevel失败, $errorCode - $errorMsg',
-                  gravity: ToastGravity.CENTER);
+              showErrorDialog('设置LogLevel失败, $errorCode - $errorMsg');
             }
           });
         },
@@ -289,23 +276,19 @@ class _AndroidPageState extends State<AndroidPage> {
               _aliyunPush.bindPhoneNumber(phone).then((bindResult) {
                 var code = bindResult['code'];
                 if (code == kAliyunPushSuccessCode) {
-                  Fluttertoast.showToast(
-                      msg: '绑定手机$phone成功', gravity: ToastGravity.CENTER);
                   setState(() {
                     _boundPhone = phone;
                   });
                   _addPhoneController.clear();
+                  showOkDialog('绑定手机$phone成功');
                 } else {
                   var errorCode = bindResult['code'];
                   var errorMsg = bindResult['errorMsg'];
-                  Fluttertoast.showToast(
-                      msg: '绑定手机号码$phone失败, $errorCode - $errorMsg',
-                      gravity: ToastGravity.CENTER);
+                  showErrorDialog('绑定手机号码$phone失败, $errorCode - $errorMsg');
                 }
               });
             } else {
-              Fluttertoast.showToast(
-                  msg: '请输入要绑定的手机号码', gravity: ToastGravity.CENTER);
+              showOkDialog('请输入要绑定的手机号码');
             }
           },
           child: const Text('绑定手机号码')),
@@ -323,17 +306,14 @@ class _AndroidPageState extends State<AndroidPage> {
             _aliyunPush.unbindPhoneNumber().then((unbindResult) {
               var code = unbindResult['code'];
               if (code == kAliyunPushSuccessCode) {
-                Fluttertoast.showToast(
-                    msg: '解绑手机号码成功', gravity: ToastGravity.CENTER);
+                showOkDialog('解绑手机号码成功');
                 setState(() {
                   _boundPhone = "";
                 });
               } else {
                 var errorCode = unbindResult['code'];
                 var errorMsg = unbindResult['errorMsg'];
-                Fluttertoast.showToast(
-                    msg: '解绑手机号码成功, $errorCode - $errorMsg',
-                    gravity: ToastGravity.CENTER);
+                showErrorDialog('解绑手机号码失败, $errorCode - $errorMsg');
               }
             });
           },
