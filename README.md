@@ -151,6 +151,62 @@ public class MyMessageReceiver extends MessageReceiver {
 
 辅助通道的集成可参考[辅助通道集成](https://help.aliyun.com/document_detail/434677.html)。
 
+在Flutter工程的android模块下的`AndroidManifest.xml`文件中设置各个辅助通道的配置参数：
+
+```xml
+<application android:name="*****">
+      <!-- 华为通道的参数appid -->
+      <meta-data android:name="com.huawei.hms.client.appid" android:value="" />
+
+      <!-- vivo通道的参数api_key为appkey -->
+      <meta-data android:name="com.vivo.push.api_key" android:value="" />
+      <meta-data android:name="com.vivo.push.app_id" android:value="" />
+
+      <!-- honor通道的参数-->
+      <meta-data android:name="com.hihonor.push.app_id" android:value="" />
+
+      <!-- oppo -->
+      <meta-data android:name="com.oppo.push.key" android:value="" />
+      <meta-data android:name="com.oppo.push.secret" android:value="" />
+      <!-- 小米-->
+      <meta-data android:name="com.xiaomi.push.id" android:value="" />
+      <meta-data android:name="com.xiaomi.push.key" android:value="" />
+
+      <!-- 魅族-->
+      <meta-data android:name="com.meizu.push.id" android:value="" />
+      <meta-data android:name="com.meizu.push.key" android:value="" />
+
+      <!-- fcm -->
+      <meta-data android:name="com.gcm.push.sendid" android:value="" />
+      <meta-data android:name="com.gcm.push.applicationid" android:value="" />
+      <meta-data android:name="com.gcm.push.projectid" android:value="" />
+      <meta-data android:name="com.gcm.push.api.key" android:value="" />
+</application>
+```
+
+**注意：**
+
+以下两个通道配置时需要特殊处理
+
++ 小米通道的`com.xiaomi.push.id`和`com.xiaomi.push.key`的值一般都是长数字，如果直接配置原始值，系统读取时会自动判断成long类型，但是AndroidManifest中的meta-data是不支持long类型的，这样就会造成插件读取到的值和实际值不一致，进而导致小米通道初始化失败
++ fcm通道的`com.gcm.push.sendid`值也是长数字，同样会导致插件读取时出错
+
+解决办法：
+
++ 配置时在原始值前方加入`id=`，插件会自动解析并读取原始值
+
+```xml
+<application android:name="*****">
+      <!-- 小米-->
+      <meta-data android:name="com.xiaomi.push.id" android:value="id=2222222222222222222" />
+      <meta-data android:name="com.xiaomi.push.key" android:value="id=5555555555555" />
+      
+      <!-- fcm -->
+      <meta-data android:name="com.gcm.push.sendid" android:value="id=999999999999" />
+</application>
+```
+
+
 ### 3.2 iOS
 
 #### 3.2.1 Objc配置

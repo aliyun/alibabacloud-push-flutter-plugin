@@ -168,6 +168,7 @@ static BOOL logEnable = NO;
         }
     }
 
+    completionHandler(UIBackgroundFetchResultNewData);
     
     return YES;
 }
