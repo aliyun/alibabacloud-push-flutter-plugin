@@ -156,7 +156,7 @@ public class MyMessageReceiver extends MessageReceiver {
 ```xml
 <application android:name="*****">
       <!-- 华为通道的参数appid -->
-      <meta-data android:name="com.huawei.hms.client.appid" android:value="" />
+      <meta-data android:name="com.huawei.hms.client.appid" android:value="appid=xxxxx" />
 
       <!-- vivo通道的参数api_key为appkey -->
       <meta-data android:name="com.vivo.push.api_key" android:value="" />
@@ -186,8 +186,9 @@ public class MyMessageReceiver extends MessageReceiver {
 
 **注意：**
 
-以下两个通道配置时需要特殊处理
+以下3个通道配置时需要特殊处理
 
++ 华为通道的`com.huawei.hms.client.appid`参数值的格式是`appid=xxxx`，有个前缀`appid=`
 + 小米通道的`com.xiaomi.push.id`和`com.xiaomi.push.key`的值一般都是长数字，如果直接配置原始值，系统读取时会自动判断成long类型，但是AndroidManifest中的meta-data是不支持long类型的，这样就会造成插件读取到的值和实际值不一致，进而导致小米通道初始化失败
 + fcm通道的`com.gcm.push.sendid`值也是长数字，同样会导致插件读取时出错
 
