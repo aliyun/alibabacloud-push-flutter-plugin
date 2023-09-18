@@ -45,9 +45,6 @@ public class AliyunPushMessageReceiver extends MessageReceiver {
 
 	@Override
 	public boolean showNotificationNow(Context context, Map<String, String> map) {
-		AliyunPushLog.e(REC_TAG, "foreground " + com.alibaba.sdk.android.push.notification.e.a(context));
-		AliyunPushLog.e(REC_TAG,
-			"show when foreground " + com.alibaba.sdk.android.push.notification.d.a(map));
 		for (Map.Entry<String, String> entry : map.entrySet()) {
 			AliyunPushLog.e(REC_TAG, "key " + entry.getKey() + " value " + entry.getValue());
 		}
