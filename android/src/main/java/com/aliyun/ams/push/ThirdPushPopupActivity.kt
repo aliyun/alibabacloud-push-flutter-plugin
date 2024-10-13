@@ -19,16 +19,25 @@ class ThirdPushPopupActivity: AndroidPopupActivity() {
      * */
     override fun onSysNoticeOpened(title: String?, summary: String?, extraMap: MutableMap<String, String>?) {
         try {
-//            val engine: FlutterActivity.CachedEngineIntentBuilder =
-//                FlutterActivity.CachedEngineIntentBuilder(MainActivity::class.java, "my_engine_id")
-//            val intent: Intent = engine.build(this)
-//            startActivity(intent)
-//            NotifyChannelUtils.onSysNoticeOpened(title, summary, extraMap)
-            val arguments: Map<String, Object> = HashMap()
-            arguments.put("title", title)
-            arguments.put("summary", summary)
-            arguments.put("extraMap", extraMap)
-            AliyunPushPlugin.sInstance.callFlutterMethod("onNotificationOpened", arguments)
+            val intent = Intent().apply {
+                val packageName = this@ThirdPushPopupActivity.packageName
+                setClassName(this@ThirdPushPopupActivity, "$packageName.MainActivity")
+            }
+            startActivity(intent)
+
+            var arguments = HashMap<String,Any>()
+            arguments.put("title", title!!)
+            arguments.put("summary", summary!!)
+            arguments.put("extraMap", extraMap!!)
+
+            val handlerThread = HandlerThread("__AliyunPushHandlerThread__")
+            handlerThread.start()
+            val handler = Handler(handlerThread.looper)
+            /// 等待 engine、路由表构建完成
+            handler.postDelayed({
+                AliyunPushPlugin.sInstance.callFlutterMethod("onNotificationOpened", arguments)
+            }, 3000)
+
             finish()
         } catch (e: Exception) {
             e.printStackTrace()

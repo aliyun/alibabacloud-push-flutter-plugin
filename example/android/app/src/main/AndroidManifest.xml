@@ -2,9 +2,9 @@
     <application android:label="push_example" android:name="${applicationName}" android:icon="@mipmap/ic_launcher">
 
         <!-- 请填写你自己的- appKey -->
-        <meta-data android:name="com.alibaba.app.appkey" android:value="" />
+        <meta-data android:name="com.alibaba.app.appkey" android:value="335001785" />
         <!-- 请填写你自己的- appSecret -->
-        <meta-data android:name="com.alibaba.app.appsecret" android:value="" />
+        <meta-data android:name="com.alibaba.app.appsecret" android:value="70fe5d8d33454eb7b93c6ba694ca72f5" />
 
         <!-- 华为通道的参数appid -->
         <meta-data android:name="com.huawei.hms.client.appid" android:value="" />

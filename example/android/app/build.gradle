@@ -36,7 +36,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "com.aliyun.emas.pocdemo"
+        applicationId "com.sinco.app.sinco.qa"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-build-configuration.
         minSdkVersion 19
@@ -55,9 +55,9 @@ android {
     }
 
     buildTypes {
-        debug {
-            signingConfig signingConfigs.config
-        }
+//        debug {
+//            signingConfig signingConfigs.config
+//        }
         release {
             signingConfig signingConfigs.config
             minifyEnabled true
