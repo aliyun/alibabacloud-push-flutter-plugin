@@ -45,3 +45,10 @@
 
 * 回调参数类型转换错误修复
 * Android 小米通道升级至3.8.6.1版本
+
+
+
+## 0.1.7
+
+* 增加冷启动点击通知栏通知, 可回调至 onNotificationOpened
+* 更新 flutter plugin 版本 0.1.7
