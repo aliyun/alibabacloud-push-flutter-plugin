@@ -46,7 +46,25 @@ dependencies:
     <!-- 请填写你自己的- appKey -->
     <meta-data android:name="com.alibaba.app.appkey" android:value="*****"/> 
     <!-- 请填写你自己的appSecret -->
-    <meta-data android:name="com.alibaba.app.appsecret" android:value="****"/> 
+    <meta-data android:name="com.alibaba.app.appsecret" android:value="****"/>
+
+    <!-- 增加 渠道通知中心 点击支持 -->
+    <activity
+        android:name="com.aliyun.ams.push.ThirdPushPopupActivity"
+        android:exported="true">
+        <intent-filter>
+            <action android:name="android.intent.action.VIEW" />
+
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.BROWSABLE" />
+
+            <data
+                android:host="${applicationId}"
+                android:path="/thirdpush"
+                android:scheme="agoo" />
+        </intent-filter>
+    </activity>
+    
 </application>
 ```
 
