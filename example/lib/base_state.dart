@@ -9,7 +9,7 @@ abstract class BaseState<T extends StatefulWidget> extends State<T> {
         context: context,
         msg: message,
         color: Colors.white,
-        actions: [
+        actionsBuilder: (context) => [
           IconsOutlineButton(
             onPressed: () {
               Navigator.of(context).pop();
@@ -27,7 +27,7 @@ abstract class BaseState<T extends StatefulWidget> extends State<T> {
         context: context,
         msg: message,
         color: Colors.white,
-        actions: [
+        actionsBuilder: (context) => [
           IconsOutlineButton(
             onPressed: () {
               Navigator.of(context).pop();
@@ -45,7 +45,7 @@ abstract class BaseState<T extends StatefulWidget> extends State<T> {
         context: context,
         msg: message,
         color: Colors.white,
-        actions: [
+        actionsBuilder: (context) => [
           IconsOutlineButton(
             onPressed: () {
               Navigator.of(context).pop();

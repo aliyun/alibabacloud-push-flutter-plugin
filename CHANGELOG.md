@@ -45,3 +45,15 @@
 
 * 回调参数类型转换错误修复
 * Android 小米通道升级至3.8.6.1版本
+
+## 0.1.7
+
+* 修复因缺少namespace导致8.0以上agp构建失败问题
+* 修改插件依赖配置,去除构建过程中因apply方式依赖插件输出的警告
+* 去除初始化过程中调用turnOnPushChannel()导致控制台输出获取不到deviceId的问题
+* 去除example中dropdown_button2依赖,改为通过弹出的方式设置logLevel
+
+## 0.1.8
+
+* 修复iOS可能出现的崩溃问题
+* 修复iOS demo运行失败问题

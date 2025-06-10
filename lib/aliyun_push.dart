@@ -375,7 +375,6 @@ class AliyunPush {
   Future<Map<dynamic, dynamic>> turnOnIOSDebug() async {
     if (!Platform.isIOS) {
       return {'code': kAliyunPushOnlyIOS, 'errorMsg': 'Only support iOS'};
-      ;
     }
     Map<dynamic, dynamic> result =
         await methodChannel.invokeMethod('turnOnDebug');
@@ -394,7 +393,6 @@ class AliyunPush {
   Future<Map<dynamic, dynamic>> setIOSBadgeNum(int num) async {
     if (!Platform.isIOS) {
       return {'code': kAliyunPushOnlyIOS, 'errorMsg': 'Only support iOS'};
-      ;
     }
     Map<dynamic, dynamic> result =
         await methodChannel.invokeMethod('setBadgeNum', {'badgeNum': num});

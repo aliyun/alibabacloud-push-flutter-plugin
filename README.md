@@ -28,7 +28,7 @@ iOS
 
 ```yaml
 dependencies:
-    aliyun_push: 0.0.2
+    aliyun_push: 0.1.8
 ```
 
 ## 三、配置

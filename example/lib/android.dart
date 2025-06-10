@@ -1,4 +1,3 @@
-import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:aliyun_push/aliyun_push.dart';
 import 'package:push_example/base_state.dart';
@@ -18,14 +17,9 @@ class _AndroidPageState extends BaseState<AndroidPage> {
 
   String _boundPhone = "";
 
-  final List<String> _logLevelList = ['ERROR', 'INFO', 'DEBUG'];
-
-  String? _selectedLogLevel;
-
   @override
   void initState() {
     super.initState();
-    _selectedLogLevel = "DEBUG";
   }
 
   @override
@@ -44,7 +38,7 @@ class _AndroidPageState extends BaseState<AndroidPage> {
         child: const Text('关闭AliyunPush Log'),
       ),
     );
-    _addSetLogLevelView(children);
+    _addSetLogLevelView(context, children);
     children.add(Padding(
       padding: const EdgeInsets.all(8.0),
       child: ListTile(
@@ -194,63 +188,70 @@ class _AndroidPageState extends BaseState<AndroidPage> {
         ));
   }
 
-  _addSetLogLevelView(List<Widget> children) {
-    children.add(Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton2(
-          hint: Text(
-            'Select LogLevel',
-            style: TextStyle(
-              fontSize: 14,
-              color: Theme.of(context).hintColor,
-            ),
-          ),
-          items: _logLevelList
-              .map((item) => DropdownMenuItem<String>(
-                    value: item,
-                    child: Text(
-                      item,
-                      style: const TextStyle(
-                        fontSize: 14,
-                      ),
-                    ),
-                  ))
-              .toList(),
-          value: _selectedLogLevel,
-          onChanged: (value) {
-            setState(() {
-              _selectedLogLevel = value as String;
-            });
-          },
-          buttonHeight: 40,
-          buttonWidth: 140,
-          itemHeight: 40,
-        ),
-      ),
-    ));
+  _addSetLogLevelView(BuildContext context, List<Widget> children) {
     children.add(ElevatedButton(
         onPressed: () {
-          int logLevel;
-          if (_selectedLogLevel == 'ERROR') {
-            logLevel = kAliyunPushLogLevelError;
-          } else if (_selectedLogLevel == 'INFO') {
-            logLevel = kAliyunPushLogLevelInfo;
-          } else {
-            logLevel = kAliyunPushLogLevelDebug;
-          }
-          _aliyunPush.setAndroidLogLevel(logLevel).then((result) {
-            var code = result['code'];
-            if (code == kAliyunPushSuccessCode) {
-              showOkDialog('成功设置LogLevel为 $_selectedLogLevel');
-            } else {
-              var errorCode = result['code'];
-              var errorMsg = result['errorMsg'];
-              showErrorDialog('设置LogLevel失败, $errorCode - $errorMsg');
-            }
-          });
+          _showSimpleDialog(context);
         },
-        child: Text('设置LogLevel为 $_selectedLogLevel')));
+        child: const Text('设置LogLevel')));
+  }
+
+  void _showSimpleDialog(BuildContext context) {
+    SimpleDialog simpleDialog = SimpleDialog(
+      title: const Text("LogLevel"),
+      children: [
+        SimpleDialogOption(
+          child: const Text("DEBUG"),
+          onPressed: () {
+            Navigator.of(context).pop();
+            _clickLogLevel('DEBUG');
+          },
+        ),
+        SimpleDialogOption(
+          child: const Text("INFO"),
+          onPressed: () {
+            Navigator.of(context).pop();
+            _clickLogLevel('INFO');
+          },
+        ),
+        SimpleDialogOption(
+          child: const Text("ERROR"),
+          onPressed: () {
+            Navigator.of(context).pop();
+            _clickLogLevel('ERROR');
+          },
+        ),
+      ],
+    );
+
+    // 显示对话框
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return simpleDialog;
+      },
+    );
+  }
+
+  void _clickLogLevel(String level){
+    int logLevel;
+    if (level == 'ERROR') {
+      logLevel = kAliyunPushLogLevelError;
+    } else if (level == 'INFO') {
+      logLevel = kAliyunPushLogLevelInfo;
+    } else {
+      logLevel = kAliyunPushLogLevelDebug;
+    }
+    _aliyunPush.setAndroidLogLevel(logLevel).then((result) {
+      var code = result['code'];
+      if (code == kAliyunPushSuccessCode) {
+        showOkDialog('成功设置LogLevel为 $level');
+      } else {
+        var errorCode = result['code'];
+        var errorMsg = result['errorMsg'];
+        showErrorDialog('设置LogLevel失败, $errorCode - $errorMsg');
+      }
+    });
   }
 
   _addBindPhoneView(List<Widget> children) {
