@@ -226,22 +226,54 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 	}
 
 	private void setLogLevel(MethodCall call, Result result) {
-		Integer level = call.argument("level");
-		HashMap<String, String> map = new HashMap<>();
-		if (level != null) {
-			final CloudPushService pushService = PushServiceFactory.getCloudPushService();
-			pushService.setLogLevel(level);
-			map.put(CODE_KEY, CODE_SUCCESS);
-		} else {
-			map.put(CODE_KEY, CODE_PARAM_ILLEGAL);
-			map.put(ERROR_MSG_KEY, "Log level is empty");
-		}
 		try {
-			result.success(map);
+			String level = call.argument("level");
+			if (level == null || level.isEmpty()) {
+				handleError(result, CODE_PARAM_ILLEGAL, "Log level is empty");
+				return;
+			}
+
+			Integer logLevel = getLogLevel(level.toLowerCase());
+			if (logLevel == null) {
+				handleError(result, CODE_PARAM_ILLEGAL, "Invalid log level: " + level);
+				return;
+			}
+
+			PushServiceFactory.getCloudPushService().setLogLevel(logLevel);
+			handleSuccess(result);
 		} catch (Exception e) {
 			AliyunPushLog.e(TAG, Log.getStackTraceString(e));
+			handleError(result, CODE_FAILED, e.getMessage());
 		}
+	}
 
+	private Integer getLogLevel(String level) {
+		switch (level) {
+			case "none":
+				return CloudPushService.LOG_OFF;
+			case "error":
+			case "warn":  // warn 映射为 error
+				return CloudPushService.LOG_ERROR;
+			case "info":
+				return CloudPushService.LOG_INFO;
+			case "debug":
+				return CloudPushService.LOG_DEBUG;
+			default:
+				return null;
+		}
+	}
+
+	private void handleSuccess(Result result) {
+		HashMap<String, String> map = new HashMap<>();
+		map.put(CODE_KEY, CODE_SUCCESS);
+		result.success(map);
+	}
+
+	private void handleError(Result result, String code, String errorMsg) {
+		HashMap<String, String> map = new HashMap<>();
+		map.put(CODE_KEY, code);
+		map.put(ERROR_MSG_KEY, errorMsg);
+		result.success(map);
 	}
 
 	private void bindAccount(MethodCall call, Result result) {

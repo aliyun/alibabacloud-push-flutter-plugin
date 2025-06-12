@@ -17,7 +17,7 @@ Aliyun Push Flutter Plugin.
   s.public_header_files = 'Classes/**/*.h'
   s.static_framework = true
   s.dependency 'Flutter'
-  s.dependency 'AlicloudPush', '~> 2.0'
+  s.dependency 'AlicloudPush', '~> 3.0'
   s.platform = :ios, '9.0'
 
   # Flutter.framework does not contain a i386 slice.

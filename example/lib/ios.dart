@@ -24,19 +24,6 @@ class _IOSPageState extends BaseState<IOSPage> {
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
       child: ElevatedButton(
           onPressed: () {
-            _aliyunPush.turnOnIOSDebug().then((result) {
-              var code = result['code'];
-              if (code == kAliyunPushSuccessCode) {
-                showOkDialog('打开debug日志成功');
-              }
-            });
-          },
-          child: const Text('打开debug日志')),
-    ));
-    children.add(Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      child: ElevatedButton(
-          onPressed: () {
             _aliyunPush.showIOSNoticeWhenForeground(true).then((result) {
               var code = result['code'];
               if (code == kAliyunPushSuccessCode) {

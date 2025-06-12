@@ -3,6 +3,7 @@
 // iOS 10 notification
 #import <UserNotifications/UserNotifications.h>
 
+
 @interface AliyunPushLog : NSObject
 
 + (void)enableLog;
@@ -216,8 +217,8 @@ static BOOL logEnable = NO;
         [self initPushSdk:call result:result];
     } else if ([@"getDeviceId" isEqualToString:call.method]) {
         [self getDeviceId:result];
-    } else if ([@"turnOnDebug" isEqualToString:call.method]) {
-        [self turnOnDebug:result];
+    } else if ([@"setLogLevel" isEqualToString:call.method]) {
+        [self setLogLevel:call result:result];
     } else if ([@"bindAccount" isEqualToString:call.method]) {
         [self bindAccount:call result:result];
     } else if ([@"unbindAccount" isEqualToString:call.method]) {
@@ -249,12 +250,13 @@ static BOOL logEnable = NO;
         result(@([CloudPushSDK isChannelOpened]));
     } else if ([@"setPluginLogEnabled" isEqualToString:call.method]) {
         NSDictionary *arguments = call.arguments;
-        bool enabled = arguments[@"enabled"];
+        BOOL enabled = [arguments[@"enabled"] boolValue];
         if (enabled) {
             [AliyunPushLog enableLog];
         } else {
             [AliyunPushLog disableLog];
         }
+        result(@{KEY_CODE: CODE_SUCCESS});
     } else {
         result(FlutterMethodNotImplemented);
     }
@@ -265,7 +267,7 @@ static BOOL logEnable = NO;
     NSString *appKey = arguments[@"appKey"];
     NSString *appSecret = arguments[@"appSecret"];
 
-    [CloudPushSDK turnOnDebug];
+    [CloudPushSDK setLogLevel:MPLogLevelDebug];
 
     if (!appKey || !appKey.length) {
         result(@{KEY_CODE: CODE_PARAMS_ILLEGAL, KEY_ERROR_MSG: @"appKey config error"});
@@ -281,7 +283,7 @@ static BOOL logEnable = NO;
     [self registerAPNS];
 
     //初始化
-    [CloudPushSDK asyncInit:appKey appSecret:appSecret callback:^(CloudPushCallbackResult *res) {
+    [CloudPushSDK startWithAppkey:appKey appSecret:appSecret callback:^(CloudPushCallbackResult * _Nonnull res) {
         if (res.success) {
             PushLogD(@"Push SDK init success, deviceId: %@.", [CloudPushSDK getDeviceId]);
             result(@{KEY_CODE:CODE_SUCCESS});
@@ -330,11 +332,33 @@ static BOOL logEnable = NO;
  *    处理到来推送消息
  */
 - (void)onMessageReceived:(NSNotification *)notification {
-    CCPSysMessage *message = [notification object];
-    NSMutableDictionary *dic = [NSMutableDictionary dictionary];
-    [dic setValue:message.title forKey:@"title"];
-    [dic setValue:message.body forKey:@"body"];
-    [self.channel invokeMethod:@"onMessage" arguments:dic];
+    NSDictionary *data = [notification object];
+    [self.channel invokeMethod:@"onMessage" arguments:data];
+}
+
+/* 设置SDK的日志级别 */
+- (void)setLogLevel:(FlutterMethodCall*)call result:(FlutterResult)result {
+    NSDictionary *arguments = call.arguments;
+    NSString *levelString = arguments[@"level"];
+
+    MPLogLevel level = MPLogLevelNone;
+    if ([levelString isEqualToString:@"none"]) {
+        level = MPLogLevelNone;
+    } else if ([levelString isEqualToString:@"error"]) {
+        level = MPLogLevelError;
+    } else if ([levelString isEqualToString:@"warn"]) {
+        level = MPLogLevelWarn;
+    } else if ([levelString isEqualToString:@"info"]) {
+        level = MPLogLevelInfo;
+    } else if ([levelString isEqualToString:@"debug"]) {
+        level = MPLogLevelDebug;
+    } else {
+        result(@{KEY_CODE: CODE_PARAMS_ILLEGAL, KEY_ERROR_MSG: @"Invalid log level"});
+        return;
+    }
+
+    [CloudPushSDK setLogLevel:level];
+    result(@{KEY_CODE: CODE_SUCCESS});
 }
 
 /* 设置角标个数 */
@@ -363,11 +387,6 @@ static BOOL logEnable = NO;
 
 - (void)getDeviceId:(FlutterResult)result {
     result([CloudPushSDK getDeviceId]);
-}
-
-- (void)turnOnDebug:(FlutterResult)result {
-    [CloudPushSDK turnOnDebug];
-    result(@{KEY_CODE:CODE_SUCCESS});
 }
 
 - (void)showNoticeWhenForeground:(FlutterMethodCall*)call result:(FlutterResult)result {

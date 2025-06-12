@@ -3,6 +3,18 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+/// log level
+enum AliyunPushLogLevel {
+  none('none'),
+  error('error'),
+  warn('warn'),
+  info('info'),
+  debug('debug');
+
+  final String value;
+  const AliyunPushLogLevel(this.value);
+}
+
 const kAliyunPushSuccessCode = "10000";
 
 ///参数错误
@@ -160,16 +172,29 @@ class AliyunPush {
     return deviceId;
   }
 
-  ///设置log的级别
-  Future<Map<dynamic, dynamic>> setAndroidLogLevel(int level) async {
-    if (!Platform.isAndroid) {
-      return {
-        'code': kAliyunPushOnlyAndroid,
-        'errorMsg': 'Only support Android'
-      };
+  ///设置SDK的日志级别
+  ///
+  /// [level] 日志级别，可选值：
+  /// - [AliyunPushLogLevel.none] 关闭日志
+  /// - [AliyunPushLogLevel.error] 错误日志
+  /// - [AliyunPushLogLevel.warn] 警告日志
+  /// - [AliyunPushLogLevel.info] 信息日志
+  /// - [AliyunPushLogLevel.debug] 调试日志
+  ///
+  /// 返回值：
+  /// - code: 错误码
+  /// - errorMsg: 错误信息
+  Future<Map<dynamic, dynamic>> setLogLevel(AliyunPushLogLevel level) async {
+    // 设置插件日志状态
+    if (level != AliyunPushLogLevel.none) {
+      await methodChannel.invokeMethod('setPluginLogEnabled', {'enabled': true});
+    } else {
+      await methodChannel.invokeMethod('setPluginLogEnabled', {'enabled': false});
     }
+    
+    // 设置SDK日志级别
     Map<dynamic, dynamic> result =
-        await methodChannel.invokeMethod('setLogLevel', {'level': level});
+        await methodChannel.invokeMethod('setLogLevel', {'level': level.value});
     return result;
   }
 
@@ -369,16 +394,6 @@ class AliyunPush {
       return;
     }
     methodChannel.invokeMethod('jumpToNotificationSettings');
-  }
-
-  ///开启iOS的debug日志
-  Future<Map<dynamic, dynamic>> turnOnIOSDebug() async {
-    if (!Platform.isIOS) {
-      return {'code': kAliyunPushOnlyIOS, 'errorMsg': 'Only support iOS'};
-    }
-    Map<dynamic, dynamic> result =
-        await methodChannel.invokeMethod('turnOnDebug');
-    return result;
   }
 
   Future<Map<dynamic, dynamic>> showIOSNoticeWhenForeground(bool enable) async {
