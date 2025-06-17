@@ -234,15 +234,16 @@ class _AndroidPageState extends BaseState<AndroidPage> {
   }
 
   void _clickLogLevel(String level){
-    int logLevel;
+    // int logLevel;
+    AliyunPushLogLevel logLevel;
     if (level == 'ERROR') {
-      logLevel = kAliyunPushLogLevelError;
+      logLevel = AliyunPushLogLevel.error;
     } else if (level == 'INFO') {
-      logLevel = kAliyunPushLogLevelInfo;
+      logLevel = AliyunPushLogLevel.info;
     } else {
-      logLevel = kAliyunPushLogLevelDebug;
+      logLevel = AliyunPushLogLevel.debug;
     }
-    _aliyunPush.setAndroidLogLevel(logLevel).then((result) {
+    _aliyunPush.setLogLevel(logLevel).then((result) {
       var code = result['code'];
       if (code == kAliyunPushSuccessCode) {
         showOkDialog('成功设置LogLevel为 $level');

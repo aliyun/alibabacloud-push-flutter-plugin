@@ -147,25 +147,6 @@ class AliyunPush {
     }
   }
 
-  ///注册厂商通道
-  Future<Map<dynamic, dynamic>> initAndroidThirdPush() async {
-    Map<dynamic, dynamic> initResult =
-        await methodChannel.invokeMethod('initThirdPush');
-    return initResult;
-  }
-
-  Future<Map<dynamic, dynamic>> closeAndroidPushLog() async {
-    if (!Platform.isAndroid) {
-      return {
-        'code': kAliyunPushOnlyAndroid,
-        'errorMsg': 'Only support Android'
-      };
-    }
-    Map<dynamic, dynamic> result =
-        await methodChannel.invokeMethod('closePushLog');
-    return result;
-  }
-
   ///获取deviceId
   Future<String> getDeviceId() async {
     var deviceId = await methodChannel.invokeMethod('getDeviceId');
@@ -265,6 +246,30 @@ class AliyunPush {
     Map<dynamic, dynamic> listResult =
         await methodChannel.invokeMethod('listTags', {'target': target});
     return listResult;
+  }
+
+  void setPluginLogEnabled(bool enabled) {
+    methodChannel.invokeMethod('setPluginLogEnabled', {'enabled': enabled});
+  }
+
+// ***************** Android专用接口 *****************
+  ///注册厂商通道
+  Future<Map<dynamic, dynamic>> initAndroidThirdPush() async {
+    Map<dynamic, dynamic> initResult =
+        await methodChannel.invokeMethod('initThirdPush');
+    return initResult;
+  }
+
+  Future<Map<dynamic, dynamic>> closeAndroidPushLog() async {
+    if (!Platform.isAndroid) {
+      return {
+        'code': kAliyunPushOnlyAndroid,
+        'errorMsg': 'Only support Android'
+      };
+    }
+    Map<dynamic, dynamic> result =
+        await methodChannel.invokeMethod('closePushLog');
+    return result;
   }
 
   ///绑定手机号码
@@ -396,6 +401,8 @@ class AliyunPush {
     methodChannel.invokeMethod('jumpToNotificationSettings');
   }
 
+// ***************** iOS专用接口 *****************
+
   Future<Map<dynamic, dynamic>> showIOSNoticeWhenForeground(bool enable) async {
     if (!Platform.isIOS) {
       return {'code': kAliyunPushOnlyIOS, 'errorMsg': 'Only support iOS'};
@@ -438,9 +445,5 @@ class AliyunPush {
     }
     var opened = await methodChannel.invokeMethod('isChannelOpened');
     return opened;
-  }
-
-  void setPluginLogEnabled(bool enabled) {
-    methodChannel.invokeMethod('setPluginLogEnabled', {'enabled': enabled});
   }
 }
