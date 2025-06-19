@@ -28,7 +28,7 @@ iOS
 
 ```yaml
 dependencies:
-    aliyun_push: 0.1.8
+    aliyun_push: 1.0.0
 ```
 
 ## 三、配置
@@ -362,6 +362,42 @@ _aliyunPush.getDeviceId().then((deviceId) {
 });
 ```
 
+### setLogLevel
+
+`Future<Map<dynamic, dynamic>> setLogLevel(AliyunPushLogLevel level) async`
+
+设置推送SDK输出日志的级别
+
+参数:
+
+| 参数名 | 类型 | 是否必须 | 含义 |
+| --- | --- | ---| --- |
+| level | AliyunPushLogLevel | 必须参数 |  `None`、`Debug`、`Info`、`Warn`、`Error`）。设置为 `None` 禁用日志，其他级别启用日志。|
+
+返回值：
+
+`Map<dynamic, dynamic>`
+
+map中包含两个key值:
+
++ `code`: 错误码
++ `errorMsg`: 错误信息
+
+代码示例：
+
+```dart
+
+_aliyunPush.setLogLevel(logLevel).then((result) {
+    var code = result['code'];
+    if (code == kAliyunPushSuccessCode) {
+        
+    } else {
+        var errorCode = result['code'];
+        var errorMsg = result['errorMsg'];
+    }      
+});
+```
+
 ### bindAccount
 
 `Future<Map<dynamic, dynamic>> bindAccount(String account) async`
@@ -637,44 +673,6 @@ _aliyunPush.closeAndroidPushLog().then((result) {
 });
 ```
 
-### setAndroidLogLevel
-
-`Future<Map<dynamic, dynamic>> setAndroidLogLevel(int level) async`
-
-设置Android推送SDK输出日志的级别
-
-> **注意：只支持Android平台**
-
-参数:
-
-| 参数名 | 类型 | 是否必须 | 含义 |
-| --- | --- | ---| --- |
-| level | int | 必须参数 |  日志级别</br>0 - Error </br> 1 - Info </br> 2- Debug|
-
-返回值：
-
-`Map<dynamic, dynamic>`
-
-map中包含两个key值:
-
-+ `code`: 错误码
-+ `errorMsg`: 错误信息
-
-代码示例：
-
-```dart
-
-_aliyunPush.setAndroidLogLevel(logLevel).then((result) {
-    var code = result['code'];
-    if (code == kAliyunPushSuccessCode) {
-        
-    } else {
-        var errorCode = result['code'];
-        var errorMsg = result['errorMsg'];
-    }      
-});
-```
-
 ### bindPhoneNumber
 
 `Future<Map<dynamic, dynamic>> bindPhoneNumber(String phone) async`
@@ -944,62 +942,6 @@ bool isEnabled = await _aliyunPush.isAndroidNotificationEnabled(
 _aliyunPush.jumpToAndroidNotificationSettings();
 ```
 
-### turnOnIOSDebug
-
-`Future<Map<dynamic, dynamic>> turnOnIOSDebug() async`
-
-打开iOS推送SDK的日志
-
-> **注意：只支持iOS平台**
-
-返回值：
-
-`Map<dynamic, dynamic>`
-
-map中包含两个key值:
-
-+ `code`: 错误码
-+ `errorMsg`: 错误信息
-
-代码示例：
-
-```dart
-_aliyunPush.turnOnIOSDebug().then((result) {
-    var code = result['code'];
-    if (code == kAliyunPushSuccessCode) {
-    }
-});
-```
-
-### showIOSNoticeWhenForeground
-
-`Future<Map<dynamic, dynamic>> showIOSNoticeWhenForeground(bool enable) async`
-
-App处于前台时显示通知
-
-> **注意：只支持iOS平台**
-
-返回值：
-
-`Map<dynamic, dynamic>`
-
-map中包含两个key值:
-
-+ `code`: 错误码
-+ `errorMsg`: 错误信息
-
-代码示例：
-
-```dart
-_aliyunPush.showIOSNoticeWhenForeground(true).then((result) {
-    var code = result['code'];
-    if (code == kAliyunPushSuccessCode) {
-        Fluttertoast.showToast(
-            msg: '设置前台显示通知成功', gravity: ToastGravity.CENTER);
-    }
-});
-```
-
 ### setIOSBadgeNum
 
 `Future<Map<dynamic, dynamic>> setIOSBadgeNum(int num) async`
@@ -1078,6 +1020,35 @@ _aliyunPush.getApnsDeviceToken().then((token) {
 });
 ```
 
+### showIOSNoticeWhenForeground
+
+`Future<Map<dynamic, dynamic>> showIOSNoticeWhenForeground(bool enable) async`
+
+App处于前台时显示通知
+
+> **注意：只支持iOS平台**
+
+返回值：
+
+`Map<dynamic, dynamic>`
+
+map中包含两个key值:
+
++ `code`: 错误码
++ `errorMsg`: 错误信息
+
+代码示例：
+
+```dart
+_aliyunPush.showIOSNoticeWhenForeground(true).then((result) {
+    var code = result['code'];
+    if (code == kAliyunPushSuccessCode) {
+        Fluttertoast.showToast(
+            msg: '设置前台显示通知成功', gravity: ToastGravity.CENTER);
+    }
+});
+```
+
 ### isIOSChannelOpened
 
 `Future<bool> isIOSChannelOpened() async`
@@ -1117,9 +1088,10 @@ _aliyunPush.setPluginLogEnabled(true);
 | 名称 | 值 |  含义 |
 | --- | --- | --- |
 | kAliyunPushSuccessCode | "10000" | 成功 |
-| kAliyunPushFailedCode | "10001" | 通用失败码 |
-| kAliyunPushOnlyAndroid | "10002" | 方法只支持Android平台|
-| kAliyunPushOnlyIOS | "10003" | 方法只支持iOS平台 |
-| kAliyunPushNotSupport | "10004" | 平台不支持，比如Android创建group只支持Android 8.0以上版本|
+| kAliyunPushParamsIllegal | "10001" | 参数错误 |
+| kAliyunPushFailedCode | "10002" | 通用失败码 |
+| kAliyunPushOnlyAndroid | "10003" | 方法只支持Android平台|
+| kAliyunPushOnlyIOS | "10004" | 方法只支持iOS平台 |
+| kAliyunPushNotSupport | "10005" | 平台不支持，比如Android创建group只支持Android 8.0以上版本|
 
 

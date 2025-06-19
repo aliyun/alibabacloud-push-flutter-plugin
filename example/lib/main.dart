@@ -220,7 +220,73 @@ class _HomePageState extends BaseState<HomePage> {
                   onPressed: () {
                     _aliyunPush.setPluginLogEnabled(true);
                   },
-                  child: const Text('开启插件日志'))
+                  child: const Text('开启插件日志')),
+              ElevatedButton(
+                onPressed: () async {
+                  String? level = await showDialog<String>(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return SimpleDialog(
+                        title: const Text('选择log级别'),
+                        children: <Widget>[
+                          SimpleDialogOption(
+                            onPressed: () => Navigator.pop(context, 'none'),
+                            child: const Text('none'),
+                          ),
+                          SimpleDialogOption(
+                            onPressed: () => Navigator.pop(context, 'error'),
+                            child: const Text('error'),
+                          ),
+                          SimpleDialogOption(
+                            onPressed: () => Navigator.pop(context, 'warn'),
+                            child: const Text('warn'),
+                          ),
+                          SimpleDialogOption(
+                            onPressed: () => Navigator.pop(context, 'info'),
+                            child: const Text('info'),
+                          ),
+                          SimpleDialogOption(
+                            onPressed: () => Navigator.pop(context, 'debug'),
+                            child: const Text('debug'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                  if (level != null) {
+                    // 字符串转AliyunPushLogLevel枚举
+                    AliyunPushLogLevel? logLevel;
+                    switch (level) {
+                      case 'none':
+                        logLevel = AliyunPushLogLevel.none;
+                        break;
+                      case 'error':
+                        logLevel = AliyunPushLogLevel.error;
+                        break;
+                      case 'warn':
+                        logLevel = AliyunPushLogLevel.warn;
+                        break;
+                      case 'info':
+                        logLevel = AliyunPushLogLevel.info;
+                        break;
+                      case 'debug':
+                        logLevel = AliyunPushLogLevel.debug;
+                        break;
+                    }
+                    if (logLevel != null) {
+                      var result = await _aliyunPush.setLogLevel(logLevel);
+                      var code = result['code'];
+                      if (code == kAliyunPushSuccessCode) {
+                        showOkDialog('设置log级别为 $level 成功');
+                      } else {
+                        var errorMsg = result['errorMsg'] ?? '未知错误';
+                        showErrorDialog('设置log级别为 $level 失败: ' + errorMsg);
+                      }
+                    }
+                  }
+                },
+                child: const Text('设置log级别'),
+              ),
             ],
           ),
         ),

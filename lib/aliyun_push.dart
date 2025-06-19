@@ -29,11 +29,6 @@ const kAliyunPushOnlyIOS = "10004";
 ///平台不支持，比如Android创建group只支持Android 8.0以上版本
 const kAliyunPushNotSupport = "10005";
 
-///LogLevel
-const kAliyunPushLogLevelError = 0;
-const kAliyunPushLogLevelInfo = 1;
-const kAliyunPushLogLevelDebug = 2;
-
 ///本设备
 const kAliyunTargetDevice = 1;
 
@@ -403,15 +398,6 @@ class AliyunPush {
 
 // ***************** iOS专用接口 *****************
 
-  Future<Map<dynamic, dynamic>> showIOSNoticeWhenForeground(bool enable) async {
-    if (!Platform.isIOS) {
-      return {'code': kAliyunPushOnlyIOS, 'errorMsg': 'Only support iOS'};
-    }
-    Map<dynamic, dynamic> result = await methodChannel
-        .invokeMethod('showNoticeWhenForeground', {'enable': enable});
-    return result;
-  }
-
   Future<Map<dynamic, dynamic>> setIOSBadgeNum(int num) async {
     if (!Platform.isIOS) {
       return {'code': kAliyunPushOnlyIOS, 'errorMsg': 'Only support iOS'};
@@ -437,6 +423,19 @@ class AliyunPush {
     var apnsDeviceToken =
         await methodChannel.invokeMethod('getApnsDeviceToken');
     return apnsDeviceToken;
+  }
+
+  /// 设置iOS通知在应用前台时是否展示
+  ///
+  /// @param enable 是否展示
+  /// @return 返回值
+  Future<Map<dynamic, dynamic>> showIOSNoticeWhenForeground(bool enable) async {
+    if (!Platform.isIOS) {
+      return {'code': kAliyunPushOnlyIOS, 'errorMsg': 'Only support iOS'};
+    }
+    Map<dynamic, dynamic> result = await methodChannel
+        .invokeMethod('showNoticeWhenForeground', {'enable': enable});
+    return result;
   }
 
   Future<bool> isIOSChannelOpened() async {
