@@ -138,28 +138,9 @@ static BOOL logEnable = NO;
          (UIRemoteNotificationTypeAlert | UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound)];
 #pragma clang diagnostic pop
     }
-}
 
-- (BOOL)application:(UIApplication*)application didReceiveRemoteNotification:(nonnull NSDictionary *)userInfo fetchCompletionHandler:(nonnull void (^)(UIBackgroundFetchResult))completionHandler {
-    PushLogD(@"onNotification, userInfo = [%@]", userInfo);
-    NSLog(@"###### onNotification  userInfo = [%@]", userInfo);
-
-    [CloudPushSDK sendNotificationAck:userInfo];
-    [self.channel invokeMethod:@"onNotification" arguments:userInfo];
-
-    if (_remoteNotification && userInfo) {
-        NSString* msgId = [userInfo valueForKey:@"m"];
-        NSString* remoteMsgId = [_remoteNotification valueForKey:@"m"];
-        if (msgId && remoteMsgId && [msgId isEqualToString:remoteMsgId]) {
-            [CloudPushSDK sendNotificationAck:_remoteNotification];
-            NSLog(@"###### onNotificationOpened  argument = [%@]", _remoteNotification);
-            [self.channel invokeMethod:@"onNotificationOpened" arguments:_remoteNotification];
-            _remoteNotification = nil;
-        }
-    }
-
-    completionHandler(UIBackgroundFetchResultNewData);
-    return YES;
+    // 创建category，并注册到通知中心
+    [self createCustomNotificationCategory];
 }
 
 - (void)handleiOS10Notification:(UNNotification *)notification {
@@ -177,16 +158,33 @@ static BOOL logEnable = NO;
     [self.channel invokeMethod:@"onNotification" arguments:userInfo];
 }
 
+/**
+ *  创建并注册通知category(iOS 10+)
+ */
+- (void)createCustomNotificationCategory {
+    // 自定义`action1`和`action2`
+    UNNotificationAction *action1 = [UNNotificationAction actionWithIdentifier:@"action1" title:@"test1" options: UNNotificationActionOptionNone];
+    UNNotificationAction *action2 = [UNNotificationAction actionWithIdentifier:@"action2" title:@"test2" options: UNNotificationActionOptionNone];
+    // 创建id为`test_category`的category，并注册两个action到category
+    // UNNotificationCategoryOptionCustomDismissAction表明可以触发通知的dismiss回调
+    UNNotificationCategory *category = [UNNotificationCategory categoryWithIdentifier:@"test_category" actions:@[action1, action2] intentIdentifiers:@[] options:
+                                        UNNotificationCategoryOptionCustomDismissAction];
+    // 注册category到通知中心
+    [_notificationCenter setNotificationCategories:[NSSet setWithObjects:category, nil]];
+}
+
 /*
     APP处于前台时收到通知(iOS 10+)
  */
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler {
+    // 处理iOS 10通知，并上报通知打开回执
+    [self handleiOS10Notification:notification];
+    [self.channel invokeMethod:@"onNotification" arguments:notification.request.content.userInfo];
+
     if(_showNoticeWhenForeground) {
         // 通知弹出，且带有声音、内容和角标
         completionHandler(UNNotificationPresentationOptionSound | UNNotificationPresentationOptionAlert | UNNotificationPresentationOptionBadge);
     } else {
-        // 处理iOS 10通知，并上报通知打开回执
-        [self handleiOS10Notification:notification];
         // 通知不弹出
         completionHandler(UNNotificationPresentationOptionNone);
     }
@@ -199,14 +197,28 @@ static BOOL logEnable = NO;
     NSString *userAction = response.actionIdentifier;
     // 点击通知打开
     if ([userAction isEqualToString:UNNotificationDefaultActionIdentifier]) {
-        [CloudPushSDK sendNotificationAck:response.notification.request.content.userInfo];
+        // 处理iOS 10通知，并上报通知打开回执
+        [self handleiOS10Notification:response.notification];
         [self.channel invokeMethod:@"onNotificationOpened" arguments:response.notification.request.content.userInfo];
     }
+
     // 通知dismiss，category创建时传入UNNotificationCategoryOptionCustomDismissAction才可以触发
     if ([userAction isEqualToString:UNNotificationDismissActionIdentifier]) {
         //通知删除回执上报
         [CloudPushSDK sendDeleteNotificationAck:response.notification.request.content.userInfo];
         [self.channel invokeMethod:@"onNotificationRemoved" arguments:response.notification.request.content.userInfo];
+    }
+
+    NSString *customAction1 = @"action1";
+    NSString *customAction2 = @"action2";
+    // 点击用户自定义Action1
+    if ([userAction isEqualToString:customAction1]) {
+        NSLog(@"User custom action1.");
+    }
+
+    // 点击用户自定义Action2
+    if ([userAction isEqualToString:customAction2]) {
+        NSLog(@"User custom action2.");
     }
 
     completionHandler();
@@ -391,7 +403,8 @@ static BOOL logEnable = NO;
 
 - (void)showNoticeWhenForeground:(FlutterMethodCall*)call result:(FlutterResult)result {
     NSDictionary *arguments = call.arguments;
-    BOOL enable = arguments[@"enable"];
+    NSNumber *enableNumber = arguments[@"enable"];
+    BOOL enable = [enableNumber boolValue];
     _showNoticeWhenForeground = enable;
     result(@{KEY_CODE:CODE_SUCCESS});
 }
