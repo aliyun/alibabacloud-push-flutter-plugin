@@ -25,19 +25,6 @@ class _AndroidPageState extends BaseState<AndroidPage> {
   @override
   Widget build(BuildContext context) {
     final children = <Widget>[];
-    children.add(
-      ElevatedButton(
-        onPressed: () {
-          _aliyunPush.closeAndroidPushLog().then((result) {
-            var code = result['code'];
-            if (code == kAliyunPushSuccessCode) {
-              showOkDialog('关闭AliyunPush Log成功');
-            }
-          });
-        },
-        child: const Text('关闭AliyunPush Log'),
-      ),
-    );
     _addSetLogLevelView(context, children);
     children.add(Padding(
       padding: const EdgeInsets.all(8.0),

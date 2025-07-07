@@ -8,6 +8,7 @@ import java.util.Map;
 import com.alibaba.sdk.android.push.CloudPushService;
 import com.alibaba.sdk.android.push.CommonCallback;
 import com.alibaba.sdk.android.push.noonesdk.PushServiceFactory;
+import com.alibaba.sdk.android.push.noonesdk.PushInitConfig;
 
 import android.app.Activity;
 import android.app.Application;
@@ -79,7 +80,7 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 	public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
 		String methodName = call.method;
 		if ("initPush".equals(methodName)) {
-			initPush(result);
+			initPush(call, result);
 		} else if ("initThirdPush".equals(methodName)) {
 			initThirdPush(result);
 		} else if ("getDeviceId".equals(methodName)) {
@@ -142,8 +143,19 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 		channel.setMethodCallHandler(null);
 	}
 
-	private void initPush(Result result) {
-		PushServiceFactory.init(mContext);
+	private void initPush(MethodCall call, Result result) {
+		String appKey = call.argument("appKey");
+		String appSecret = call.argument("appSecret");
+		if (TextUtils.isEmpty(appKey) || TextUtils.isEmpty(appSecret) || !(mContext instanceof Application)) {
+			PushServiceFactory.init(mContext);
+		} else {
+			PushInitConfig config = new PushInitConfig.Builder()
+					.application((Application) mContext)
+					.appKey(appKey)
+					.appSecret(appSecret)
+					.build();
+			PushServiceFactory.init(config);
+		}
 		final CloudPushService pushService = PushServiceFactory.getCloudPushService();
 		pushService.setLogLevel(CloudPushService.LOG_DEBUG);
 		pushService.register(mContext, new CommonCallback() {

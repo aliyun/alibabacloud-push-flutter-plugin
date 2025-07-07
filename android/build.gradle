@@ -8,7 +8,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.1.2'
+        classpath 'com.android.tools.build:gradle:8.2.0'
     }
 }
 
@@ -31,7 +31,7 @@ rootProject.allprojects {
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 36
     namespace "com.aliyun.ams.push"
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8

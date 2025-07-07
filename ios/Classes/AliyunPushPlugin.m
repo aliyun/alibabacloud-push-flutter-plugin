@@ -103,47 +103,47 @@ static BOOL logEnable = NO;
 }
 
 -(void)registerAPNS {
-    float systemVersionNum = [[[UIDevice currentDevice] systemVersion] floatValue];
-    if (systemVersionNum >= 10.0) {
-        // iOS 10 notifications
-        _notificationCenter = [UNUserNotificationCenter currentNotificationCenter];
-        _notificationCenter.delegate = self;
-        // 请求推送权限
-        [_notificationCenter requestAuthorizationWithOptions:UNAuthorizationOptionAlert | UNAuthorizationOptionBadge | UNAuthorizationOptionSound completionHandler:^(BOOL granted, NSError * _Nullable error) {
-            if (granted) {
-                // granted
-                PushLogD(@"####### ===> User authored notification.");
-                // 向APNs注册，获取deviceToken
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [[UIApplication sharedApplication] registerForRemoteNotifications];
-                });
-            } else {
-                // not granted
-                PushLogD(@"####### ===> User denied notification.");
-            }
-        }];
-    } else if (systemVersionNum >= 8.0) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored"-Wdeprecated-declarations"
-        [[UIApplication sharedApplication] registerUserNotificationSettings:
-         [UIUserNotificationSettings settingsForTypes:
-          (UIUserNotificationTypeSound | UIUserNotificationTypeAlert | UIUserNotificationTypeBadge)
-                                           categories:nil]];
-        [[UIApplication sharedApplication] registerForRemoteNotifications];
-#pragma clang diagnostic pop
-    } else {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored"-Wdeprecated-declarations"
-        [[UIApplication sharedApplication] registerForRemoteNotificationTypes:
-         (UIRemoteNotificationTypeAlert | UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound)];
-#pragma clang diagnostic pop
-    }
-
-    // 创建category，并注册到通知中心
-    [self createCustomNotificationCategory];
+    _notificationCenter = [UNUserNotificationCenter currentNotificationCenter];
+    _notificationCenter.delegate = self;
+    // 请求推送权限
+    [_notificationCenter requestAuthorizationWithOptions:UNAuthorizationOptionAlert | UNAuthorizationOptionBadge | UNAuthorizationOptionSound completionHandler:^(BOOL granted, NSError * _Nullable error) {
+        if (granted) {
+            // granted
+            PushLogD(@"####### ===> User authored notification.");
+            // 向APNs注册，获取deviceToken
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [[UIApplication sharedApplication] registerForRemoteNotifications];
+            });
+        } else {
+            // not granted
+            PushLogD(@"####### ===> User denied notification.");
+        }
+    }];
 }
 
-- (void)handleiOS10Notification:(UNNotification *)notification {
+ - (BOOL)application:(UIApplication*)application didReceiveRemoteNotification:(nonnull NSDictionary *)userInfo fetchCompletionHandler:(nonnull void (^)(UIBackgroundFetchResult))completionHandler {
+   PushLogD(@"onNotification, userInfo = [%@]", userInfo);
+   NSLog(@"###### onNotification  userInfo = [%@]", userInfo);
+
+   [CloudPushSDK sendNotificationAck:userInfo];
+   [self.channel invokeMethod:@"onNotification" arguments:userInfo];
+   if (_remoteNotification && userInfo) {
+       NSString* msgId = [userInfo valueForKey:@"m"];
+       NSString* remoteMsgId = [_remoteNotification valueForKey:@"m"];
+       if (msgId && remoteMsgId && [msgId isEqualToString:remoteMsgId]) {
+           [CloudPushSDK sendNotificationAck:_remoteNotification];
+           NSLog(@"###### onNotificationOpened  argument = [%@]", _remoteNotification);
+           [self.channel invokeMethod:@"onNotificationOpened" arguments:_remoteNotification];
+           _remoteNotification = nil;
+       }
+   }
+
+   completionHandler(UIBackgroundFetchResultNewData);
+   return YES;
+ }
+
+
+- (void)handleiOS10Notification:(UNNotification *)notification isSendAck:(BOOL)isSendAck {
     UNNotificationRequest *request = notification.request;
     UNNotificationContent *content = request.content;
     NSDictionary *userInfo = content.userInfo;
@@ -155,36 +155,21 @@ static BOOL logEnable = NO;
 
     // 通知打开回执上报
     [CloudPushSDK sendNotificationAck:userInfo];
-    [self.channel invokeMethod:@"onNotification" arguments:userInfo];
-}
-
-/**
- *  创建并注册通知category(iOS 10+)
- */
-- (void)createCustomNotificationCategory {
-    // 自定义`action1`和`action2`
-    UNNotificationAction *action1 = [UNNotificationAction actionWithIdentifier:@"action1" title:@"test1" options: UNNotificationActionOptionNone];
-    UNNotificationAction *action2 = [UNNotificationAction actionWithIdentifier:@"action2" title:@"test2" options: UNNotificationActionOptionNone];
-    // 创建id为`test_category`的category，并注册两个action到category
-    // UNNotificationCategoryOptionCustomDismissAction表明可以触发通知的dismiss回调
-    UNNotificationCategory *category = [UNNotificationCategory categoryWithIdentifier:@"test_category" actions:@[action1, action2] intentIdentifiers:@[] options:
-                                        UNNotificationCategoryOptionCustomDismissAction];
-    // 注册category到通知中心
-    [_notificationCenter setNotificationCategories:[NSSet setWithObjects:category, nil]];
+    if (isSendAck) {
+        [self.channel invokeMethod:@"onNotification" arguments:userInfo];
+    }
 }
 
 /*
     APP处于前台时收到通知(iOS 10+)
  */
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler {
-    // 处理iOS 10通知，并上报通知打开回执
-    [self handleiOS10Notification:notification];
-    [self.channel invokeMethod:@"onNotification" arguments:notification.request.content.userInfo];
-
     if(_showNoticeWhenForeground) {
         // 通知弹出，且带有声音、内容和角标
         completionHandler(UNNotificationPresentationOptionSound | UNNotificationPresentationOptionAlert | UNNotificationPresentationOptionBadge);
     } else {
+        // 处理iOS 10通知，并上报通知打开回执
+        [self handleiOS10Notification:notification isSendAck:YES];
         // 通知不弹出
         completionHandler(UNNotificationPresentationOptionNone);
     }
@@ -197,8 +182,8 @@ static BOOL logEnable = NO;
     NSString *userAction = response.actionIdentifier;
     // 点击通知打开
     if ([userAction isEqualToString:UNNotificationDefaultActionIdentifier]) {
-        // 处理iOS 10通知，并上报通知打开回执
-        [self handleiOS10Notification:response.notification];
+        // 处理通知
+        [self handleiOS10Notification:response.notification isSendAck:NO];
         [self.channel invokeMethod:@"onNotificationOpened" arguments:response.notification.request.content.userInfo];
     }
 
@@ -207,18 +192,6 @@ static BOOL logEnable = NO;
         //通知删除回执上报
         [CloudPushSDK sendDeleteNotificationAck:response.notification.request.content.userInfo];
         [self.channel invokeMethod:@"onNotificationRemoved" arguments:response.notification.request.content.userInfo];
-    }
-
-    NSString *customAction1 = @"action1";
-    NSString *customAction2 = @"action2";
-    // 点击用户自定义Action1
-    if ([userAction isEqualToString:customAction1]) {
-        NSLog(@"User custom action1.");
-    }
-
-    // 点击用户自定义Action2
-    if ([userAction isEqualToString:customAction2]) {
-        NSLog(@"User custom action2.");
     }
 
     completionHandler();
@@ -281,16 +254,6 @@ static BOOL logEnable = NO;
 
     [CloudPushSDK setLogLevel:MPLogLevelDebug];
 
-    if (!appKey || !appKey.length) {
-        result(@{KEY_CODE: CODE_PARAMS_ILLEGAL, KEY_ERROR_MSG: @"appKey config error"});
-        return;
-    }
-
-    if (!appSecret || !appSecret.length) {
-        result(@{KEY_CODE: CODE_PARAMS_ILLEGAL, KEY_ERROR_MSG: @"appSecret config error"});
-        return;
-    }
-
     //APNS注册，获取deviceToken并上报
     [self registerAPNS];
 
@@ -345,7 +308,18 @@ static BOOL logEnable = NO;
  */
 - (void)onMessageReceived:(NSNotification *)notification {
     NSDictionary *data = [notification object];
-    [self.channel invokeMethod:@"onMessage" arguments:data];
+    NSString *title = data[@"title"];
+    NSString *content = data[@"content"];
+
+    NSMutableDictionary *message = [NSMutableDictionary dictionary];
+    if (title) {
+        [message setObject:title forKey:@"title"];
+    }
+    if (content) {
+        [message setObject:content forKey:@"content"];
+    }
+
+    [self.channel invokeMethod:@"onMessage" arguments:message];
 }
 
 /* 设置SDK的日志级别 */
@@ -416,17 +390,13 @@ static BOOL logEnable = NO;
 - (void)bindAccount:(FlutterMethodCall *)call result:(FlutterResult)result {
     NSDictionary *arguments = call.arguments;
     NSString* account = arguments[@"account"];
-    if (account) {
-        [CloudPushSDK bindAccount:account withCallback:^(CloudPushCallbackResult *res) {
-            if (res.success) {
-                result(@{KEY_CODE:CODE_SUCCESS});
-            } else {
-                result(@{KEY_CODE:CODE_FAILED, KEY_ERROR_MSG: [self stringFromError:res.error]});
-            }
-        }];
-    } else {
-        result(@{KEY_CODE: CODE_PARAMS_ILLEGAL, KEY_ERROR_MSG: @"account can not be empty"});
-    }
+    [CloudPushSDK bindAccount:account withCallback:^(CloudPushCallbackResult *res) {
+        if (res.success) {
+            result(@{KEY_CODE:CODE_SUCCESS});
+        } else {
+            result(@{KEY_CODE:CODE_FAILED, KEY_ERROR_MSG: [self stringFromError:res.error]});
+        }
+    }];
 }
 
 - (void)unbindAccount:(FlutterResult)result {
@@ -442,33 +412,25 @@ static BOOL logEnable = NO;
 - (void)addAlias:(FlutterMethodCall*)call result:(FlutterResult)result {
     NSDictionary *arguments = call.arguments;
     NSString* alias = arguments[@"alias"];
-    if (alias) {
-        [CloudPushSDK addAlias:alias withCallback:^(CloudPushCallbackResult *res) {
-            if (res.success) {
-                result(@{KEY_CODE:CODE_SUCCESS});
-            } else {
-                result(@{KEY_CODE:CODE_FAILED, KEY_ERROR_MSG: [self stringFromError:res.error]});
-            }
-        }];
-    } else {
-        result(@{KEY_CODE: CODE_PARAMS_ILLEGAL, KEY_ERROR_MSG: @"alias can not be empty"});
-    }
+    [CloudPushSDK addAlias:alias withCallback:^(CloudPushCallbackResult *res) {
+        if (res.success) {
+            result(@{KEY_CODE:CODE_SUCCESS});
+        } else {
+            result(@{KEY_CODE:CODE_FAILED, KEY_ERROR_MSG: [self stringFromError:res.error]});
+        }
+    }];
 }
 
 - (void)removeAlias:(FlutterMethodCall*)call result:(FlutterResult)result {
     NSDictionary *arguments = call.arguments;
     NSString* alias = arguments[@"alias"];
-    if (alias) {
-        [CloudPushSDK removeAlias:alias withCallback:^(CloudPushCallbackResult *res) {
-            if (res.success) {
-                result(@{KEY_CODE:CODE_SUCCESS});
-            } else {
-                result(@{KEY_CODE:CODE_FAILED, KEY_ERROR_MSG: [self stringFromError:res.error]});
-            }
-        }];
-    } else {
-        result(@{KEY_CODE: CODE_PARAMS_ILLEGAL, KEY_ERROR_MSG: @"alias can not be empty"});
-    }
+    [CloudPushSDK removeAlias:alias withCallback:^(CloudPushCallbackResult *res) {
+        if (res.success) {
+            result(@{KEY_CODE:CODE_SUCCESS});
+        } else {
+            result(@{KEY_CODE:CODE_FAILED, KEY_ERROR_MSG: [self stringFromError:res.error]});
+        }
+    }];
 }
 
 - (void)listAlias:(FlutterResult)result {
@@ -488,24 +450,20 @@ static BOOL logEnable = NO;
     NSString* alias = arguments[@"alias"];
     id targetObj = arguments[@"target"];
 
-    if (tags && tags.count != 0) {
-        int target;
-        if (!targetObj) {
-            target = 1;
-        } else {
-            target = [targetObj intValue];
-        }
-        [CloudPushSDK bindTag:target withTags:tags withAlias:alias withCallback:^(CloudPushCallbackResult *res){
-            if (res.success) {
-                result(@{KEY_CODE:CODE_SUCCESS});
-            } else {
-                PushLogD(@"#### ===> %@", res.error);
-                result(@{KEY_CODE:CODE_FAILED, KEY_ERROR_MSG: [self stringFromError:res.error]});
-            }
-        }];
+    int target;
+    if (!targetObj) {
+        target = 1;
     } else {
-        result(@{KEY_CODE: CODE_PARAMS_ILLEGAL, KEY_ERROR_MSG: @"tags can not be empty"});
+        target = [targetObj intValue];
     }
+    [CloudPushSDK bindTag:target withTags:tags withAlias:alias withCallback:^(CloudPushCallbackResult *res){
+        if (res.success) {
+            result(@{KEY_CODE:CODE_SUCCESS});
+        } else {
+            PushLogD(@"#### ===> %@", res.error);
+            result(@{KEY_CODE:CODE_FAILED, KEY_ERROR_MSG: [self stringFromError:res.error]});
+        }
+    }];
 }
 
 - (void)unbindTag:(FlutterMethodCall*)call result:(FlutterResult)result {
@@ -515,23 +473,19 @@ static BOOL logEnable = NO;
     NSString* alias = arguments[@"alias"];
     id targetObj = arguments[@"target"];
 
-    if (tags && tags.count != 0) {
-        int target;
-        if (!targetObj) {
-            target = 1;
-        } else {
-            target = [targetObj intValue];
-        }
-        [CloudPushSDK unbindTag:target withTags:tags withAlias:alias withCallback:^(CloudPushCallbackResult *res){
-            if (res.success) {
-                result(@{KEY_CODE:CODE_SUCCESS});
-            } else {
-                result(@{KEY_CODE:CODE_FAILED, KEY_ERROR_MSG: [self stringFromError:res.error]});
-            }
-        }];
+    int target;
+    if (!targetObj) {
+        target = 1;
     } else {
-        result(@{KEY_CODE: CODE_PARAMS_ILLEGAL, KEY_ERROR_MSG: @"tags can not be empty"});
+        target = [targetObj intValue];
     }
+    [CloudPushSDK unbindTag:target withTags:tags withAlias:alias withCallback:^(CloudPushCallbackResult *res){
+        if (res.success) {
+            result(@{KEY_CODE:CODE_SUCCESS});
+        } else {
+            result(@{KEY_CODE:CODE_FAILED, KEY_ERROR_MSG: [self stringFromError:res.error]});
+        }
+    }];
 }
 
 - (void)listTags:(FlutterMethodCall*)call result:(FlutterResult)result {

@@ -137,7 +137,7 @@ class AliyunPush {
       return initResult;
     } else {
       Map<dynamic, dynamic> initResult =
-          await methodChannel.invokeMethod('initPush');
+          await methodChannel.invokeMethod('initPush', {'appKey': appKey, 'appSecret': appSecret});
       return initResult;
     }
   }
@@ -243,28 +243,12 @@ class AliyunPush {
     return listResult;
   }
 
-  void setPluginLogEnabled(bool enabled) {
-    methodChannel.invokeMethod('setPluginLogEnabled', {'enabled': enabled});
-  }
-
 // ***************** Android专用接口 *****************
   ///注册厂商通道
   Future<Map<dynamic, dynamic>> initAndroidThirdPush() async {
     Map<dynamic, dynamic> initResult =
         await methodChannel.invokeMethod('initThirdPush');
     return initResult;
-  }
-
-  Future<Map<dynamic, dynamic>> closeAndroidPushLog() async {
-    if (!Platform.isAndroid) {
-      return {
-        'code': kAliyunPushOnlyAndroid,
-        'errorMsg': 'Only support Android'
-      };
-    }
-    Map<dynamic, dynamic> result =
-        await methodChannel.invokeMethod('closePushLog');
-    return result;
   }
 
   ///绑定手机号码

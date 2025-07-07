@@ -105,8 +105,8 @@ class _HomePageState extends BaseState<HomePage> {
       appKey = "填写自己iOS项目的appKey";
       appSecret = "填写自己iOS项目的appSecret";
     } else {
-      appKey = "";
-      appSecret = "";
+      appKey = "填写自己Android项目的appKey";
+      appSecret = "填写自己Android项目的appSecret";
     }
 
     _aliyunPush
@@ -216,11 +216,6 @@ class _HomePageState extends BaseState<HomePage> {
                     );
                   },
                   child: const Text('iOS平台特定方法')),
-              ElevatedButton(
-                  onPressed: () {
-                    _aliyunPush.setPluginLogEnabled(true);
-                  },
-                  child: const Text('开启插件日志')),
               ElevatedButton(
                 onPressed: () async {
                   String? level = await showDialog<String>(
