@@ -136,8 +136,8 @@ class AliyunPush {
           'initPushSdk', {'appKey': appKey, 'appSecret': appSecret});
       return initResult;
     } else {
-      Map<dynamic, dynamic> initResult =
-          await methodChannel.invokeMethod('initPush', {'appKey': appKey, 'appSecret': appSecret});
+      Map<dynamic, dynamic> initResult = await methodChannel
+          .invokeMethod('initPush', {'appKey': appKey, 'appSecret': appSecret});
       return initResult;
     }
   }
@@ -163,11 +163,13 @@ class AliyunPush {
   Future<Map<dynamic, dynamic>> setLogLevel(AliyunPushLogLevel level) async {
     // 设置插件日志状态
     if (level != AliyunPushLogLevel.none) {
-      await methodChannel.invokeMethod('setPluginLogEnabled', {'enabled': true});
+      await methodChannel
+          .invokeMethod('setPluginLogEnabled', {'enabled': true});
     } else {
-      await methodChannel.invokeMethod('setPluginLogEnabled', {'enabled': false});
+      await methodChannel
+          .invokeMethod('setPluginLogEnabled', {'enabled': false});
     }
-    
+
     // 设置SDK日志级别
     Map<dynamic, dynamic> result =
         await methodChannel.invokeMethod('setLogLevel', {'level': level.value});

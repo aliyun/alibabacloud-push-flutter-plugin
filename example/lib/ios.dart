@@ -15,7 +15,6 @@ class _IOSPageState extends BaseState<IOSPage> {
   final TextEditingController _badgeController = TextEditingController();
 
   String _apnsToken = "";
-  
 
   @override
   Widget build(BuildContext context) {

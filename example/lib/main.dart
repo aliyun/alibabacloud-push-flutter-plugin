@@ -136,8 +136,7 @@ class _HomePageState extends BaseState<HomePage> {
         showOkDialog("初始化辅助通道成功");
       } else {
         String errorMsg = initResult['errorMsg'];
-        showErrorDialog(
-            '初始化辅助通道成功, errorMsg: $errorMsg');
+        showErrorDialog('初始化辅助通道成功, errorMsg: $errorMsg');
       }
     });
 

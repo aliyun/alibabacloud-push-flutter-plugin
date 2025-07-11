@@ -117,7 +117,6 @@ class _AndroidPageState extends BaseState<AndroidPage> {
                 .then((createResult) {
               var code = createResult['code'];
               if (code == kAliyunPushSuccessCode) {
-
                 showOkDialog('创建$channel通道成功');
               } else {
                 var errorCode = createResult['code'];
@@ -220,7 +219,7 @@ class _AndroidPageState extends BaseState<AndroidPage> {
     );
   }
 
-  void _clickLogLevel(String level){
+  void _clickLogLevel(String level) {
     // int logLevel;
     AliyunPushLogLevel logLevel;
     if (level == 'ERROR') {
