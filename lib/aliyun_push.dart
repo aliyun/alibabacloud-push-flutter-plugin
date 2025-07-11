@@ -3,6 +3,18 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+/// log level
+enum AliyunPushLogLevel {
+  none('none'),
+  error('error'),
+  warn('warn'),
+  info('info'),
+  debug('debug');
+
+  final String value;
+  const AliyunPushLogLevel(this.value);
+}
+
 const kAliyunPushSuccessCode = "10000";
 
 ///参数错误
@@ -16,11 +28,6 @@ const kAliyunPushOnlyIOS = "10004";
 
 ///平台不支持，比如Android创建group只支持Android 8.0以上版本
 const kAliyunPushNotSupport = "10005";
-
-///LogLevel
-const kAliyunPushLogLevelError = 0;
-const kAliyunPushLogLevelInfo = 1;
-const kAliyunPushLogLevelDebug = 2;
 
 ///本设备
 const kAliyunTargetDevice = 1;
@@ -129,29 +136,10 @@ class AliyunPush {
           'initPushSdk', {'appKey': appKey, 'appSecret': appSecret});
       return initResult;
     } else {
-      Map<dynamic, dynamic> initResult =
-          await methodChannel.invokeMethod('initPush');
+      Map<dynamic, dynamic> initResult = await methodChannel
+          .invokeMethod('initPush', {'appKey': appKey, 'appSecret': appSecret});
       return initResult;
     }
-  }
-
-  ///注册厂商通道
-  Future<Map<dynamic, dynamic>> initAndroidThirdPush() async {
-    Map<dynamic, dynamic> initResult =
-        await methodChannel.invokeMethod('initThirdPush');
-    return initResult;
-  }
-
-  Future<Map<dynamic, dynamic>> closeAndroidPushLog() async {
-    if (!Platform.isAndroid) {
-      return {
-        'code': kAliyunPushOnlyAndroid,
-        'errorMsg': 'Only support Android'
-      };
-    }
-    Map<dynamic, dynamic> result =
-        await methodChannel.invokeMethod('closePushLog');
-    return result;
   }
 
   ///获取deviceId
@@ -160,16 +148,31 @@ class AliyunPush {
     return deviceId;
   }
 
-  ///设置log的级别
-  Future<Map<dynamic, dynamic>> setAndroidLogLevel(int level) async {
-    if (!Platform.isAndroid) {
-      return {
-        'code': kAliyunPushOnlyAndroid,
-        'errorMsg': 'Only support Android'
-      };
+  ///设置SDK的日志级别
+  ///
+  /// [level] 日志级别，可选值：
+  /// - [AliyunPushLogLevel.none] 关闭日志
+  /// - [AliyunPushLogLevel.error] 错误日志
+  /// - [AliyunPushLogLevel.warn] 警告日志
+  /// - [AliyunPushLogLevel.info] 信息日志
+  /// - [AliyunPushLogLevel.debug] 调试日志
+  ///
+  /// 返回值：
+  /// - code: 错误码
+  /// - errorMsg: 错误信息
+  Future<Map<dynamic, dynamic>> setLogLevel(AliyunPushLogLevel level) async {
+    // 设置插件日志状态
+    if (level != AliyunPushLogLevel.none) {
+      await methodChannel
+          .invokeMethod('setPluginLogEnabled', {'enabled': true});
+    } else {
+      await methodChannel
+          .invokeMethod('setPluginLogEnabled', {'enabled': false});
     }
+
+    // 设置SDK日志级别
     Map<dynamic, dynamic> result =
-        await methodChannel.invokeMethod('setLogLevel', {'level': level});
+        await methodChannel.invokeMethod('setLogLevel', {'level': level.value});
     return result;
   }
 
@@ -240,6 +243,14 @@ class AliyunPush {
     Map<dynamic, dynamic> listResult =
         await methodChannel.invokeMethod('listTags', {'target': target});
     return listResult;
+  }
+
+// ***************** Android专用接口 *****************
+  ///注册厂商通道
+  Future<Map<dynamic, dynamic>> initAndroidThirdPush() async {
+    Map<dynamic, dynamic> initResult =
+        await methodChannel.invokeMethod('initThirdPush');
+    return initResult;
   }
 
   ///绑定手机号码
@@ -371,24 +382,7 @@ class AliyunPush {
     methodChannel.invokeMethod('jumpToNotificationSettings');
   }
 
-  ///开启iOS的debug日志
-  Future<Map<dynamic, dynamic>> turnOnIOSDebug() async {
-    if (!Platform.isIOS) {
-      return {'code': kAliyunPushOnlyIOS, 'errorMsg': 'Only support iOS'};
-    }
-    Map<dynamic, dynamic> result =
-        await methodChannel.invokeMethod('turnOnDebug');
-    return result;
-  }
-
-  Future<Map<dynamic, dynamic>> showIOSNoticeWhenForeground(bool enable) async {
-    if (!Platform.isIOS) {
-      return {'code': kAliyunPushOnlyIOS, 'errorMsg': 'Only support iOS'};
-    }
-    Map<dynamic, dynamic> result = await methodChannel
-        .invokeMethod('showNoticeWhenForeground', {'enable': enable});
-    return result;
-  }
+// ***************** iOS专用接口 *****************
 
   Future<Map<dynamic, dynamic>> setIOSBadgeNum(int num) async {
     if (!Platform.isIOS) {
@@ -417,15 +411,24 @@ class AliyunPush {
     return apnsDeviceToken;
   }
 
+  /// 设置iOS通知在应用前台时是否展示
+  ///
+  /// @param enable 是否展示
+  /// @return 返回值
+  Future<Map<dynamic, dynamic>> showIOSNoticeWhenForeground(bool enable) async {
+    if (!Platform.isIOS) {
+      return {'code': kAliyunPushOnlyIOS, 'errorMsg': 'Only support iOS'};
+    }
+    Map<dynamic, dynamic> result = await methodChannel
+        .invokeMethod('showNoticeWhenForeground', {'enable': enable});
+    return result;
+  }
+
   Future<bool> isIOSChannelOpened() async {
     if (!Platform.isIOS) {
       return false;
     }
     var opened = await methodChannel.invokeMethod('isChannelOpened');
     return opened;
-  }
-
-  void setPluginLogEnabled(bool enabled) {
-    methodChannel.invokeMethod('setPluginLogEnabled', {'enabled': enabled});
   }
 }

@@ -1,4 +1,4 @@
-package com.aliyun.ams.push_example;
+package com.aliyun.emas.pocdemo;
 
 import io.flutter.embedding.android.FlutterActivity;
 

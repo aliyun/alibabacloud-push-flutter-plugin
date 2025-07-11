@@ -25,19 +25,6 @@ class _AndroidPageState extends BaseState<AndroidPage> {
   @override
   Widget build(BuildContext context) {
     final children = <Widget>[];
-    children.add(
-      ElevatedButton(
-        onPressed: () {
-          _aliyunPush.closeAndroidPushLog().then((result) {
-            var code = result['code'];
-            if (code == kAliyunPushSuccessCode) {
-              showOkDialog('关闭AliyunPush Log成功');
-            }
-          });
-        },
-        child: const Text('关闭AliyunPush Log'),
-      ),
-    );
     _addSetLogLevelView(context, children);
     children.add(Padding(
       padding: const EdgeInsets.all(8.0),
@@ -130,7 +117,6 @@ class _AndroidPageState extends BaseState<AndroidPage> {
                 .then((createResult) {
               var code = createResult['code'];
               if (code == kAliyunPushSuccessCode) {
-
                 showOkDialog('创建$channel通道成功');
               } else {
                 var errorCode = createResult['code'];
@@ -233,16 +219,17 @@ class _AndroidPageState extends BaseState<AndroidPage> {
     );
   }
 
-  void _clickLogLevel(String level){
-    int logLevel;
+  void _clickLogLevel(String level) {
+    // int logLevel;
+    AliyunPushLogLevel logLevel;
     if (level == 'ERROR') {
-      logLevel = kAliyunPushLogLevelError;
+      logLevel = AliyunPushLogLevel.error;
     } else if (level == 'INFO') {
-      logLevel = kAliyunPushLogLevelInfo;
+      logLevel = AliyunPushLogLevel.info;
     } else {
-      logLevel = kAliyunPushLogLevelDebug;
+      logLevel = AliyunPushLogLevel.debug;
     }
-    _aliyunPush.setAndroidLogLevel(logLevel).then((result) {
+    _aliyunPush.setLogLevel(logLevel).then((result) {
       var code = result['code'];
       if (code == kAliyunPushSuccessCode) {
         showOkDialog('成功设置LogLevel为 $level');

@@ -3,6 +3,7 @@
 // iOS 10 notification
 #import <UserNotifications/UserNotifications.h>
 
+
 @interface AliyunPushLog : NSObject
 
 + (void)enableLog;
@@ -102,66 +103,47 @@ static BOOL logEnable = NO;
 }
 
 -(void)registerAPNS {
-    float systemVersionNum = [[[UIDevice currentDevice] systemVersion] floatValue];
-    if (systemVersionNum >= 10.0) {
-        // iOS 10 notifications
-        _notificationCenter = [UNUserNotificationCenter currentNotificationCenter];
-        _notificationCenter.delegate = self;
-        // 请求推送权限
-        [_notificationCenter requestAuthorizationWithOptions:UNAuthorizationOptionAlert | UNAuthorizationOptionBadge | UNAuthorizationOptionSound completionHandler:^(BOOL granted, NSError * _Nullable error) {
-            if (granted) {
-                // granted
-                PushLogD(@"####### ===> User authored notification.");
-                // 向APNs注册，获取deviceToken
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [[UIApplication sharedApplication] registerForRemoteNotifications];
-                });
-            } else {
-                // not granted
-                PushLogD(@"####### ===> User denied notification.");
-            }
-        }];
-    } else if (systemVersionNum >= 8.0) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored"-Wdeprecated-declarations"
-        [[UIApplication sharedApplication] registerUserNotificationSettings:
-         [UIUserNotificationSettings settingsForTypes:
-          (UIUserNotificationTypeSound | UIUserNotificationTypeAlert | UIUserNotificationTypeBadge)
-                                           categories:nil]];
-        [[UIApplication sharedApplication] registerForRemoteNotifications];
-#pragma clang diagnostic pop
-    } else {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored"-Wdeprecated-declarations"
-        [[UIApplication sharedApplication] registerForRemoteNotificationTypes:
-         (UIRemoteNotificationTypeAlert | UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound)];
-#pragma clang diagnostic pop
-    }
-}
-
-- (BOOL)application:(UIApplication*)application didReceiveRemoteNotification:(nonnull NSDictionary *)userInfo fetchCompletionHandler:(nonnull void (^)(UIBackgroundFetchResult))completionHandler {
-    PushLogD(@"onNotification, userInfo = [%@]", userInfo);
-    NSLog(@"###### onNotification  userInfo = [%@]", userInfo);
-
-    [CloudPushSDK sendNotificationAck:userInfo];
-    [self.channel invokeMethod:@"onNotification" arguments:userInfo];
-
-    if (_remoteNotification && userInfo) {
-        NSString* msgId = [userInfo valueForKey:@"m"];
-        NSString* remoteMsgId = [_remoteNotification valueForKey:@"m"];
-        if (msgId && remoteMsgId && [msgId isEqualToString:remoteMsgId]) {
-            [CloudPushSDK sendNotificationAck:_remoteNotification];
-            NSLog(@"###### onNotificationOpened  argument = [%@]", _remoteNotification);
-            [self.channel invokeMethod:@"onNotificationOpened" arguments:_remoteNotification];
-            _remoteNotification = nil;
+    _notificationCenter = [UNUserNotificationCenter currentNotificationCenter];
+    _notificationCenter.delegate = self;
+    // 请求推送权限
+    [_notificationCenter requestAuthorizationWithOptions:UNAuthorizationOptionAlert | UNAuthorizationOptionBadge | UNAuthorizationOptionSound completionHandler:^(BOOL granted, NSError * _Nullable error) {
+        if (granted) {
+            // granted
+            PushLogD(@"####### ===> User authored notification.");
+            // 向APNs注册，获取deviceToken
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [[UIApplication sharedApplication] registerForRemoteNotifications];
+            });
+        } else {
+            // not granted
+            PushLogD(@"####### ===> User denied notification.");
         }
-    }
-
-    completionHandler(UIBackgroundFetchResultNewData);
-    return YES;
+    }];
 }
 
-- (void)handleiOS10Notification:(UNNotification *)notification {
+ - (BOOL)application:(UIApplication*)application didReceiveRemoteNotification:(nonnull NSDictionary *)userInfo fetchCompletionHandler:(nonnull void (^)(UIBackgroundFetchResult))completionHandler {
+   PushLogD(@"onNotification, userInfo = [%@]", userInfo);
+   NSLog(@"###### onNotification  userInfo = [%@]", userInfo);
+
+   [CloudPushSDK sendNotificationAck:userInfo];
+   [self.channel invokeMethod:@"onNotification" arguments:userInfo];
+   if (_remoteNotification && userInfo) {
+       NSString* msgId = [userInfo valueForKey:@"m"];
+       NSString* remoteMsgId = [_remoteNotification valueForKey:@"m"];
+       if (msgId && remoteMsgId && [msgId isEqualToString:remoteMsgId]) {
+           [CloudPushSDK sendNotificationAck:_remoteNotification];
+           NSLog(@"###### onNotificationOpened  argument = [%@]", _remoteNotification);
+           [self.channel invokeMethod:@"onNotificationOpened" arguments:_remoteNotification];
+           _remoteNotification = nil;
+       }
+   }
+
+   completionHandler(UIBackgroundFetchResultNewData);
+   return YES;
+ }
+
+
+- (void)handleiOS10Notification:(UNNotification *)notification isSendAck:(BOOL)isSendAck {
     UNNotificationRequest *request = notification.request;
     UNNotificationContent *content = request.content;
     NSDictionary *userInfo = content.userInfo;
@@ -173,7 +155,9 @@ static BOOL logEnable = NO;
 
     // 通知打开回执上报
     [CloudPushSDK sendNotificationAck:userInfo];
-    [self.channel invokeMethod:@"onNotification" arguments:userInfo];
+    if (isSendAck) {
+        [self.channel invokeMethod:@"onNotification" arguments:userInfo];
+    }
 }
 
 /*
@@ -185,7 +169,7 @@ static BOOL logEnable = NO;
         completionHandler(UNNotificationPresentationOptionSound | UNNotificationPresentationOptionAlert | UNNotificationPresentationOptionBadge);
     } else {
         // 处理iOS 10通知，并上报通知打开回执
-        [self handleiOS10Notification:notification];
+        [self handleiOS10Notification:notification isSendAck:YES];
         // 通知不弹出
         completionHandler(UNNotificationPresentationOptionNone);
     }
@@ -198,9 +182,11 @@ static BOOL logEnable = NO;
     NSString *userAction = response.actionIdentifier;
     // 点击通知打开
     if ([userAction isEqualToString:UNNotificationDefaultActionIdentifier]) {
-        [CloudPushSDK sendNotificationAck:response.notification.request.content.userInfo];
+        // 处理通知
+        [self handleiOS10Notification:response.notification isSendAck:NO];
         [self.channel invokeMethod:@"onNotificationOpened" arguments:response.notification.request.content.userInfo];
     }
+
     // 通知dismiss，category创建时传入UNNotificationCategoryOptionCustomDismissAction才可以触发
     if ([userAction isEqualToString:UNNotificationDismissActionIdentifier]) {
         //通知删除回执上报
@@ -216,8 +202,8 @@ static BOOL logEnable = NO;
         [self initPushSdk:call result:result];
     } else if ([@"getDeviceId" isEqualToString:call.method]) {
         [self getDeviceId:result];
-    } else if ([@"turnOnDebug" isEqualToString:call.method]) {
-        [self turnOnDebug:result];
+    } else if ([@"setLogLevel" isEqualToString:call.method]) {
+        [self setLogLevel:call result:result];
     } else if ([@"bindAccount" isEqualToString:call.method]) {
         [self bindAccount:call result:result];
     } else if ([@"unbindAccount" isEqualToString:call.method]) {
@@ -249,12 +235,13 @@ static BOOL logEnable = NO;
         result(@([CloudPushSDK isChannelOpened]));
     } else if ([@"setPluginLogEnabled" isEqualToString:call.method]) {
         NSDictionary *arguments = call.arguments;
-        bool enabled = arguments[@"enabled"];
+        BOOL enabled = [arguments[@"enabled"] boolValue];
         if (enabled) {
             [AliyunPushLog enableLog];
         } else {
             [AliyunPushLog disableLog];
         }
+        result(@{KEY_CODE: CODE_SUCCESS});
     } else {
         result(FlutterMethodNotImplemented);
     }
@@ -265,23 +252,13 @@ static BOOL logEnable = NO;
     NSString *appKey = arguments[@"appKey"];
     NSString *appSecret = arguments[@"appSecret"];
 
-    [CloudPushSDK turnOnDebug];
-
-    if (!appKey || !appKey.length) {
-        result(@{KEY_CODE: CODE_PARAMS_ILLEGAL, KEY_ERROR_MSG: @"appKey config error"});
-        return;
-    }
-
-    if (!appSecret || !appSecret.length) {
-        result(@{KEY_CODE: CODE_PARAMS_ILLEGAL, KEY_ERROR_MSG: @"appSecret config error"});
-        return;
-    }
+    [CloudPushSDK setLogLevel:MPLogLevelDebug];
 
     //APNS注册，获取deviceToken并上报
     [self registerAPNS];
 
     //初始化
-    [CloudPushSDK asyncInit:appKey appSecret:appSecret callback:^(CloudPushCallbackResult *res) {
+    [CloudPushSDK startWithAppkey:appKey appSecret:appSecret callback:^(CloudPushCallbackResult * _Nonnull res) {
         if (res.success) {
             PushLogD(@"Push SDK init success, deviceId: %@.", [CloudPushSDK getDeviceId]);
             result(@{KEY_CODE:CODE_SUCCESS});
@@ -330,11 +307,44 @@ static BOOL logEnable = NO;
  *    处理到来推送消息
  */
 - (void)onMessageReceived:(NSNotification *)notification {
-    CCPSysMessage *message = [notification object];
-    NSMutableDictionary *dic = [NSMutableDictionary dictionary];
-    [dic setValue:message.title forKey:@"title"];
-    [dic setValue:message.body forKey:@"body"];
-    [self.channel invokeMethod:@"onMessage" arguments:dic];
+    NSDictionary *data = [notification object];
+    NSString *title = data[@"title"];
+    NSString *content = data[@"content"];
+
+    NSMutableDictionary *message = [NSMutableDictionary dictionary];
+    if (title) {
+        [message setObject:title forKey:@"title"];
+    }
+    if (content) {
+        [message setObject:content forKey:@"content"];
+    }
+
+    [self.channel invokeMethod:@"onMessage" arguments:message];
+}
+
+/* 设置SDK的日志级别 */
+- (void)setLogLevel:(FlutterMethodCall*)call result:(FlutterResult)result {
+    NSDictionary *arguments = call.arguments;
+    NSString *levelString = arguments[@"level"];
+
+    MPLogLevel level = MPLogLevelNone;
+    if ([levelString isEqualToString:@"none"]) {
+        level = MPLogLevelNone;
+    } else if ([levelString isEqualToString:@"error"]) {
+        level = MPLogLevelError;
+    } else if ([levelString isEqualToString:@"warn"]) {
+        level = MPLogLevelWarn;
+    } else if ([levelString isEqualToString:@"info"]) {
+        level = MPLogLevelInfo;
+    } else if ([levelString isEqualToString:@"debug"]) {
+        level = MPLogLevelDebug;
+    } else {
+        result(@{KEY_CODE: CODE_PARAMS_ILLEGAL, KEY_ERROR_MSG: @"Invalid log level"});
+        return;
+    }
+
+    [CloudPushSDK setLogLevel:level];
+    result(@{KEY_CODE: CODE_SUCCESS});
 }
 
 /* 设置角标个数 */
@@ -365,14 +375,10 @@ static BOOL logEnable = NO;
     result([CloudPushSDK getDeviceId]);
 }
 
-- (void)turnOnDebug:(FlutterResult)result {
-    [CloudPushSDK turnOnDebug];
-    result(@{KEY_CODE:CODE_SUCCESS});
-}
-
 - (void)showNoticeWhenForeground:(FlutterMethodCall*)call result:(FlutterResult)result {
     NSDictionary *arguments = call.arguments;
-    BOOL enable = arguments[@"enable"];
+    NSNumber *enableNumber = arguments[@"enable"];
+    BOOL enable = [enableNumber boolValue];
     _showNoticeWhenForeground = enable;
     result(@{KEY_CODE:CODE_SUCCESS});
 }
@@ -384,17 +390,13 @@ static BOOL logEnable = NO;
 - (void)bindAccount:(FlutterMethodCall *)call result:(FlutterResult)result {
     NSDictionary *arguments = call.arguments;
     NSString* account = arguments[@"account"];
-    if (account) {
-        [CloudPushSDK bindAccount:account withCallback:^(CloudPushCallbackResult *res) {
-            if (res.success) {
-                result(@{KEY_CODE:CODE_SUCCESS});
-            } else {
-                result(@{KEY_CODE:CODE_FAILED, KEY_ERROR_MSG: [self stringFromError:res.error]});
-            }
-        }];
-    } else {
-        result(@{KEY_CODE: CODE_PARAMS_ILLEGAL, KEY_ERROR_MSG: @"account can not be empty"});
-    }
+    [CloudPushSDK bindAccount:account withCallback:^(CloudPushCallbackResult *res) {
+        if (res.success) {
+            result(@{KEY_CODE:CODE_SUCCESS});
+        } else {
+            result(@{KEY_CODE:CODE_FAILED, KEY_ERROR_MSG: [self stringFromError:res.error]});
+        }
+    }];
 }
 
 - (void)unbindAccount:(FlutterResult)result {
@@ -410,33 +412,25 @@ static BOOL logEnable = NO;
 - (void)addAlias:(FlutterMethodCall*)call result:(FlutterResult)result {
     NSDictionary *arguments = call.arguments;
     NSString* alias = arguments[@"alias"];
-    if (alias) {
-        [CloudPushSDK addAlias:alias withCallback:^(CloudPushCallbackResult *res) {
-            if (res.success) {
-                result(@{KEY_CODE:CODE_SUCCESS});
-            } else {
-                result(@{KEY_CODE:CODE_FAILED, KEY_ERROR_MSG: [self stringFromError:res.error]});
-            }
-        }];
-    } else {
-        result(@{KEY_CODE: CODE_PARAMS_ILLEGAL, KEY_ERROR_MSG: @"alias can not be empty"});
-    }
+    [CloudPushSDK addAlias:alias withCallback:^(CloudPushCallbackResult *res) {
+        if (res.success) {
+            result(@{KEY_CODE:CODE_SUCCESS});
+        } else {
+            result(@{KEY_CODE:CODE_FAILED, KEY_ERROR_MSG: [self stringFromError:res.error]});
+        }
+    }];
 }
 
 - (void)removeAlias:(FlutterMethodCall*)call result:(FlutterResult)result {
     NSDictionary *arguments = call.arguments;
     NSString* alias = arguments[@"alias"];
-    if (alias) {
-        [CloudPushSDK removeAlias:alias withCallback:^(CloudPushCallbackResult *res) {
-            if (res.success) {
-                result(@{KEY_CODE:CODE_SUCCESS});
-            } else {
-                result(@{KEY_CODE:CODE_FAILED, KEY_ERROR_MSG: [self stringFromError:res.error]});
-            }
-        }];
-    } else {
-        result(@{KEY_CODE: CODE_PARAMS_ILLEGAL, KEY_ERROR_MSG: @"alias can not be empty"});
-    }
+    [CloudPushSDK removeAlias:alias withCallback:^(CloudPushCallbackResult *res) {
+        if (res.success) {
+            result(@{KEY_CODE:CODE_SUCCESS});
+        } else {
+            result(@{KEY_CODE:CODE_FAILED, KEY_ERROR_MSG: [self stringFromError:res.error]});
+        }
+    }];
 }
 
 - (void)listAlias:(FlutterResult)result {
@@ -456,24 +450,20 @@ static BOOL logEnable = NO;
     NSString* alias = arguments[@"alias"];
     id targetObj = arguments[@"target"];
 
-    if (tags && tags.count != 0) {
-        int target;
-        if (!targetObj) {
-            target = 1;
-        } else {
-            target = [targetObj intValue];
-        }
-        [CloudPushSDK bindTag:target withTags:tags withAlias:alias withCallback:^(CloudPushCallbackResult *res){
-            if (res.success) {
-                result(@{KEY_CODE:CODE_SUCCESS});
-            } else {
-                PushLogD(@"#### ===> %@", res.error);
-                result(@{KEY_CODE:CODE_FAILED, KEY_ERROR_MSG: [self stringFromError:res.error]});
-            }
-        }];
+    int target;
+    if (!targetObj) {
+        target = 1;
     } else {
-        result(@{KEY_CODE: CODE_PARAMS_ILLEGAL, KEY_ERROR_MSG: @"tags can not be empty"});
+        target = [targetObj intValue];
     }
+    [CloudPushSDK bindTag:target withTags:tags withAlias:alias withCallback:^(CloudPushCallbackResult *res){
+        if (res.success) {
+            result(@{KEY_CODE:CODE_SUCCESS});
+        } else {
+            PushLogD(@"#### ===> %@", res.error);
+            result(@{KEY_CODE:CODE_FAILED, KEY_ERROR_MSG: [self stringFromError:res.error]});
+        }
+    }];
 }
 
 - (void)unbindTag:(FlutterMethodCall*)call result:(FlutterResult)result {
@@ -483,23 +473,19 @@ static BOOL logEnable = NO;
     NSString* alias = arguments[@"alias"];
     id targetObj = arguments[@"target"];
 
-    if (tags && tags.count != 0) {
-        int target;
-        if (!targetObj) {
-            target = 1;
-        } else {
-            target = [targetObj intValue];
-        }
-        [CloudPushSDK unbindTag:target withTags:tags withAlias:alias withCallback:^(CloudPushCallbackResult *res){
-            if (res.success) {
-                result(@{KEY_CODE:CODE_SUCCESS});
-            } else {
-                result(@{KEY_CODE:CODE_FAILED, KEY_ERROR_MSG: [self stringFromError:res.error]});
-            }
-        }];
+    int target;
+    if (!targetObj) {
+        target = 1;
     } else {
-        result(@{KEY_CODE: CODE_PARAMS_ILLEGAL, KEY_ERROR_MSG: @"tags can not be empty"});
+        target = [targetObj intValue];
     }
+    [CloudPushSDK unbindTag:target withTags:tags withAlias:alias withCallback:^(CloudPushCallbackResult *res){
+        if (res.success) {
+            result(@{KEY_CODE:CODE_SUCCESS});
+        } else {
+            result(@{KEY_CODE:CODE_FAILED, KEY_ERROR_MSG: [self stringFromError:res.error]});
+        }
+    }];
 }
 
 - (void)listTags:(FlutterMethodCall*)call result:(FlutterResult)result {
