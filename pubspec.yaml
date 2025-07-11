@@ -1,6 +1,6 @@
 name: aliyun_push
 description: Aliyun Push Flutter plugin.
-version: 1.0.0
+version: 1.0.0-beta.1
 homepage: https://help.aliyun.com/document_detail/434552.html
 
 environment:
