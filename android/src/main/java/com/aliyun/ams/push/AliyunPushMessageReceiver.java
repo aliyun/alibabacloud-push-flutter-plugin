@@ -68,7 +68,9 @@ public class AliyunPushMessageReceiver extends MessageReceiver {
 			arguments.putAll(extraMap);
 		} else {
 		}
-
+		arguments.put("title", title);
+		arguments.put("summary", summary);
+		
 		AliyunPushPlugin.sInstance.callFlutterMethod("onNotification", arguments);
 	}
 
