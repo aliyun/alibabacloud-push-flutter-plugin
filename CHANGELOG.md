@@ -62,3 +62,7 @@
 
 * 升级iOS端SDK版本
 * 更新部分api
+
+## 1.0.0
+
+* 修复onNotification回调，Android端通知缺少title和summary字段的问题
