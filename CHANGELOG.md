@@ -66,3 +66,7 @@
 ## 1.0.0
 
 * 修复onNotification回调，Android端通知缺少title和summary字段的问题
+
+## 1.0.1
+
+* 修改compileSdkVersion和minSdkVersion，提高插件兼容性
