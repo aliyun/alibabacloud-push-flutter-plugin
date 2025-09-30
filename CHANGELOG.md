@@ -70,3 +70,7 @@
 ## 1.0.1
 
 * 修改compileSdkVersion和minSdkVersion，提高插件兼容性
+
+## 1.0.2
+
+* 修复compileSdkVersion过低导致的resource android:attr/lStar not found错误
