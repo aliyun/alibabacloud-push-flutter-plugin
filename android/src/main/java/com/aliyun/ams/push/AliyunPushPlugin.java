@@ -133,6 +133,8 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 			if (enabled != null) {
 				AliyunPushLog.setLogEnabled(enabled);
 			}
+		} else if ("setAndroidBadgeNum".equals(methodName)) {
+			setAndroidBadgeNum(call, result);
 		} else {
 			result.notImplemented();
 		}
@@ -883,6 +885,44 @@ public class AliyunPushPlugin implements FlutterPlugin, MethodCallHandler {
 			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		}
 		mContext.startActivity(intent);
+	}
+
+	private void setAndroidBadgeNum(MethodCall call, Result result) {
+		HashMap<String, String> map = new HashMap<>();
+		Integer badgeNum = call.argument("badgeNum");
+		
+		if (badgeNum == null) {
+			map.put(CODE_KEY, CODE_PARAM_ILLEGAL);
+			map.put(ERROR_MSG_KEY, "badgeNum can not be null");
+			try {
+				result.success(map);
+			} catch (Exception e) {
+				AliyunPushLog.e(TAG, Log.getStackTraceString(e));
+			}
+			return;
+		}
+
+		try {
+			final CloudPushService pushService = PushServiceFactory.getCloudPushService();
+			// 调用阿里云推送SDK的setBadgeNum方法
+			pushService.setBadgeNum(mContext, badgeNum);
+			
+			map.put(CODE_KEY, CODE_SUCCESS);
+			try {
+				result.success(map);
+			} catch (Exception e) {
+				AliyunPushLog.e(TAG, Log.getStackTraceString(e));
+			}
+		} catch (Exception e) {
+			AliyunPushLog.e(TAG, "setAndroidBadgeNum error: " + Log.getStackTraceString(e));
+			map.put(CODE_KEY, CODE_FAILED);
+			map.put(ERROR_MSG_KEY, "Failed to set badge number: " + e.getMessage());
+			try {
+				result.success(map);
+			} catch (Exception ex) {
+				AliyunPushLog.e(TAG, Log.getStackTraceString(ex));
+			}
+		}
 	}
 
 }

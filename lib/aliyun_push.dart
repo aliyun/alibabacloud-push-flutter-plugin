@@ -382,6 +382,21 @@ class AliyunPush {
     methodChannel.invokeMethod('jumpToNotificationSettings');
   }
 
+  ///设置Android角标数
+  ///
+  ///@param num 角标数量
+  Future<Map<dynamic, dynamic>> setAndroidBadgeNum(int num) async {
+    if (!Platform.isAndroid) {
+      return {
+        'code': kAliyunPushOnlyAndroid,
+        'errorMsg': 'Only support Android'
+      };
+    }
+    Map<dynamic, dynamic> result = await methodChannel
+        .invokeMethod('setAndroidBadgeNum', {'badgeNum': num});
+    return result;
+  }
+
 // ***************** iOS专用接口 *****************
 
   Future<Map<dynamic, dynamic>> setIOSBadgeNum(int num) async {
