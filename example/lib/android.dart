@@ -14,6 +14,7 @@ class _AndroidPageState extends BaseState<AndroidPage> {
 
   final TextEditingController _addPhoneController = TextEditingController();
   final TextEditingController _channelController = TextEditingController();
+  final TextEditingController _badgeController = TextEditingController();
 
   String _boundPhone = "";
 
@@ -162,6 +163,62 @@ class _AndroidPageState extends BaseState<AndroidPage> {
                 id: _channelController.text);
           },
           child: const Text('跳转通知通道设置界面')),
+    ));
+
+    // 添加角标设置功能
+    children.add(Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: ListTile(
+        title: const Text(
+          '角标设置',
+          style: TextStyle(color: Colors.white),
+        ),
+        tileColor: Colors.grey.shade400,
+        trailing: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
+      ),
+    ));
+    children.add(
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+        child: TextField(
+          autofocus: false,
+          keyboardType: TextInputType.number,
+          decoration: const InputDecoration(
+            labelText: "角标数量",
+            hintText: "请输入角标数量",
+          ),
+          controller: _badgeController,
+        ),
+      ),
+    );
+    children.add(Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+      child: ElevatedButton(
+          onPressed: () {
+            String badgeText = _badgeController.text;
+            if (badgeText.isEmpty) {
+              showWarningDialog('请输入角标数量');
+              return;
+            }
+
+            int? badgeNum = int.tryParse(badgeText);
+            if (badgeNum == null) {
+              showWarningDialog('请输入有效的数字');
+              return;
+            }
+
+            _aliyunPush.setAndroidBadgeNum(badgeNum).then((result) {
+              var code = result['code'];
+              if (code == kAliyunPushSuccessCode) {
+                showOkDialog('设置Android角标数量为 $badgeNum 成功');
+              } else {
+                var errorCode = result['code'];
+                var errorMsg = result['errorMsg'];
+                showErrorDialog('设置Android角标失败: $errorCode - $errorMsg');
+              }
+            });
+          },
+          child: const Text('设置Android角标数量')),
     ));
 
     return Scaffold(

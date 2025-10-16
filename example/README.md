@@ -32,7 +32,7 @@ flutter emulators --launch Pixel_7_API_34
 # 然后执行：
 flutter run
 # 或指定设备：
-flutter run -d emulator Pixel_7_API_34
+flutter run -d <device-id>
 ```
 
 真机运行：
@@ -43,7 +43,7 @@ flutter run -d emulator Pixel_7_API_34
 # 然后执行：
 flutter run
 # 或：
-flutter run -d<device-id>
+flutter run -d <device-id>
 ```
 
 #### 运行到iOS

@@ -1,4 +1,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <!-- 华为/荣耀 Badge 需要权限 -->
+    <uses-permission android:name="com.hihonor.android.launcher.permission.CHANGE_BADGE" />
+    <uses-permission android:name="com.huawei.android.launcher.permission.CHANGE_BADGE" />
+    
+    <!-- VIVO 角标需要权限 -->
+    <uses-permission android:name="com.vivo.notification.permission.BADGE_ICON" />
+    
     <application
         android:label="push_example"
         android:name="${applicationName}"

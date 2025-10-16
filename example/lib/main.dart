@@ -274,7 +274,7 @@ class _HomePageState extends BaseState<HomePage> {
                         showOkDialog('设置log级别为 $level 成功');
                       } else {
                         var errorMsg = result['errorMsg'] ?? '未知错误';
-                        showErrorDialog('设置log级别为 $level 失败: ' + errorMsg);
+                        showErrorDialog('设置log级别为 $level 失败: $errorMsg');
                       }
                     }
                   }

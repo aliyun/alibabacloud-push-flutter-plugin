@@ -74,3 +74,8 @@
 ## 1.0.2
 
 * 修复compileSdkVersion过低导致的resource android:attr/lStar not found错误
+
+## 1.0.3
+
+* 新增Android角标设置功能，添加`setAndroidBadgeNum(int num)`接口，支持设置Android应用角标数量
+* 适配Android 16KB内存页面大小

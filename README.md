@@ -713,7 +713,8 @@ _aliyunPush.clearNotifications().then((result) {
 
 #### createAndroidChannel
 
-`Future<Map<dynamic, dynamic>> createAndroidChannel(
+```dart
+Future<Map<dynamic, dynamic>> createAndroidChannel(
       String id, String name, int importance, String description,
       {String? groupId,
       bool? allowBubbles,
@@ -725,7 +726,8 @@ _aliyunPush.clearNotifications().then((result) {
       int? soundContentType,
       int? soundFlag,
       bool? vibration,
-      List<int>? vibrationPatterns})`
+      List<int>? vibrationPatterns})
+```
 
 创建Android平台的NotificationChannel
 
@@ -842,6 +844,60 @@ bool isEnabled = await _aliyunPush.isAndroidNotificationEnabled(
 
 ```dart
 _aliyunPush.jumpToAndroidNotificationSettings();
+```
+
+#### setAndroidBadgeNum
+
+`Future<Map<dynamic, dynamic>> setAndroidBadgeNum(int num) async`
+
+设置Android应用角标数量
+
+> **注意：只支持Android平台**
+
+参数:
+
+| 参数名 | 类型 | 是否必须 | 含义 |
+| --- | --- | ---| --- |
+| num | int | 必须参数 | 要设置的角标数量 |
+
+返回值：
+
+`Map<dynamic, dynamic>`
+
+map中包含两个key值:
+
++ `code`: 错误码
++ `errorMsg`: 错误信息
+
+支持情况：当前接口仅支持华为、荣耀、VIVO机型
+
++ 华为机型：EMUI 4.1 及以上支持角标功能
++ 荣耀机型：Magic UI 6.0 版本开始支持数字角标
+
+权限配置：
+在`android/app/src/main/AndroidManifest.xml`中添加以下权限：
+```xml
+<!-- 华为/荣耀 Badge 需要权限 -->
+<uses-permission android:name="com.hihonor.android.launcher.permission.CHANGE_BADGE" />
+<uses-permission android:name="com.huawei.android.launcher.permission.CHANGE_BADGE" />
+
+<!-- VIVO 角标需要权限 -->
+<uses-permission android:name="com.vivo.notification.permission.BADGE_ICON" />
+```
+
+代码示例:
+
+```dart
+_aliyunPush.setAndroidBadgeNum(5).then((result) {
+    var code = result['code'];
+    if (code == kAliyunPushSuccessCode) {
+        print('设置Android角标成功');
+    } else {
+        var errorCode = result['code'];
+        var errorMsg = result['errorMsg'];
+        print('设置Android角标失败: $errorCode - $errorMsg');
+    }
+});
 ```
 
 ### 6.4 iOS 专用接口
