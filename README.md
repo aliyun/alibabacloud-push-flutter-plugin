@@ -844,6 +844,57 @@ bool isEnabled = await _aliyunPush.isAndroidNotificationEnabled(
 _aliyunPush.jumpToAndroidNotificationSettings();
 ```
 
+#### setAndroidBadgeNum
+
+`Future<Map<dynamic, dynamic>> setAndroidBadgeNum(int num) async`
+
+设置Android应用角标数量
+
+> **注意：只支持Android平台**
+
+参数:
+
+| 参数名 | 类型 | 是否必须 | 含义 |
+| --- | --- | ---| --- |
+| num | int | 必须参数 | 要设置的角标数量 |
+
+返回值：
+
+`Map<dynamic, dynamic>`
+
+map中包含两个key值:
+
++ `code`: 错误码
++ `errorMsg`: 错误信息
+
+代码示例:
+
+```dart
+_aliyunPush.setAndroidBadgeNum(5).then((result) {
+    var code = result['code'];
+    if (code == kAliyunPushSuccessCode) {
+        print('设置Android角标成功');
+    } else {
+        var errorCode = result['code'];
+        var errorMsg = result['errorMsg'];
+        print('设置Android角标失败: $errorCode - $errorMsg');
+    }
+});
+```
+
+**权限说明：**
+
+插件已自动添加以下角标权限，无需手动配置：
+
+```xml
+<!-- 华为/荣耀 Badge 需要权限 -->
+<uses-permission android:name="com.hihonor.android.launcher.permission.CHANGE_BADGE" />
+<uses-permission android:name="com.huawei.android.launcher.permission.CHANGE_BADGE" />
+
+<!-- VIVO 角标需要权限 -->
+<uses-permission android:name="com.vivo.notification.permission.BADGE_ICON" />
+```
+
 ### 6.4 iOS 专用接口
 
 #### setIOSBadgeNum
