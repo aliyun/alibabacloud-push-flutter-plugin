@@ -77,9 +77,5 @@
 
 ## 1.0.3
 
-* 新增Android角标设置功能
-  - 添加`setAndroidBadgeNum(int num)`接口，支持设置Android应用角标数量
-  - 在Android原生层调用阿里云推送SDK的setBadgeNum方法
-  - 自动添加华为/荣耀/VIVO角标权限声明
-  - 在example应用中添加角标设置测试功能
-  - 完善跨平台角标管理，Android和iOS分别实现对应功能
+* 新增Android角标设置功能，添加`setAndroidBadgeNum(int num)`接口，支持设置Android应用角标数量
+* 适配Android 16KB内存页面大小
