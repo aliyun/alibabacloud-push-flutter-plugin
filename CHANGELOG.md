@@ -79,3 +79,8 @@
 
 * 新增Android角标设置功能，添加`setAndroidBadgeNum(int num)`接口，支持设置Android应用角标数量
 * 适配Android 16KB内存页面大小
+
+
+## 1.0.4
+
+* 修复extraMap数据在`onNotification`和`onNotificationOpened`中回调格式不一致问题
