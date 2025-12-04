@@ -18,7 +18,7 @@
 
 ```yaml
 dependencies:
-    aliyun_push: 1.0.3
+    aliyun_push: 1.0.4
 ```
 
 ## 4. 插件初始化
