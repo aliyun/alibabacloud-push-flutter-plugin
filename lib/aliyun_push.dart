@@ -15,6 +15,19 @@ enum AliyunPushLogLevel {
   const AliyunPushLogLevel(this.value);
 }
 
+/// iOS 前台通知处理模式
+enum ForegroundNoticeMode {
+  /// 仅触发回调，不展示通知
+  callbackOnly(0),
+  /// 仅展示通知，不触发回调
+  showOnly(1),
+  /// 展示通知且触发回调
+  showAndCallback(2);
+
+  final int value;
+  const ForegroundNoticeMode(this.value);
+}
+
 const kAliyunPushSuccessCode = "10000";
 
 ///参数错误
@@ -426,17 +439,37 @@ class AliyunPush {
     return apnsDeviceToken;
   }
 
-  /// 设置iOS通知在应用前台时是否展示
+  /// 设置iOS通知在应用前台时的处理模式
   ///
-  /// @param enable 是否展示
+  /// [mode] 前台通知处理模式，可选值：
+  /// - [ForegroundNoticeMode.callbackOnly] 仅触发回调，不展示通知
+  /// - [ForegroundNoticeMode.showOnly] 仅展示通知，不触发回调
+  /// - [ForegroundNoticeMode.showAndCallback] 展示通知且触发回调
+  ///
   /// @return 返回值
-  Future<Map<dynamic, dynamic>> showIOSNoticeWhenForeground(bool enable) async {
+  Future<Map<dynamic, dynamic>> setIOSForegroundNoticeMode(
+      ForegroundNoticeMode mode) async {
     if (!Platform.isIOS) {
       return {'code': kAliyunPushOnlyIOS, 'errorMsg': 'Only support iOS'};
     }
     Map<dynamic, dynamic> result = await methodChannel
-        .invokeMethod('showNoticeWhenForeground', {'enable': enable});
+        .invokeMethod('showNoticeWhenForeground', {'mode': mode.value});
     return result;
+  }
+
+  /// 设置iOS通知在应用前台时是否展示
+  ///
+  /// @param enable 是否展示
+  /// @return 返回值
+  @Deprecated('Use setIOSForegroundNoticeMode with ForegroundNoticeMode instead')
+  Future<Map<dynamic, dynamic>> showIOSNoticeWhenForeground(bool enable) async {
+    if (!Platform.isIOS) {
+      return {'code': kAliyunPushOnlyIOS, 'errorMsg': 'Only support iOS'};
+    }
+    ForegroundNoticeMode mode = enable 
+        ? ForegroundNoticeMode.showOnly 
+        : ForegroundNoticeMode.callbackOnly;
+    return setIOSForegroundNoticeMode(mode);
   }
 
   Future<bool> isIOSChannelOpened() async {

@@ -49,7 +49,7 @@ static BOOL logEnable = NO;
 @implementation AliyunPushPlugin {
     // iOS 10通知中心
     UNUserNotificationCenter *_notificationCenter;
-    BOOL _showNoticeWhenForeground;
+    NSInteger _foregroundNoticeMode; // 0-仅回调 1-仅展示 2-展示且回调
     NSData* _deviceToken;
     NSDictionary* _remoteNotification;
 }
@@ -164,14 +164,18 @@ static BOOL logEnable = NO;
     APP处于前台时收到通知(iOS 10+)
  */
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler {
-    if(_showNoticeWhenForeground) {
-        // 通知弹出，且带有声音、内容和角标
+    if (_foregroundNoticeMode == 0) {
+        // CALLBACK_ONLY: 仅触发回调，不展示通知
+        [self handleiOS10Notification:notification isSendAck:YES];
+        completionHandler(UNNotificationPresentationOptionNone);
+    } else if (_foregroundNoticeMode == 1) {
+        // SHOW_ONLY: 仅展示通知，不触发回调
+        [self handleiOS10Notification:notification isSendAck:NO];
         completionHandler(UNNotificationPresentationOptionSound | UNNotificationPresentationOptionAlert | UNNotificationPresentationOptionBadge);
     } else {
-        // 处理iOS 10通知，并上报通知打开回执
+        // SHOW_AND_CALLBACK: 展示通知且触发回调
         [self handleiOS10Notification:notification isSendAck:YES];
-        // 通知不弹出
-        completionHandler(UNNotificationPresentationOptionNone);
+        completionHandler(UNNotificationPresentationOptionSound | UNNotificationPresentationOptionAlert | UNNotificationPresentationOptionBadge);
     }
 }
 
@@ -377,9 +381,24 @@ static BOOL logEnable = NO;
 
 - (void)showNoticeWhenForeground:(FlutterMethodCall*)call result:(FlutterResult)result {
     NSDictionary *arguments = call.arguments;
-    NSNumber *enableNumber = arguments[@"enable"];
-    BOOL enable = [enableNumber boolValue];
-    _showNoticeWhenForeground = enable;
+    NSNumber *modeNumber = arguments[@"mode"];
+    NSInteger mode = [modeNumber integerValue];
+    
+    // mode: 0-仅回调 1-仅展示 2-展示且回调
+    if (mode == 0) {
+        // CALLBACK_ONLY: 仅触发回调，不展示通知
+        _foregroundNoticeMode = 0;
+    } else if (mode == 1) {
+        // SHOW_ONLY: 仅展示通知，不触发回调
+        _foregroundNoticeMode = 1;
+    } else if (mode == 2) {
+        // SHOW_AND_CALLBACK: 展示通知且触发回调
+        _foregroundNoticeMode = 2;
+    } else {
+        result(@{KEY_CODE: CODE_PARAMS_ILLEGAL, KEY_ERROR_MSG: @"Invalid foreground notice mode"});
+        return;
+    }
+    
     result(@{KEY_CODE:CODE_SUCCESS});
 }
 

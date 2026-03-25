@@ -18,7 +18,6 @@
 
 ## 0.0.5
 
-
 * 修复Android创建Channel时desc字段key值不一致问题
 
 ## 0.0.6 
@@ -80,7 +79,14 @@
 * 新增Android角标设置功能，添加`setAndroidBadgeNum(int num)`接口，支持设置Android应用角标数量
 * 适配Android 16KB内存页面大小
 
-
 ## 1.0.4
 
 * 修复extraMap数据在`onNotification`和`onNotificationOpened`中回调格式不一致问题
+
+## 1.1.4
+
+* 新增`setIOSForegroundNoticeMode`方法，支持iOS前台通知三种处理模式：
+  - `ForegroundNoticeMode.callbackOnly`：仅触发回调，不展示通知
+  - `ForegroundNoticeMode.showOnly`：仅展示通知，不触发回调
+  - `ForegroundNoticeMode.showAndCallback`：展示通知且触发回调
+* `showIOSNoticeWhenForeground`方法标记为废弃，建议使用`setIOSForegroundNoticeMode`

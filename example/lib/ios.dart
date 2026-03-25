@@ -23,27 +23,47 @@ class _IOSPageState extends BaseState<IOSPage> {
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
       child: ElevatedButton(
           onPressed: () {
-            _aliyunPush.showIOSNoticeWhenForeground(true).then((result) {
+            _aliyunPush
+                .setIOSForegroundNoticeMode(ForegroundNoticeMode.callbackOnly)
+                .then((result) {
               var code = result['code'];
               if (code == kAliyunPushSuccessCode) {
-                showOkDialog('设置前台显示通知成功');
+                showOkDialog('设置前台仅回调模式成功');
               }
             });
           },
-          child: const Text('前台显示通知')),
+          child: const Text('前台仅回调(不显示通知)')),
     ));
     children.add(Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
       child: ElevatedButton(
           onPressed: () {
-            _aliyunPush.showIOSNoticeWhenForeground(false).then((result) {
+            _aliyunPush
+                .setIOSForegroundNoticeMode(ForegroundNoticeMode.showOnly)
+                .then((result) {
               var code = result['code'];
               if (code == kAliyunPushSuccessCode) {
-                showOkDialog('设置前台不显示通知成功');
+                showOkDialog('设置前台仅显示模式成功');
               }
             });
           },
-          child: const Text('前台不显示通知')),
+          child: const Text('前台仅显示(不回调)')),
+    ));
+    children.add(Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+      child: ElevatedButton(
+          onPressed: () {
+            _aliyunPush
+                .setIOSForegroundNoticeMode(
+                    ForegroundNoticeMode.showAndCallback)
+                .then((result) {
+              var code = result['code'];
+              if (code == kAliyunPushSuccessCode) {
+                showOkDialog('设置前台显示且回调模式成功');
+              }
+            });
+          },
+          child: const Text('前台显示且回调')),
     ));
     children.add(
       Padding(
