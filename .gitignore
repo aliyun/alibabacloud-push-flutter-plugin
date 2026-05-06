@@ -36,3 +36,5 @@ example/build/
 .idea/
 .vscode/
 
+# FVM Version Cache
+.fvm/
