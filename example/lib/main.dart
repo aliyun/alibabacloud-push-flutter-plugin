@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:aliyun_push/aliyun_push.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:push_example/base_state.dart';
 import 'package:push_example/ios.dart';
 
@@ -102,11 +103,11 @@ class _HomePageState extends BaseState<HomePage> {
     String appKey;
     String appSecret;
     if (Platform.isIOS) {
-      appKey = "填写自己iOS项目的appKey";
-      appSecret = "填写自己iOS项目的appSecret";
+      appKey = "335545903";
+      appSecret = "bf524eae098740c2bce55c968a082353";
     } else {
-      appKey = "填写自己Android项目的appKey";
-      appSecret = "填写自己Android项目的appSecret";
+      appKey = "335571660";
+      appSecret = "f56b5ac90f9a41598f64c8f6d73fe132";
     }
 
     _aliyunPush
@@ -181,9 +182,24 @@ class _HomePageState extends BaseState<HomePage> {
                   },
                   child: const Text('查询deviceId')),
               if (_deviceId != "")
-                Text(
-                  "deviceId: $_deviceId",
-                  style: const TextStyle(fontSize: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        "deviceId: $_deviceId",
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.copy, size: 18),
+                      onPressed: () {
+                        Clipboard.setData(ClipboardData(text: _deviceId));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('已复制 DeviceId')),
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ElevatedButton(
                   onPressed: () {

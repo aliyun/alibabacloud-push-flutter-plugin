@@ -46,9 +46,11 @@ const kAliyunPushNotSupport = "10005";
 const kAliyunTargetDevice = 1;
 
 ///本设备绑定账号
+@Deprecated('不再建议使用，请使用设备维度标签接口 bindDeviceTag/unbindDeviceTag/listDeviceTags')
 const kAliyunTargetAccount = 2;
 
 ///别名
+@Deprecated('不再建议使用，请使用设备维度标签接口 bindDeviceTag/unbindDeviceTag/listDeviceTags')
 const kAliyunTargetAlias = 3;
 
 typedef PushCallback = Future<dynamic> Function(Map<dynamic, dynamic> message);
@@ -224,11 +226,37 @@ class AliyunPush {
     return listResult;
   }
 
-  ///添加标签
+  /// 绑定设备标签（推荐使用）
+  ///
+  /// @param tags 标签名列表
+  Future<Map<dynamic, dynamic>> bindDeviceTag(List<String> tags) async {
+    Map<dynamic, dynamic> bindResult = await methodChannel.invokeMethod(
+        'bindTag', {'tags': tags, 'target': kAliyunTargetDevice, 'alias': null});
+    return bindResult;
+  }
+
+  /// 解绑设备标签（推荐使用）
+  ///
+  /// @param tags 标签名列表
+  Future<Map<dynamic, dynamic>> unbindDeviceTag(List<String> tags) async {
+    Map<dynamic, dynamic> unbindResult = await methodChannel.invokeMethod(
+        'unbindTag', {'tags': tags, 'target': kAliyunTargetDevice, 'alias': null});
+    return unbindResult;
+  }
+
+  /// 查询设备标签列表（推荐使用）
+  Future<Map<dynamic, dynamic>> listDeviceTags() async {
+    Map<dynamic, dynamic> listResult =
+        await methodChannel.invokeMethod('listTags', {'target': kAliyunTargetDevice});
+    return listResult;
+  }
+
+  /// 添加标签
   ///
   /// @param tags     标签名
   /// @param target   目标类型，1: 本设备  2: 本设备绑定账号  3: 别名
   /// @param alias    别名（仅当target = 3时生效）
+  @Deprecated('不再建议使用，请使用 bindDeviceTag')
   Future<Map<dynamic, dynamic>> bindTag(List<String> tags,
       {int target = kAliyunTargetDevice, String? alias}) async {
     Map<dynamic, dynamic> bindResult = await methodChannel.invokeMethod(
@@ -236,11 +264,12 @@ class AliyunPush {
     return bindResult;
   }
 
-  ///移除标签
+  /// 移除标签
   ///
   /// @param tags     标签名
   /// @param target   目标类型，1: 本设备  2: 本设备绑定账号  3: 别名
   /// @param alias    别名（仅当target = 3时生效）
+  @Deprecated('不再建议使用，请使用 unbindDeviceTag')
   Future<Map<dynamic, dynamic>> unbindTag(List<String> tags,
       {int target = kAliyunTargetDevice, String? alias}) async {
     Map<dynamic, dynamic> unbindResult = await methodChannel.invokeMethod(
@@ -251,6 +280,7 @@ class AliyunPush {
   /// 查询标签列表
   ///
   /// @param target   目标类型，1: 本设备
+  @Deprecated('不再建议使用，请使用 listDeviceTags')
   Future<Map<dynamic, dynamic>> listTags(
       {int target = kAliyunTargetDevice}) async {
     Map<dynamic, dynamic> listResult =

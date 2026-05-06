@@ -1,3 +1,12 @@
+## 1.2.0
+
+* 新增设备标签标准接口：`bindDeviceTag`、`unbindDeviceTag`、`listDeviceTags`
+* 废弃旧标签接口 `bindTag`、`unbindTag`、`listTags`，不再建议使用账号和别名维度标签操作
+* 废弃标签目标类型常量 `kAliyunTargetAccount`、`kAliyunTargetAlias`
+* iOS 依赖 AlicloudPush 最低版本升级至 3.2.4
+  - AlicloudUTDID 1.6.1.1 — 修复 OpenUDID 导致的 App Store 审核拒绝问题
+  - AlicloudELS 1.0.4 — 解决 iOS 编译告警和 compact unwind 问题
+
 ## 1.1.4
 
 * 新增`setIOSForegroundNoticeMode`方法，支持iOS前台通知三种处理模式：

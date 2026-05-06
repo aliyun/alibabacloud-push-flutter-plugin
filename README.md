@@ -447,19 +447,17 @@ _pushPlugin.listAlias(account).then((result) {
 });
 ```
 
-#### `bindTag`
+#### `bindDeviceTag`
 
-`Future<Map<dynamic, dynamic>> bindTag(List<String> tags,{int target = kAliyunTargetDevice, String? alias}) async`
+`Future<Map<dynamic, dynamic>> bindDeviceTag(List<String> tags) async`
 
-添加标签
-  
+绑定设备标签
+
 参数:
 
 | 参数名 | 类型 | 是否必须 | 含义 |
 | --- | --- | ---| --- |
 | tags | List\<String> | 必须参数 |  要绑定的标签列表 |
-| target | int | 可选参数 |  目标类型，1: 本设备  2: 本设备绑定账号  3: 别名</br>默认是1 |
-| alias | String| 可选参数 | 别名（仅当target = 3时生效）
 
 返回值：
 
@@ -473,7 +471,7 @@ map中包含两个key值:
 代码实例:
 
 ```dart
-_pushPlugin.bindTag(tags).then((result) {
+_pushPlugin.bindDeviceTag(tags).then((result) {
     var code = result['code'];
     if (code == kAliyunPushSuccessCode) {             
     } else {
@@ -481,19 +479,17 @@ _pushPlugin.bindTag(tags).then((result) {
 });
 ```
 
-#### `unbindTag`
+#### `unbindDeviceTag`
 
-`Future<Map<dynamic, dynamic>> unbindTag(List<String> tags, {int target = kAliyunTargetDevice, String? alias}) async`
+`Future<Map<dynamic, dynamic>> unbindDeviceTag(List<String> tags) async`
 
-移除标签
+解绑设备标签
 
 参数:
 
 | 参数名 | 类型 | 是否必须 | 含义 |
 | --- | --- | ---| --- |
 | tags | List\<String\> | 必须参数 |  要移除的标签列表 |
-| target | int | 可选参数 |  目标类型，1: 本设备  2: 本设备绑定账号  3: 别名</br>默认是1 |
-| alias | String| 可选参数 | 别名（仅当target = 3时生效）
 
 返回值：
 
@@ -507,7 +503,7 @@ map中包含两个key值:
 代码实例:
 
 ```dart
-_pushPlugin.unbindTag(tags).then((result) {
+_pushPlugin.unbindDeviceTag(tags).then((result) {
     var code = result['code'];
     if (code == kAliyunPushSuccessCode) {             
     } else {
@@ -515,11 +511,11 @@ _pushPlugin.unbindTag(tags).then((result) {
 });
 ```
 
-#### `listTags`
+#### `listDeviceTags`
 
-`Future<Map<dynamic, dynamic>> listTags`
+`Future<Map<dynamic, dynamic>> listDeviceTags() async`
 
-查询标签列表
+查询设备标签列表
 
 返回值：
 
@@ -534,10 +530,10 @@ map中包含三个key值:
 代码示例：
 
 ```dart
- _pushPlugin.listTags(account).then((result) {
+_pushPlugin.listDeviceTags().then((result) {
     var code = result['code'];
     if (code == kAliyunPushSuccessCode) {      
-        var tagsList = listTagsResult['tagsList'];      
+        var tagsList = result['tagsList'];      
     } else {
     }
 });
@@ -1100,12 +1096,6 @@ _aliyunPush.addMessageReceiver(
 | kAliyunPushNotSupport | "10005" | 平台不支持，比如Android创建group只支持Android 8.0以上版本|
 
 > 详细的原生SDK错误码请参考阿里云文档：[Android](https://help.aliyun.com/document_detail/434686.html), [iOS](https://help.aliyun.com/document_detail/434705.html)
-
-#### 标签目标类型
-
-- `kAliyunTargetDevice = 1`: 设备目标。
-- `kAliyunTargetAccount = 2`: 账户目标。
-- `kAliyunTargetAlias = 3`: 别名目标。
 
 #### 类型定义
 

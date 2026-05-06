@@ -16,11 +16,7 @@ class _CommonApiPageState extends BaseState<CommonApiPage> {
   final TextEditingController _addAliasController = TextEditingController();
   final TextEditingController _removeAliasController = TextEditingController();
   final TextEditingController _addTagController = TextEditingController();
-  final TextEditingController _addAccountTagController =
-      TextEditingController();
   final TextEditingController _removeTagController = TextEditingController();
-  final TextEditingController _removeAccountTagController =
-      TextEditingController();
 
   String _boundAccount = "";
 
@@ -70,7 +66,7 @@ class _CommonApiPageState extends BaseState<CommonApiPage> {
     children.add(ElevatedButton(
         onPressed: () {
           _pushPlugin
-              .listTags(target: kAliyunTargetDevice)
+              .listDeviceTags()
               .then((listTagsResult) {
             var code = listTagsResult['code'];
             if (code == kAliyunPushSuccessCode) {
@@ -84,22 +80,6 @@ class _CommonApiPageState extends BaseState<CommonApiPage> {
           });
         },
         child: const Text('查询设备标签列表')));
-    children.add(Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: ListTile(
-        title: const Text(
-          '账号标签添加/删除',
-          style: TextStyle(color: Colors.white),
-        ),
-        tileColor: Colors.grey.shade400,
-        trailing: const Icon(
-          Icons.keyboard_arrow_down,
-          color: Colors.white,
-        ),
-      ),
-    ));
-    _addBindAccountTagView(children);
-    _addUnbindAccountTagView(children);
 
     return Scaffold(
         appBar: AppBar(
@@ -297,7 +277,7 @@ class _CommonApiPageState extends BaseState<CommonApiPage> {
             if (tag != '') {
               var tags = <String>[];
               tags.add(tag);
-              _pushPlugin.bindTag(tags).then((bindTagResult) {
+              _pushPlugin.bindDeviceTag(tags).then((bindTagResult) {
                 var code = bindTagResult['code'];
                 if (code == kAliyunPushSuccessCode) {
                   showOkDialog('添加标签$tag成功');
@@ -338,7 +318,7 @@ class _CommonApiPageState extends BaseState<CommonApiPage> {
             if (tag != '') {
               var tags = <String>[];
               tags.add(tag);
-              _pushPlugin.unbindTag(tags).then((bindTagResult) {
+              _pushPlugin.unbindDeviceTag(tags).then((bindTagResult) {
                 var code = bindTagResult['code'];
                 if (code == kAliyunPushSuccessCode) {
                   showOkDialog('删除标签$tag成功');
@@ -357,87 +337,4 @@ class _CommonApiPageState extends BaseState<CommonApiPage> {
     ));
   }
 
-  _addBindAccountTagView(List<Widget> children) {
-    children.add(
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-        child: TextField(
-          autofocus: false,
-          decoration: const InputDecoration(
-            labelText: "给账号添加的标签",
-            hintText: "给账号添加的标签",
-          ),
-          controller: _addAccountTagController,
-        ),
-      ),
-    );
-    children.add(Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      child: ElevatedButton(
-          onPressed: () {
-            var tag = _addAccountTagController.text;
-            if (tag != '') {
-              var tags = <String>[];
-              tags.add(tag);
-              _pushPlugin
-                  .bindTag(tags, target: kAliyunTargetAccount)
-                  .then((bindTagResult) {
-                var code = bindTagResult['code'];
-                if (code == kAliyunPushSuccessCode) {
-                  showOkDialog('添加标签$tag成功');
-                  _addAccountTagController.clear();
-                } else {
-                  var errorCode = bindTagResult['code'];
-                  var errorMsg = bindTagResult['errorMsg'];
-                  showErrorDialog('添加标签$tag失败, $errorCode - $errorMsg');
-                }
-              });
-            } else {
-              showWarningDialog('请输入要添加的标签');
-            }
-          },
-          child: const Text('给账号添加标签')),
-    ));
-  }
-
-  _addUnbindAccountTagView(List<Widget> children) {
-    children.add(Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      child: TextField(
-        autofocus: false,
-        decoration: const InputDecoration(
-          labelText: "删除的账号标签",
-          hintText: "删除的账号标签",
-        ),
-        controller: _removeAccountTagController,
-      ),
-    ));
-    children.add(Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      child: ElevatedButton(
-          onPressed: () {
-            var tag = _removeAccountTagController.text;
-            if (tag != '') {
-              var tags = <String>[];
-              tags.add(tag);
-              _pushPlugin
-                  .unbindTag(tags, target: kAliyunTargetAccount)
-                  .then((bindTagResult) {
-                var code = bindTagResult['code'];
-                if (code == kAliyunPushSuccessCode) {
-                  showOkDialog('删除标签$tag成功');
-                  _removeAccountTagController.clear();
-                } else {
-                  var errorCode = bindTagResult['code'];
-                  var errorMsg = bindTagResult['errorMsg'];
-                  showErrorDialog('删除标签$tag失败, $errorCode - $errorMsg');
-                }
-              });
-            } else {
-              showWarningDialog('请输入要删除的标签');
-            }
-          },
-          child: const Text('删除账号标签')),
-    ));
-  }
 }
