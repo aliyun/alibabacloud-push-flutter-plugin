@@ -1,49 +1,41 @@
-## 0.0.1
+## 1.1.4
 
-* 集成Android推送 3.8.2版本，iOS推送1.9.9.7版本
-  
-## 0.0.2
+* 新增`setIOSForegroundNoticeMode`方法，支持iOS前台通知三种处理模式：
+  - `ForegroundNoticeMode.callbackOnly`：仅触发回调，不展示通知
+  - `ForegroundNoticeMode.showOnly`：仅展示通知，不触发回调
+  - `ForegroundNoticeMode.showAndCallback`：展示通知且触发回调
+* `showIOSNoticeWhenForeground`方法标记为废弃，建议使用`setIOSForegroundNoticeMode`
 
-* 更新LICENSE
+## 1.0.4
 
-## 0.0.3
+* 修复extraMap数据在`onNotification`和`onNotificationOpened`中回调格式不一致问题
 
-* 内部代码优化
+## 1.0.3
 
-## 0.0.4
+* 新增Android角标设置功能，添加`setAndroidBadgeNum(int num)`接口，支持设置Android应用角标数量
+* 适配Android 16KB内存页面大小
 
-* README优化
-* 代码优化
-* 增加控制插件日志是否开启的API
+## 1.0.2
 
-## 0.0.5
+* 修复compileSdkVersion过低导致的resource android:attr/lStar not found错误
 
-* 修复Android创建Channel时desc字段key值不一致问题
+## 1.0.1
 
-## 0.0.6 
+* 修改compileSdkVersion和minSdkVersion，提高插件兼容性
 
-* android代码增加保护机制
+## 1.0.0
 
-## 0.0.7
+* 修复onNotification回调，Android端通知缺少title和summary字段的问题
 
-* ios初始化时增加网络判断
+## 1.0.0-beta.1
 
-## 0.0.8
+* 升级iOS端SDK版本
+* 更新部分api
 
-* Android升级到3.8.5版本
+## 0.1.8
 
-## 0.0.9
-
-* 优化代码
-
-## 0.1.0
-
-* Android升级到3.8.6版本
-
-## 0.1.1 
-
-* 回调参数类型转换错误修复
-* Android 小米通道升级至3.8.6.1版本
+* 修复iOS可能出现的崩溃问题
+* 修复iOS demo运行失败问题
 
 ## 0.1.7
 
@@ -52,41 +44,49 @@
 * 去除初始化过程中调用turnOnPushChannel()导致控制台输出获取不到deviceId的问题
 * 去除example中dropdown_button2依赖,改为通过弹出的方式设置logLevel
 
-## 0.1.8
+## 0.1.1 
 
-* 修复iOS可能出现的崩溃问题
-* 修复iOS demo运行失败问题
+* 回调参数类型转换错误修复
+* Android 小米通道升级至3.8.6.1版本
 
-## 1.0.0-beta.1
+## 0.1.0
 
-* 升级iOS端SDK版本
-* 更新部分api
+* Android升级到3.8.6版本
 
-## 1.0.0
+## 0.0.9
 
-* 修复onNotification回调，Android端通知缺少title和summary字段的问题
+* 优化代码
 
-## 1.0.1
+## 0.0.8
 
-* 修改compileSdkVersion和minSdkVersion，提高插件兼容性
+* Android升级到3.8.5版本
 
-## 1.0.2
+## 0.0.7
 
-* 修复compileSdkVersion过低导致的resource android:attr/lStar not found错误
+* ios初始化时增加网络判断
 
-## 1.0.3
+## 0.0.6 
 
-* 新增Android角标设置功能，添加`setAndroidBadgeNum(int num)`接口，支持设置Android应用角标数量
-* 适配Android 16KB内存页面大小
+* android代码增加保护机制
 
-## 1.0.4
+## 0.0.5
 
-* 修复extraMap数据在`onNotification`和`onNotificationOpened`中回调格式不一致问题
+* 修复Android创建Channel时desc字段key值不一致问题
 
-## 1.1.4
+## 0.0.4
 
-* 新增`setIOSForegroundNoticeMode`方法，支持iOS前台通知三种处理模式：
-  - `ForegroundNoticeMode.callbackOnly`：仅触发回调，不展示通知
-  - `ForegroundNoticeMode.showOnly`：仅展示通知，不触发回调
-  - `ForegroundNoticeMode.showAndCallback`：展示通知且触发回调
-* `showIOSNoticeWhenForeground`方法标记为废弃，建议使用`setIOSForegroundNoticeMode`
+* README优化
+* 代码优化
+* 增加控制插件日志是否开启的API
+
+## 0.0.3
+
+* 内部代码优化
+
+## 0.0.2
+
+* 更新LICENSE
+
+## 0.0.1
+
+* 集成Android推送 3.8.2版本，iOS推送1.9.9.7版本
